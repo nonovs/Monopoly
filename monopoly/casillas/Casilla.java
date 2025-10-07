@@ -1,5 +1,6 @@
-package monopoly;
+package monopoly.casillas;
 
+import monopoly.Grupo;
 import partida.*;
 import java.util.ArrayList;
 

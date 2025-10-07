@@ -1,10 +1,10 @@
 package monopoly;
-
+import monopoly.casillas.Casilla;
 import partida.*;
 import java.util.ArrayList;
 
 
-class Grupo {
+public class Grupo {
 
     //Atributos
     private ArrayList<Casilla> miembros; //Casillas miembros del grupo.
@@ -37,7 +37,8 @@ class Grupo {
     * Parámetro: jugador que se quiere evaluar.
     * Valor devuelto: true si es dueño de todas las casillas del grupo, false en otro caso.
      */
-    public boolean esDuenhoGrupo(Jugador jugador) {
-    }
+    //public boolean esDuenhoGrupo(Jugador jugador) {
+
+    //}
 
 }
