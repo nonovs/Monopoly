@@ -5,14 +5,13 @@ import partida.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
 public class Tablero {
-    //Atributos.
-    private ArrayList<ArrayList<Casilla>> posiciones; //Posiciones del tablero: se define como un arraylist de arraylists de casillas (uno por cada lado del tablero).
-    private HashMap<String, Grupo> grupos; //Grupos del tablero, almacenados como un HashMap con clave String (será el color del grupo).
-    private Jugador banca; //Un jugador que será la banca.
+    // Atributos
+    private ArrayList<ArrayList<Casilla>> posiciones; // 4 lados del tablero
+    private HashMap<String, Grupo> grupos; // Grupos por color
+    private Jugador banca;
 
-    //Constructor: únicamente le pasamos el jugador banca (que se creará desde el menú).
+    // Constructor
     public Tablero(Jugador banca) {
         this.banca = banca;
         this.grupos = new HashMap<>();
@@ -20,88 +19,100 @@ public class Tablero {
         generarCasillas();
     }
 
-    
-    //Método para crear todas las casillas del tablero. Formado a su vez por cuatro métodos (1/lado).
+    // Genera las casillas del tablero
     private void generarCasillas() {
         this.insertarLadoSur();
         this.insertarLadoOeste();
         this.insertarLadoNorte();
         this.insertarLadoEste();
     }
-    
-    //Método para insertar las casillas del lado norte.
-    private void insertarLadoNorte() {
-        ArrayList<Casilla> ladoNorte = new ArrayList<>();
-        //ladoNorte.add(new Especial())
-    }
 
-    //Método para insertar las casillas del lado sur.
+    // Lado Sur
     private void insertarLadoSur() {
         ArrayList<Casilla> ladoSur = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            // Ejemplo: colores alternos según posición
+            String color = (i % 2 == 0) ? Valor.RED : Valor.GREEN;
+            ladoSur.add(new Casilla(color + "Sur " + i + Valor.RESET));
+        }
+        posiciones.add(ladoSur);
     }
 
-    //Método que inserta casillas del lado oeste.
+    // Lado Oeste
     private void insertarLadoOeste() {
         ArrayList<Casilla> ladoOeste = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            String color = (i % 2 == 0) ? Valor.BLUE : Valor.YELLOW;
+            ladoOeste.add(new Casilla(color + "Oeste " + i + Valor.RESET));
+        }
+        posiciones.add(ladoOeste);
     }
 
-    //Método que inserta las casillas del lado este.
+    // Lado Norte
+    private void insertarLadoNorte() {
+        ArrayList<Casilla> ladoNorte = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            String color = (i % 2 == 0) ? Valor.CYAN : Valor.PURPLE;
+            ladoNorte.add(new Casilla(color + "Norte " + i + Valor.RESET));
+        }
+        posiciones.add(ladoNorte);
+    }
+
+    // Lado Este
     private void insertarLadoEste() {
         ArrayList<Casilla> ladoEste = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            String color = (i % 2 == 0) ? Valor.BLACK : Valor.WHITE;
+            ladoEste.add(new Casilla(color + "Este " + i + Valor.RESET));
+        }
+        posiciones.add(ladoEste);
     }
 
-    //Para imprimir el tablero, modificamos el método toString().
+    // Imprime el tablero
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        //Imprime sur (de izquierda a derecha)
-        for (Casilla c: posiciones.get(0)) {
-            sb.append(String.format("|%-10s", c.getNombre()));
-            sb.append("|\n");
+
+        // Sur (izquierda a derecha)
+        for (Casilla c : posiciones.get(0)) {
+            sb.append(String.format("|%-15s", c.getNombre()));
         }
-        for (int i=1;i<9;i++){
-            sb.append(String.format("|%-10s",posiciones.get(1).get(9-i).getNombre()));//Oeste de abaixo arriba
-            for (int j=0;j<8;j++){
-                sb.append("     ");
-                sb.append(String.format("|%-10s",posiciones.get(3).get(i).getNombre()));//este de arriba abajo
+        sb.append("\n");
+
+        // Lados Este/Oeste (centro del tablero)
+        for (int i = 1; i < 9; i++) {
+            sb.append(String.format("|%-15s", posiciones.get(1).get(9 - i).getNombre())); // Oeste arriba-abajo
+            for (int j = 0; j < 8; j++) {
+                sb.append(String.format("%-15s", " ")); // Espacio central
             }
+            sb.append(String.format("|%-15s", posiciones.get(3).get(i).getNombre())); // Este arriba-abajo
+            sb.append("\n");
         }
-        for (int i=9; i>=0;i--){
-            sb.append(String.format("|%-10s",posiciones.get(2).get(i).getNombre()));
-            sb.append("|\n");
+
+        // Norte (derecha a izquierda)
+        for (int i = 9; i >= 0; i--) {
+            sb.append(String.format("|%-15s", posiciones.get(2).get(i).getNombre()));
         }
+        sb.append("\n");
+
         return sb.toString();
     }
-    // Metodo que me devolve a casilla por posicion
-    public Casilla getCasilla(int posicion){
-        if (posicion >= 0 && posicion < 40){
-            return this.posiciones.get(posicion/10).get(posicion%10);// Posicion/10 indica que ala del tablero usar 0-9 son el sur etc
-        }//%10 indica la posicion dentro de ese lado
-        else return null;
+
+    // Devuelve casilla por posición global (0-39)
+    public Casilla getCasilla(int posicion) {
+        if (posicion < 0 || posicion >= 40) return null;
+        int lado = posicion / 10;
+        int indice = posicion % 10;
+        return posiciones.get(lado).get(indice);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     //Método usado para buscar la casilla con el nombre pasado como argumento:
-    public Casilla encontrar_casilla(String nombre){
-        int i;
-        for (i=0;i<40;i++){
-            if(getCasilla(i).getNombre().equals(nombre)){
+    public Casilla encontrar_casilla(String nombre) {
+        for (int i = 0; i < 40; i++) {
+            if (getCasilla(i).getNombre().equals(nombre)) {
                 return getCasilla(i);
             }
         }
-        return  null;
+        return null;
     }
 }

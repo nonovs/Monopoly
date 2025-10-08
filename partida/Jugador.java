@@ -17,6 +17,12 @@ public class Jugador {
     private int vueltas; //Cuenta las vueltas dadas al tablero.
     private ArrayList<Casilla> propiedades; //Propiedades que posee el jugador.
 
+    //Atributos definidos por mi
+    private int posicion;
+    private int turnosEnCarcel;
+    private ArrayList<Casilla> hipotecadas;
+
+
     //Constructor vacío. Se usará para crear la banca.
     public Jugador() {
     }
@@ -53,4 +59,30 @@ public class Jugador {
     public void encarcelar(ArrayList<ArrayList<Casilla>> pos) {
     }
 
+    public void pagar(float cantidad){
+        fortuna -= cantidad;
+    }
+
+    public float getFortuna(){
+        return fortuna;
+    }
+
+    public void recibir(float cantidad){
+        fortuna += cantidad;
+    }
+
+    public void enviarACarcel(){
+        this.enCarcel = true;
+        this.posicion = 10;
+        this.turnosEnCarcel = 0;
+        System.out.println(nombre + "Jugador enviando ACarcel");
+    }
+
+    public String getNombre(){
+        return nombre;
+    }
+
+    public boolean tieneHipoteca(Casilla c){
+        return hipotecadas.contains(c);
+    }
 }

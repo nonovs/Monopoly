@@ -1,5 +1,5 @@
 package monopoly;
-import monopoly.casillas.Casilla;
+import monopoly.casillas.*;
 import partida.*;
 import java.util.ArrayList;
 
@@ -10,6 +10,13 @@ public class Grupo {
     private ArrayList<Casilla> miembros; //Casillas miembros del grupo.
     private String colorGrupo; //Color del grupo
     private int numCasillas; //Número de casillas del grupo.
+
+    //Atributos
+    private float alquilerCasa;
+    private float alquilerHotel;
+    private float alquilerPiscina;
+    private float alquilerPista;
+    private ArrayList<Solar> solares;
 
     //Constructor vacío.
     public Grupo() {
