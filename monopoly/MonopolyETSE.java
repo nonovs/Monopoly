@@ -1,6 +1,6 @@
 package monopoly;
 
-import partida.Jugador;
+import partida.Jugador;//a
 
 import java.util.jar.JarEntry;
 
