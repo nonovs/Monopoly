@@ -93,4 +93,58 @@ private static  void procesarComando(String linea,Tablero tablero){
             }
     }
 
+
+    /*case "lanzar":
+                if (partes.length >= 2 && partes[1].equalsIgnoreCase("dados")) {
+                    if (partes.length == 2) {
+                        tablero.lanzarDados(); // aleatorio
+                    } else {
+                        // lanzar dados con valor forzado, ej: "lanzar dados 2+4"
+                        String[] valores = partes[2].split("\\+");
+                        int dado1 = Integer.parseInt(valores[0]);
+                        int dado2 = Integer.parseInt(valores[1]);
+                        tablero.lanzarDados(dado1, dado2);
+                    }
+                }
+                break;
+
+            case "acabar":
+                if (partes.length >= 2 && partes[1].equalsIgnoreCase("turno")) {
+                    tablero.acabarTurno();
+                }
+                break;
+
+            case "salir":
+                if (partes.length >= 2 && (partes[1].equalsIgnoreCase("cárcel") || partes[1].equalsIgnoreCase("carcel"))) {
+                    tablero.salirCarcel();
+                }
+                break;
+
+            case "describir":
+                if (partes.length >= 2) {
+                    if (partes[1].equalsIgnoreCase("jugador") && partes.length >= 3) {
+                        tablero.describirJugador(partes[2]);
+                    } else {
+                        tablero.describirCasilla(partes[1]);
+                    }
+                }
+                break;
+
+            case "comprar":
+                if (partes.length >= 2) {
+                    tablero.comprar(partes[1]);
+                }
+                break;
+
+            case "ver":
+                if (partes.length >= 2 && partes[1].equalsIgnoreCase("tablero")) {
+                    System.out.println(tablero);
+                }
+                break;
+
+            default:
+                System.out.println("Comando no reconocido: " + linea);
+        }
+    }
+}*/
 }
