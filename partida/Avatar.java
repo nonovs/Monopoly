@@ -87,7 +87,7 @@ public class Avatar {
             this.jugador.setPosicion(nuevaPosicion); //ACABAR CLASE JUGADOR
         }
 
-        table
+
     }
 
     /*Método que permite generar un ID para un avatar. Sólo lo usamos en esta clase (por ello es privado).
