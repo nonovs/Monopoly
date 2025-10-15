@@ -29,7 +29,7 @@ public class Avatar {
         generarId(avCreados);
         avCreados.add(this);
 
-    } //HOLAA
+    }
 
     public String getId() {
         return id;

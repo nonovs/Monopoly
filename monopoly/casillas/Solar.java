@@ -77,7 +77,7 @@ public class Solar extends Casilla {
         if (pistaDeporte) total += grupo.getAlquilerPista();
 
         // Doble alquiler si el grupo está completo y no hay edificios
-        if (grupo.esPropiedadCompleta(getDuenho()) && casas == 0 && !hotel && !piscina && !pistaDeporte) {
+        if (grupo.esDuenhoGrupo(getDuenho()) && casas == 0 && !hotel && !piscina && !pistaDeporte) {
             total *= 2;
         }
 
@@ -86,7 +86,7 @@ public class Solar extends Casilla {
 
     // Métodos para construir edificios
     public boolean construirCasa() {
-        if (casas < 4 && !hotel && grupo.esPropiedadCompleta(getDuenho())) {
+        if (casas < 4 && !hotel && grupo.esDuenhoGrupo(getDuenho())) {
             casas++;
             return true;
         }
