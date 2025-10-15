@@ -85,4 +85,8 @@ public class Jugador {
     public boolean tieneHipoteca(Casilla c){
         return hipotecadas.contains(c);
     }
+
+    public void setAvatar(Avatar nuevoAvatar) {
+        this.avatar = nuevoAvatar;
+    }
 }

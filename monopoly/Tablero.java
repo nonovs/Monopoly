@@ -115,4 +115,9 @@ public class Tablero {
         }
         return null;
     }
+
+
+    public void mostrarTablero() {
+        System.out.println(this.toString());
+    }
 }
