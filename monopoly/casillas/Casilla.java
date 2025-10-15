@@ -119,7 +119,7 @@ public class Casilla {
     public float getValor() { return valor; }
     public void setValor(float valor){ this.valor = valor; }
     public int getPosicion() { return posicion; }
-    public int setPosicion(int posicion) {this.posicion=posicon;}
+    public int setPosicion(int posicion) {this.posicion=posicion;}
     public Jugador getDuenho() { return duenho; }
     public void setDuenho(Jugador j) { this.duenho = j; }
     public Grupo getGrupo() { return grupo; }

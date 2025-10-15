@@ -111,17 +111,14 @@ public class Jugador {
     }
 
     public void enviarACarcel(){
+        this.avatar.getLugar().eliminarAvatar(this.avatar);
+        this.avatar.setLugar(carcel);
+
         this.enCarcel = true;
         this.posicion = 10;
-        this.turnosEnCarcel = 0;
+        this.turnosEnCarcel +=1;
         System.out.println(nombre + "  enviando a la Carcel");
-        if(avatar!=null){
-            this.posicion=10;
-            Casilla lugar = new Casilla();
-
-            lugar.setPosicion(posicion);
-            avatar.setLugar(lugar);
-        }
+        this.avatar.getLugar().anhadirAvatar(this.avatar);
     }
     public void salirDeCarcel(){
         this.enCarcel = false;
@@ -136,8 +133,108 @@ public class Jugador {
     public boolean tieneHipoteca(Casilla c){
         return hipotecadas.contains(c);
     }
+    public void hipotecarPropiedad(Casilla c){
+        if(propiedades.contains(c)){
+            hipotecadas.add(c);
+            this.fortuna+=c.getHipoteca();
+            System.out.println(nombre + "  ha hipotecado " + c.getNombre() + "por " +c.getHipoteca());
+        }
+    }
+
+    public void deshipotecarPropiedad(Casilla c){
+        if(propiedades.contains(c)){
+            hipotecadas.remove(c);
+            this.fortuna-=c.getHipoteca();
+            System.out.println(nombre + "  deshipotecado " + c.getNombre() + "por " +c.getHipoteca());
+        }
+    }
 
     public void setAvatar(Avatar nuevoAvatar) {
         this.avatar = nuevoAvatar;
+
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public Avatar getAvatar() {
+        return avatar;
+    }
+
+    public void setFortuna(float fortuna) {
+        this.fortuna = fortuna;
+    }
+
+    public float getGastos() {
+        return gastos;
+    }
+
+    public void setGastos(float gastos) {
+        this.gastos = gastos;
+    }
+
+    public boolean isEnCarcel() {
+        return enCarcel;
+    }
+
+    public void setEnCarcel(boolean enCarcel) {
+        this.enCarcel = enCarcel;
+    }
+
+    public int getTiradasCarcel() {
+        return tiradasCarcel;
+    }
+
+    public void setTiradasCarcel(int tiradasCarcel) {
+        this.tiradasCarcel = tiradasCarcel;
+    }
+
+    public int getVueltas() {
+        return vueltas;
+    }
+
+    public void setVueltas(int vueltas) {
+        this.vueltas = vueltas;
+    }
+
+    public ArrayList<Casilla> getPropiedades() {
+        return propiedades;
+    }
+
+    public void setPropiedades(ArrayList<Casilla> propiedades) {
+        this.propiedades = propiedades;
+    }
+
+    public int getPosicion() {
+        return posicion;
+    }
+
+    public void setPosicion(int posicion) {
+        this.posicion = posicion;
+    }
+
+    public int getTurnosEnCarcel() {
+        return turnosEnCarcel;
+    }
+
+    public void setTurnosEnCarcel(int turnosEnCarcel) {
+        this.turnosEnCarcel = turnosEnCarcel;
+    }
+
+    public ArrayList<Casilla> getHipotecadas() {
+        return hipotecadas;
+    }
+
+    public void setHipotecadas(ArrayList<Casilla> hipotecadas) {
+        this.hipotecadas = hipotecadas;
+    }
+
+    public Object getCasilla() {
+        return casilla;
+    }
+
+    public void setCasilla(Object casilla) {
+        this.casilla = casilla;
     }
 }
