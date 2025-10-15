@@ -3,7 +3,7 @@ package monopoly.casillas;
 import partida.*;
 import java.util.ArrayList;
 
-public class Servicios extends Casilla {
+public class fServicios extends Casilla {
 
     private final float valor;
     private final float factorServicio = 50000; // Valor fijo según el guión
