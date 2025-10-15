@@ -62,6 +62,7 @@ public class Avatar {
     public void setLugar(Casilla lugar) {
         this.lugar = lugar;
     }
+    //adffa
 
     //A continuación, tenemos otros métodos útiles para el desarrollo del juego.
     /*Método que permite mover a un avatar a una casilla concreta. Parámetros:
