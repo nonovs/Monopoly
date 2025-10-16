@@ -1,9 +1,9 @@
 package monopoly.casillas;
-
+import monopoly.Tablero;
 import partida.*;
 
 public class Especial extends Casilla {
-
+    public Tablero tablero;
     // Constructor
     public Especial(String nombre, int posicion, Jugador duenho) {
         super(nombre, "Especial", posicion, duenho);
@@ -13,7 +13,7 @@ public class Especial extends Casilla {
     public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {
         switch (getNombre()) {
             case "Ir a la cárcel":
-                actual.enviarACarcel(); // Método que deberías tener en Jugador
+                actual.enviarACarcel(tablero.getCasilla(10)); // Método que deberías tener en Jugador
                 System.out.println(actual.getNombre() + " ha sido enviado a la cárcel.");
                 return true;
 

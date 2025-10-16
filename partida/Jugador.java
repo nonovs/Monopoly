@@ -21,7 +21,7 @@ public class Jugador {
     private int posicion;
     private int turnosEnCarcel;
     private ArrayList<Casilla> hipotecadas;
-    private Object casilla;
+
 
 
     //Constructor vacío. Se usará para crear la banca.
@@ -32,9 +32,9 @@ public class Jugador {
         this.tiradasCarcel=0;
         this.vueltas=0;
         this.enCarcel=false;
-        this.propiedades=new ArrayList();
+        this.propiedades=new ArrayList<Casilla>();
         this.posicion=0;
-        this.hipotecadas=new ArrayList();
+        this.hipotecadas=new ArrayList<Casilla>();
         this.turnosEnCarcel=0;
         this.avatar=null;
 
@@ -52,8 +52,8 @@ public class Jugador {
         this.tiradasCarcel=0;
         this.enCarcel=false;
         this.vueltas=0;
-        this.propiedades=new ArrayList();
-        this.hipotecadas=new ArrayList();
+        this.propiedades=new ArrayList<Casilla>();
+        this.hipotecadas=new ArrayList<Casilla>();
         this.posicion= inicio != null ? inicio.getPosicion() : 0;
         this.turnosEnCarcel=0;
         this.avatar=null;
@@ -110,21 +110,23 @@ public class Jugador {
         sumarFortuna(cantidad);
     }
 
-    public void enviarACarcel(){
-        this.avatar.getLugar().eliminarAvatar(this.avatar);
-        this.avatar.setLugar(carcel);
-
-        this.enCarcel = true;
-        this.posicion = 10;
-        this.turnosEnCarcel +=1;
-        System.out.println(nombre + "  enviando a la Carcel");
-        this.avatar.getLugar().anhadirAvatar(this.avatar);
+    public void enviarACarcel(Casilla casillaCarcel){
+        if (this.avatar != null && this.avatar.getLugar()!=null ) {
+            this.avatar.getLugar().eliminarAvatar(this.avatar);
+        }//Quito o avatar da casilla actual
+        //Ahora movo a casilla de carcel
+        this.avatar.setLugar(casillaCarcel);
+        casillaCarcel.anhadirAvatar(this.avatar);
+        this.enCarcel=true;
+        this.posicion=casillaCarcel.getPosicion();
+        this.turnosEnCarcel+=1;
+        System.out.println(nombre + " ha sido enviado a carcel");
     }
     public void salirDeCarcel(){
         this.enCarcel = false;
         this.turnosEnCarcel = 0;
         this.tiradasCarcel=0;
-        System.out.println(nombre + "  saliando a la Carcel");
+        System.out.println(nombre + "  sale de la Carcel");
     }
     public String getNombre(){
         return nombre;
@@ -142,7 +144,7 @@ public class Jugador {
     }
 
     public void deshipotecarPropiedad(Casilla c){
-        if(propiedades.contains(c)){
+        if(hipotecadas.contains(c)){
             hipotecadas.remove(c);
             this.fortuna-=c.getHipoteca();
             System.out.println(nombre + "  deshipotecado " + c.getNombre() + "por " +c.getHipoteca());
@@ -230,11 +232,5 @@ public class Jugador {
         this.hipotecadas = hipotecadas;
     }
 
-    public Object getCasilla() {
-        return casilla;
-    }
 
-    public void setCasilla(Object casilla) {
-        this.casilla = casilla;
-    }
 }
