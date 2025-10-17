@@ -21,7 +21,7 @@ public class Casilla {
     //Constructores:
     public Casilla() {
         this.avatares = new ArrayList<>();
-    }//Parámetros vacíos
+    }
 
     /*Constructor para casillas tipo Solar, Servicios o Transporte:
     * Parámetros: nombre casilla, tipo (debe ser solar, serv. o transporte), posición en el tablero, valor y dueño.
@@ -119,7 +119,7 @@ public class Casilla {
     public float getValor() { return valor; }
     public void setValor(float valor){ this.valor = valor; }
     public int getPosicion() { return posicion; }
-    public int setPosicion(int posicion) {this.posicion=posicion;}
+    public int setPosicion(int posicion) {return this.posicion=posicion;}
     public Jugador getDuenho() { return duenho; }
     public void setDuenho(Jugador j) { this.duenho = j; }
     public Grupo getGrupo() { return grupo; }

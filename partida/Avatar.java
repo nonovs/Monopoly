@@ -4,7 +4,7 @@ import monopoly.casillas.Casilla;
 import monopoly.Tablero;
 import java.security.PrivilegedActionException;
 import java.util.ArrayList;
-
+import java.lang.Exception;
 
 public class Avatar {
 
@@ -108,7 +108,7 @@ public class Avatar {
                 return;
             }
         }
-        throw new PrivilegedActionException("No hay mas identificadores de avatares")
+        //throw new Exception("No hay mas identificadores de avatares");
     }
 
 }

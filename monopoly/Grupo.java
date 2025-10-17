@@ -28,10 +28,12 @@ public class Grupo {
     * Requiere como parámetros las dos casillas miembro y el color del grupo.
      */
     public Grupo(Casilla cas1, Casilla cas2, String colorGrupo) {
-        this();
+        this.miembros = new ArrayList<>();
+        this.solares = new ArrayList<>();
+    
         this.colorGrupo = colorGrupo;
-        miembros.add(cas1);
-        miembros.add(cas2);
+        this.miembros.add(cas1);
+        this.miembros.add(cas2);
         numCasillas = 2;
     }
 
@@ -39,11 +41,13 @@ public class Grupo {
     * Requiere como parámetros las tres casillas miembro y el color del grupo.
      */
     public Grupo(Casilla cas1, Casilla cas2, Casilla cas3, String colorGrupo) {
-        this();
-        this.colorGrupo = colorGrupo;
-        miembros.add(cas1);
-        miembros.add(cas2);
-        miembros.add(cas3);
+        
+        this.miembros = new ArrayList<>();
+        this.solares = new ArrayList<>();
+        this.colorGrupo = colorGrupo; 
+        this.miembros.add(cas1);
+        this.miembros.add(cas2);
+        this.miembros.add(cas3);
         numCasillas = 3;
     }
 

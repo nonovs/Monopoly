@@ -150,7 +150,7 @@ public class Jugador {
             System.out.println(nombre + "  deshipotecado " + c.getNombre() + "por " +c.getHipoteca());
         }
     }
-
+   
     public void setAvatar(Avatar nuevoAvatar) {
         this.avatar = nuevoAvatar;
 

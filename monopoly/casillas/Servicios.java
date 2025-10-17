@@ -3,16 +3,16 @@ package monopoly.casillas;
 import partida.*;
 import java.util.ArrayList;
 
-public class fServicios extends Casilla {
+public class Servicios extends Casilla {
 
-    private final float valor;
+    private final float valor=0;
     private final float factorServicio = 50000; // Valor fijo según el guión
 
     // Constructor
-    public Servicios(String nombre, int posicion, float valor, Jugador duenho) {
+   /* public Servicios(String nombre, int posicion, float valor, Jugador duenho) {
         super(nombre, "Servicios", posicion, valor, duenho);
         this.valor = valor;
-    }
+    }*/
 
     @Override
     public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {

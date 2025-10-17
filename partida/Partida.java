@@ -15,13 +15,13 @@ public class Partida {
     Casilla salida= tablero.getCasilla(0);
 
     public Partida() {
-        this.banca = new Jugador("Banca", "B"); // Por ejemplo
+        this.banca = new Jugador(); // Por ejemplo
         this.tablero = new Tablero(banca);
         this.jugadores = new ArrayList<>();
         this.turnoActual = 0;
     }
 
-    public void procesarFichero(String fichero) {
+    /*public void procesarFichero(String fichero) {
         try (BufferedReader buffer = new BufferedReader(new FileReader(fichero))) {
             String linea;
             while ((linea = buffer.readLine()) != null) {
@@ -48,8 +48,9 @@ public class Partida {
             }
         }
     }
+    */
 
-    public void procesarComando(String linea) {
+    /*public void procesarComando(String linea) {
         if (linea.isEmpty()) return;
         String[] partes = linea.split(" ");
         switch (partes[0].toLowerCase()) {
@@ -114,7 +115,7 @@ public class Partida {
             default:
                 System.out.println("Comando no reconocido: " + linea);
         }
-    }
+    }*/
 
     // Métodos de juego
     public void crearJugador(String nombre, String tipoavatar) {
@@ -130,6 +131,7 @@ public class Partida {
             System.out.println("No se puede crar otro jugadro, se excede el máximo(4)");
             return;
         }
+        
         Jugador nuevoJugador = new Jugador(nombre,tipoavatar,salida, (ArrayList<Avatar>) avataresCreados);
         //Creo el avatar del jugador
         Avatar nuevoAvatar = new Avatar(tipoavatar,nuevoJugador,salida, (ArrayList<Avatar>) avataresCreados);
@@ -139,12 +141,12 @@ public class Partida {
         tablero.mostrarTablero();
 
     }
-    public String getJugadorActual() { ... }
+    /*public String getJugadorActual() { ... }
     public void listarJugadores() { ... }
     public void lanzarDados() { ... }
     public void lanzarDados(int d1, int d2) { ... }
     public void acabarTurno() { ... }
     public void salirCarcel() { ... }
     public void describirJugador(String nombre) { ... }
-    public void comprar(String nombrePropiedad) { ... }
+    public void comprar(String nombrePropiedad) { ... }*/
 }

@@ -20,17 +20,19 @@ public class Menu {
 
     //CONSTRUCTOR
     public Menu(){
-        this.banca = new Jugador("Banca", "B");
+        this.banca = new Jugador();
         this.tablero = new Tablero(banca);
         this.dado1 = new Dado();
         this.dado2 = new Dado();
     }
 
     // Método para inciar una partida: crea los jugadores y avatares.
-    private void iniciarPartida() {
+    public void iniciarPartida() {
+        
         System.out.println("Bienvenido al Monopoly");
-        System.out.println("Introduce comandos. Escribe 'salir' para temrinar");
-        procesarComandos();
+        mostrarTablero();
+        //System.out.println("Introduce comandos. Escribe 'salir' para temrinar");
+        //procesarComandos();
     }
     /** Bucle principal de lectura de comandos **/
     private void procesarComandos() {
@@ -82,7 +84,7 @@ public class Menu {
 
             case "lanzar":
                 if (partes.length >= 2 && partes[1].equalsIgnoreCase("dados"))
-                    lanzarDados();
+                   // lanzarDados();
                 break;
 
             case "comprar":
@@ -105,6 +107,10 @@ public class Menu {
             default:
                 System.out.println("Comando no reconocido.");
         }
+    }
+
+    private void mostrarTablero(){
+        tablero.mostrarTablero();
     }
 
     private void crearJugador(String nombre, String tipoAvatar) {
@@ -162,7 +168,7 @@ public class Menu {
     * Parámetros: nombre de la casilla a describir.
     */
     private void descCasilla(String nombre) {
-        Casilla c = tablero.buscarCasilla(nombre);
+        Casilla c = tablero.encontrar_casilla(nombre);
         if (c != null)
             System.out.println(c.infoCasilla());
         else
@@ -170,28 +176,28 @@ public class Menu {
     }
 
     //Método que ejecuta todas las acciones relacionadas con el comando 'lanzar dados'.
-    private void lanzarDados() {
+   /* private void lanzarDados() {
         if (jugadores.isEmpty()) {
             System.out.println("No hay jugadores en la partida.");
             return;
         }
 
         Jugador actual = jugadores.get(turno);
-        int d1 = dado1.lanzar();
-        int d2 = dado2.lanzar();
+        int d1 = dado1.tirar();
+        int d2 = dado2.tirar();
         int suma = d1 + d2;
 
         System.out.printf("%s ha sacado %d + %d = %d%n", actual.getNombre(), d1, d2, suma);
-        actual.mover(suma, tablero);
+        actual.mover(suma,tablero);
         tirado = true;
     }
-
+        */
     /*Método que ejecuta todas las acciones realizadas con el comando 'comprar nombre_casilla'.
     * Parámetro: cadena de caracteres con el nombre de la casilla.
      */
     private void comprar(String nombre) {
         Jugador actual = jugadores.get(turno);
-        Casilla cas = tablero.buscarCasilla(nombre);
+        Casilla cas = tablero.encontrar_casilla(nombre);
         if (cas != null) {
             cas.comprarCasilla(actual, banca);
         } else {
@@ -203,7 +209,7 @@ public class Menu {
     private void salirCarcel() {
         Jugador actual = jugadores.get(turno);
         if (actual.isEnCarcel()) {
-            actual.salirCarcel();
+            actual.salirDeCarcel();
         } else {
             System.out.println("No estás en la cárcel.");
         }
@@ -211,7 +217,12 @@ public class Menu {
 
     // Método que realiza las acciones asociadas al comando 'listar enventa'.
     private void listarVenta() {
-        tablero.listaCasillasEnVenta();
+        for(Casilla c: tablero.getCasillas()) {
+            if (c.getDuenho() == banca) {
+                System.out.println(c.casEnVenta());
+            }
+        }
+
     }
 
     // Método que realiza las acciones asociadas al comando 'listar jugadores'.
