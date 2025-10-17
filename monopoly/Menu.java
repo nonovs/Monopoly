@@ -31,14 +31,15 @@ public class Menu {
         
         System.out.println("Bienvenido al Monopoly");
         mostrarTablero();
-        //System.out.println("Introduce comandos. Escribe 'salir' para temrinar");
-        //procesarComandos();
+        System.out.println("Introduce comandos. Escribe 'salir' para temrinar \n");
+        procesarComandos();
     }
     /** Bucle principal de lectura de comandos **/
     private void procesarComandos() {
-        Scanner sc = new Scanner(System.in);
+
         while (true) {
             System.out.print("> ");
+            Scanner sc = new Scanner(System.in);
             String comando = sc.nextLine().trim();
             if (comando.equalsIgnoreCase("salir")) {
                 System.out.println("Fin de la partida.");
@@ -106,6 +107,18 @@ public class Menu {
 
             default:
                 System.out.println("Comando no reconocido.");
+                System.out.println(" COMANDOS DISPONIBLES:");
+                System.out.println("  crear jugador <nombre> <tipo_avatar>");
+                System.out.println("  listar jugadores");
+                System.out.println("  listar enventa");
+                System.out.println("  listar avatares");
+                System.out.println("  describir jugador <nombre>");
+                System.out.println("  describir avatar <id_avatar>");
+                System.out.println("  describir <nombre_casilla>");
+                System.out.println("  lanzar dados");
+                System.out.println("  comprar <nombre_casilla>");
+                System.out.println("  salir carcel");
+                System.out.println("  acabar turno");
         }
     }
 
