@@ -111,15 +111,18 @@ public class Jugador {
     }
 
     public void enviarACarcel(Casilla casillaCarcel){
-        if (this.avatar != null && this.avatar.getLugar()!=null ) {
+        if (this.avatar != null && this.avatar.getLugar()!=null) {
             this.avatar.getLugar().eliminarAvatar(this.avatar);
-        }//Quito o avatar da casilla actual
-        //Ahora movo a casilla de carcel
-        this.avatar.setLugar(casillaCarcel);
-        casillaCarcel.anhadirAvatar(this.avatar);
-        this.enCarcel=true;
-        this.posicion=casillaCarcel.getPosicion();
-        this.turnosEnCarcel+=1;
+        }
+        // mover avatar a carcel si existe
+        if (this.avatar != null) {
+            this.avatar.setLugar(casillaCarcel);
+            casillaCarcel.anhadirAvatar(this.avatar);
+        }
+        this.enCarcel = true;
+        this.posicion = casillaCarcel.getPosicion();
+        this.turnosEnCarcel = 0;   // reiniciar turnos en carcel al entrar
+        this.tiradasCarcel = 0;    // reiniciar contador de tiradas en carcel
         System.out.println(nombre + " ha sido enviado a carcel");
     }
     public void salirDeCarcel(){
