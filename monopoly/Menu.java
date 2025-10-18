@@ -64,7 +64,9 @@ public class Menu {
                     System.out.println("Uso: crear jugador <nombre> <tipo_avatar>");
                 }
                 break;
-
+            case "jugador":
+                mostrarJugadorEnTurno();
+                break;
             case "listar":
                 if (partes.length >= 2) {
                     if (partes[1].equalsIgnoreCase("jugadores")) listarJugadores();
@@ -154,7 +156,7 @@ public class Menu {
             return;
         }
 
-        Casilla salida = tablero.getCasilla(0);
+        Casilla salida = tablero.encontrar_casilla("Salida");
 
         // crea jugador
         Jugador nuevo = new Jugador(nombre, tipoAvatar, salida, avatares);
@@ -169,6 +171,27 @@ public class Menu {
         System.out.printf("{nombre: %s, avatar: %s}%n", nombre, avatar.getId());
         tablero.mostrarTablero();
     }
+
+    // --- muestra el jugador que tiene el turno actual ---
+    private void mostrarJugadorEnTurno() {
+        // valida que haya jugadores creados
+        if (jugadores == null || jugadores.isEmpty()) {
+            System.out.println("No hay jugadores en la partida");
+            return;
+        }
+
+        // obtiene el jugador del indice turno
+        Jugador actual = jugadores.get(turno);
+
+        // obtiene datos basicos para mostrar
+        String nombre = actual.getNombre();
+        String avatarId = (actual.getAvatar() != null) ? actual.getAvatar().getId() : "-";
+        int pos = actual.getPosicion();
+
+        // imprime el turno con informacion util
+        System.out.printf("Turno de: %s (avatar %s) - posicion %d%n", nombre, avatarId, pos);
+    }
+
 
     /* describir jugador <nombre> */
     private void descJugador(String[] partes) {

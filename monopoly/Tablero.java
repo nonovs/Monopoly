@@ -312,29 +312,40 @@ public class Tablero {
     // Devuelve casilla por posición global (0-39)
     public Casilla getCasilla(int posicion) {
         if (posicion < 0 || posicion >= 40) return null;
-        int lado = posicion / 10;
-        int indice = posicion % 10;
-        return posiciones.get(lado).get(indice);
+        for (ArrayList<Casilla> lado : posiciones) {
+            for (Casilla c : lado) {
+                if (c.getPosicion() == posicion) return c;
+            }
+        }
+        return null;
     }
 
-    //Método usado para buscar la casilla con el nombre pasado como argumento:
+    // quita codigos ANSI de color para comparar nombres "limpios"
+    private static String sinAnsi(String s) {
+        return s == null ? null : s.replaceAll("\\u001B\\[[;\\d]*m", "");
+    }
+
     public Casilla encontrar_casilla(String nombre) {
-        for (int i = 0; i < 40; i++) {
-            if (getCasilla(i).getNombre().equals(nombre)) {
-                return getCasilla(i);
+        String objetivo = sinAnsi(nombre);
+        for (ArrayList<Casilla> lado : posiciones) {
+            for (Casilla c : lado) {
+                if (sinAnsi(c.getNombre()).equalsIgnoreCase(objetivo)) {
+                    return c;
+                }
             }
         }
         return null;
     }
 
 
-    public ArrayList<Casilla> getCasillas(){
-        ArrayList<Casilla> todasCasillas = new ArrayList<>(40);
-        for(int i=0;i<40;i++){
-            todasCasillas.add(getCasilla(i));
+    public ArrayList<Casilla> getCasillas() {
+        ArrayList<Casilla> todas = new ArrayList<>(40);
+        for (ArrayList<Casilla> lado : posiciones) {
+            todas.addAll(lado);
         }
-        return todasCasillas;
+        return todas;
     }
+
 
     public void mostrarTablero() {
         System.out.println(this.toString());
