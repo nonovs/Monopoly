@@ -1,5 +1,9 @@
 package monopoly;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 import partida.*;
 import monopoly.casillas.Casilla;
@@ -171,6 +175,7 @@ public class Menu {
         avatares.add(avatar);
 
         System.out.printf("{nombre: %s, avatar: %s}%n", nombre, avatar.getId());
+        salida.anhadirAvatar(avatar);
         tablero.mostrarTablero();
     }
 
@@ -194,7 +199,32 @@ public class Menu {
     }
 
 
+    public boolean procesarFichero(String fichero) {
+        try (BufferedReader buffer = new BufferedReader(new FileReader(fichero))) {
+            String linea;
+            while ((linea = buffer.readLine()) != null) {
+                linea = linea.trim();
+                if (linea.isEmpty()) continue;
 
+                // eco opcional para seguir la ejecución del fichero
+                System.out.println("> " + linea);
+
+                // Si la línea es exactamente "salir" (sin argumentos), solicitamos terminar la ejecución
+                if (linea.equalsIgnoreCase("salir")) {
+                    System.out.println("Se encontró 'salir' en el fichero. Terminando ejecución según especificación.");
+                    return true;
+                }
+
+                // ejecutar la línea como comando normal
+                analizarComando(linea);
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Archivo no encontrado: " + fichero);
+        } catch (IOException e) {
+            System.out.println("Error leyendo el archivo: " + fichero);
+        }
+        return false;
+    }
 
     /* describir jugador <nombre> */
     private void descJugador(String[] partes) {
@@ -344,7 +374,7 @@ public class Menu {
             irACarcel(j);
             mostrarTablero();
             return; // no evaluar mas esta tirada
-        }        
+        }
 
         System.out.printf("%s avanza a %s (pos %d)%n", j.getNombre(),
                 destino != null ? destino.getNombre() : "desconocida", posFin);
@@ -444,20 +474,20 @@ public class Menu {
     // comprobar si el jugador puede jugar (no en carcel o paga fianza)
 
     private boolean comprobarCarcel(Jugador j) {
-    if (j.isEnCarcel()) {
-        System.out.println(j.getNombre() + " esta en la carcel y debe pagar 500000 para salir");
-        if (j.getFortuna() >= 500000) {
-            j.pagar(500000);
-            j.salirDeCarcel();
-            System.out.println(j.getNombre() + " paga 500000 y sale de la carcel");
-            return true; // ya puede jugar
-        } else {
-            System.out.println("No tienes suficiente dinero para pagar la fianza. No puedes lanzar los dados");
-            return false; // no puede jugar
+        if (j.isEnCarcel()) {
+            System.out.println(j.getNombre() + " esta en la carcel y debe pagar 500000 para salir");
+            if (j.getFortuna() >= 500000) {
+                j.pagar(500000);
+                j.salirDeCarcel();
+                System.out.println(j.getNombre() + " paga 500000 y sale de la carcel");
+                return true; // ya puede jugar
+            } else {
+                System.out.println("No tienes suficiente dinero para pagar la fianza. No puedes lanzar los dados");
+                return false; // no puede jugar
+            }
         }
+        return true; // no estaba en carcel
     }
-    return true; // no estaba en carcel
-}
 
     private boolean procesarTiradaEnCarcel(Jugador actual, int d1, int d2, int suma) {
         System.out.printf("%s esta en la carcel y ha tirado %d + %d%n", actual.getNombre(), d1, d2);

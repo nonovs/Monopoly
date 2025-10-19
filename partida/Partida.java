@@ -1,4 +1,4 @@
-package partida;
+/*package partida;
 
 import monopoly.*;
 import monopoly.casillas.Casilla;
@@ -118,7 +118,7 @@ public class Partida {
     }*/
 
     // Métodos de juego
-    public void crearJugador(String nombre, String tipoavatar) {
+   /* public void crearJugador(String nombre, String tipoavatar) {
         //Primero compruebo que el jugador no exista ya
         for(Jugador j : jugadores){
             if(j.getNombre().equalsIgnoreCase(nombre)){
@@ -141,12 +141,12 @@ public class Partida {
         tablero.mostrarTablero();
 
     }
-    /*public String getJugadorActual() { ... }
+    public String getJugadorActual() { ... }
     public void listarJugadores() { ... }
     public void lanzarDados() { ... }
     public void lanzarDados(int d1, int d2) { ... }
     public void acabarTurno() { ... }
     public void salirCarcel() { ... }
     public void describirJugador(String nombre) { ... }
-    public void comprar(String nombrePropiedad) { ... }*/
-}
+    public void comprar(String nombrePropiedad) { ... }
+}*/

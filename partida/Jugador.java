@@ -56,7 +56,7 @@ public class Jugador {
         this.hipotecadas=new ArrayList<Casilla>();
         this.posicion= inicio != null ? inicio.getPosicion() : 0;
         this.turnosEnCarcel=0;
-        this.avatar=null;
+        this.avatar=new Avatar(tipoAvatar,this,inicio,avCreados);
 
     }
 
@@ -131,6 +131,11 @@ public class Jugador {
         this.tiradasCarcel=0;
         System.out.println(nombre + "  sale de la Carcel");
     }
+    @Override//Esto meto pa que me funcione ben listar jugadores
+    public String toString() {
+        return "{nombre: " + nombre + ", avatar: " + (avatar != null ? avatar.getId() : "null") + "}";
+    }
+
     public String getNombre(){
         return nombre;
     }

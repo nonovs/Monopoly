@@ -99,7 +99,7 @@ public class Avatar {
         for(char c= 'A'; c <= 'Z'; c++){
             boolean idUsada= false;
             for(Avatar avatar : avCreados){
-                if (avatar.getId() !=  null && avatar.getId().equals(c)) {
+                if (avatar.getId() !=  null && avatar.getId().equals(String.valueOf(c))) {
                     idUsada = true;
                     break;
                 }
