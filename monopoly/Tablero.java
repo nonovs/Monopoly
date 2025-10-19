@@ -2,7 +2,7 @@ package monopoly;
 
 import java.lang.invoke.LambdaConversionException;
 import java.lang.reflect.Array;
-import monopoly.casillas.Casilla;
+import monopoly.casillas.*;
 import partida.*;
 import java.util.ArrayList;
 import java.util.HashMap;
