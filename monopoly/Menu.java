@@ -150,7 +150,7 @@ public class Menu {
     }
 
     private void crearJugador(String nombre, String tipoAvatar) {
-        // evitar duplicados
+        // evitar duplicados en nombre
         for (Jugador j : jugadores) {
             if (j.getNombre().equalsIgnoreCase(nombre)) {
                 System.out.println("Ya existe un jugador con ese nombre.");
@@ -163,22 +163,44 @@ public class Menu {
         }
 
         Casilla salida = tablero.encontrar_casilla("Salida");
+        if (salida == null) {
+            System.out.println("No se encontró la casilla Salida.");
+            return;
+        }
 
-        // crea jugador
+        // crear jugador (si tu constructor ya crea avatar, lo devolverá en getAvatar)
         Jugador nuevo = new Jugador(nombre, tipoAvatar, salida, avatares);
+        Avatar avatar = nuevo.getAvatar();
 
-        // crea avatar y lo asigna explicitamente
-        Avatar avatar = new Avatar(tipoAvatar, nuevo, salida, avatares);
-        nuevo.setAvatar(avatar);
+        // Si el constructor del Jugador NO creó el avatar, créalo aquí
+        if (avatar == null) {
+            avatar = new Avatar(tipoAvatar, nuevo, salida, avatares);
+            nuevo.setAvatar(avatar);
+        }
 
+        // registrar jugador sin duplicar avatar en la lista de avatares
         jugadores.add(nuevo);
-        avatares.add(avatar);
+        boolean ya = false;
+        for (Avatar a : avatares) {
+            if (a.getId().equalsIgnoreCase(avatar.getId())) { ya = true; break; }
+        }
+        if (!ya) avatares.add(avatar);
+
+        // añadir avatar a la casilla Salida solo si no está ya
+        boolean presente = false;
+        for (Avatar a : salida.getAvatares()) {
+            if (a.getId().equalsIgnoreCase(avatar.getId())) { presente = true; break; }
+        }
+        if (!presente) {
+            salida.anhadirAvatar(avatar);
+        }
+
+        // sincronizar posicion del jugador
+        nuevo.setPosicion(salida.getPosicion());
 
         System.out.printf("{nombre: %s, avatar: %s}%n", nombre, avatar.getId());
-        salida.anhadirAvatar(avatar);
         tablero.mostrarTablero();
     }
-
     // --- muestra el jugador que tiene el turno actual ---
     private void mostrarJugadorEnTurno() {
         if (jugadores == null || jugadores.isEmpty()) {

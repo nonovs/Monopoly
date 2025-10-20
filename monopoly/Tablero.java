@@ -6,7 +6,9 @@ import monopoly.casillas.*;
 import partida.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+import monopoly.casillas.Casilla;
 public class Tablero {
     // Atributos
     private ArrayList<ArrayList<Casilla>> posiciones;
@@ -273,41 +275,101 @@ public class Tablero {
 
         this.posiciones.add(ladoEste);
     }
+    public String jugadoresTablero(Casilla casilla) {
+        if (casilla == null) return "";
+        List<Avatar> avs = casilla.getAvatares();
+        if (avs == null || avs.isEmpty()) return "";
+        StringBuilder sb = new StringBuilder();
+        sb.append("&");
+        for (Avatar a : avs) if (a != null && a.getId() != null) sb.append(a.getId());
+        String res = sb.toString();
+        int max = Math.max(1, Valor.NCHARS_CASILLA - 1);
+        return res.length() > max ? res.substring(0, max - 1) + "…" : res;
+    }
 
     // Imprime el tablero
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-
-        // lado norte correcto
+        // north
         sb.append("|");
-        for (int i = 0; i < 11; i++) {
-            sb.append(String.format("%-10s|", posiciones.get(2).get(i).getNombre()));
+        for (int i=0;i<11;i++){
+            Casilla c = posiciones.get(2).get(i);
+            String nombreColored = c.getNombre(); // mantiene códigos ANSI
+            String avs = jugadoresTablero(c); // "&A" or ""
+            String content = avs.isEmpty() ? nombreColored : nombreColored + " " + avs;
+            sb.append(String.format("%-10s|", content));
         }
         sb.append("\n");
-
-        // lado oeste correcto
-        for (int i = 0; i <= 8; i++) { // lado Oeste de abaixo arriba
-            sb.append(String.format("|%-12s|", posiciones.get(1).get(i).getNombre()));
-
-            // Espacio central
-            for (int j = 0; j < 9; j++) {
-                sb.append("        ");
-            }
-
-            // Lado este correcto
-            sb.append(String.format("|%-10s|\n", posiciones.get(3).get(8 - i).getNombre()));
+        // center
+        for (int i=0;i<=8;i++){
+            Casilla o = posiciones.get(1).get(i);
+            String nameO = o.getNombre();
+            String avsO = jugadoresTablero(o);
+            String contentO = avsO.isEmpty() ? nameO : nameO + " " + avsO;
+            sb.append(String.format("|%-12s|", contentO));
+            for (int j=0;j<9;j++) sb.append("        ");
+            Casilla e = posiciones.get(3).get(8-i);
+            String nameE = e.getNombre();
+            String avsE = jugadoresTablero(e);
+            String contentE = avsE.isEmpty() ? nameE : nameE + " " + avsE;
+            sb.append(String.format("|%-10s|\n", contentE));
         }
-
-        // lado sur
+        // south
         sb.append("|");
-        for (int i = 0; i <= 10; i++) {
-            sb.append(String.format("%-11s|", posiciones.get(0).get(i).getNombre()));
+        for (int i=0;i<=10;i++){
+            Casilla c = posiciones.get(0).get(i);
+            String nombreColored = c.getNombre();
+            String avs = jugadoresTablero(c);
+            String content = avs.isEmpty() ? nombreColored : nombreColored + " " + avs;
+            sb.append(String.format("%-11s|", content));
         }
         sb.append("\n");
-
         return sb.toString();
     }
+    public String conEspacios(int n) {
+        if (n <= 0) return "";
+        StringBuilder sb = new StringBuilder(n);
+        for (int i = 0; i < n; i++) sb.append(' ');
+        return sb.toString();
+    }
+
+    public String subrayar(String texto) {
+        return Valor.SUBRAYADO + texto + Valor.RESET;
+    }
+
+    private static String sinAnsi(String s) {
+        return s == null ? "" : s.replaceAll("\\u001B\\[[;\\d]*m", "");
+    }
+
+    /**
+     * Devuelve la cadena de fichas (avatares) para la parte inferior de la casilla.
+     * Mantengo tu función 'fichas' (la que pintaba &ID en la línea inferior subrayada).
+     */
+    public String fichas(Casilla casilla) {
+        int nj = casilla.getAvatares().size();
+        String fichas = "";
+
+        if (nj == 0) {
+            fichas += conEspacios(Valor.NCHARS_CASILLA);
+        } else {
+            fichas += Valor.BOLD_STRING + "&";
+            int i = 0;
+            for (; i < nj && i < Valor.NCHARS_CASILLA - 1; i++) {
+                String id = casilla.getAvatares().get(i).getId();
+                if (id == null) id = "";
+                fichas += id;
+            }
+            int rellenar = Valor.NCHARS_CASILLA - i - 1;
+            fichas += conEspacios(Math.max(0, rellenar));
+        }
+        return fichas;
+    }
+
+    public String formatoFichas(Casilla casilla) {
+        return subrayar(fichas(casilla)) + Valor.BARRA;
+    }
+
 
     // Devuelve casilla por posición global (0-39)
     public Casilla getCasilla(int posicion) {
@@ -320,10 +382,7 @@ public class Tablero {
         return null;
     }
 
-    // quita codigos ANSI de color para comparar nombres "limpios"
-    private static String sinAnsi(String s) {
-        return s == null ? null : s.replaceAll("\\u001B\\[[;\\d]*m", "");
-    }
+
 
     public Casilla encontrar_casilla(String nombre) {
         String objetivo = sinAnsi(nombre);

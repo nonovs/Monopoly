@@ -17,7 +17,9 @@ public class Valor {
     public static final double IMPUESTO_FIJO = 2_000_000;   // casillas de impuesto
     public static final double SALIR_CARCEL = 500_000;      // pagar para salir de la cárcel
 
-    
+    //Defino el ancho de las casillas con nombre
+    public static final int NCHARS_CASILLA = 8;
+    public static final String BARRA = "|";
     //Colores del texto:
     public static final String RESET = "\u001B[0m";
     public static final String BLACK = "\u001B[30m";

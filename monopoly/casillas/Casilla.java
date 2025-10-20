@@ -127,5 +127,5 @@ public class Casilla {
     public float getImpuesto() { return impuesto; }
     public float getHipoteca() { return hipoteca; }
     public void setHipoteca(float h) { this.hipoteca = h; }
-    public ArrayList<Avatar> getAvatares() { return avatares; }
+    public ArrayList<Avatar> getAvatares() {  return avatares == null ? new ArrayList<>(): new ArrayList<>(avatares);}
 }
