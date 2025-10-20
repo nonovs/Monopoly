@@ -127,6 +127,10 @@ public class Menu {
                 if (partes.length >= 2 && partes[1].equalsIgnoreCase("turno"))
                     acabarTurno();
                 break;
+            case "ver":
+                if (partes.length >= 2 && partes[1].equalsIgnoreCase("tablero"))
+                    mostrarTablero();
+                break;
 
             default:
                 System.out.println("Comando no reconocido.");
@@ -142,6 +146,8 @@ public class Menu {
                 System.out.println("  comprar <nombre_casilla>");
                 System.out.println("  salir carcel");
                 System.out.println("  acabar turno");
+                System.out.println("  ver tablero");
+
         }
     }
 
@@ -248,11 +254,20 @@ public class Menu {
         return false;
     }
 
+
+
     /* describir jugador <nombre> */
     private void descJugador(String[] partes) {
         String nombre = partes[2];
         for (Jugador j : jugadores) {
             if (j.getNombre().equalsIgnoreCase(nombre)) {
+                String avatarId = (j.getAvatar() != null) ? j.getAvatar().getId() : "-";
+                float fortuna = 0f;
+                try {
+                    fortuna = j.getFortuna(); // si existe getFortuna()
+                } catch (Throwable _e) {
+                    // si no existe, dejamos 0 o adapta según tu API
+                }
                 System.out.println(j);
                 return;
             }

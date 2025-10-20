@@ -291,31 +291,31 @@ public class Tablero {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        // north
+        //Lado norte
         sb.append("|");
         for (int i=0;i<11;i++){
             Casilla c = posiciones.get(2).get(i);
-            String nombreColored = c.getNombre(); // mantiene códigos ANSI
-            String avs = jugadoresTablero(c); // "&A" or ""
+            String nombreColored = c.getNombre();
+            String avs = jugadoresTablero(c); // "&A" ou ""
             String content = avs.isEmpty() ? nombreColored : nombreColored + " " + avs;
             sb.append(String.format("%-10s|", content));
         }
         sb.append("\n");
-        // center
-        for (int i=0;i<=8;i++){
+        // centro
+        for (int i=0;i<=8;i++){//Lado oeste
             Casilla o = posiciones.get(1).get(i);
             String nameO = o.getNombre();
             String avsO = jugadoresTablero(o);
             String contentO = avsO.isEmpty() ? nameO : nameO + " " + avsO;
             sb.append(String.format("|%-12s|", contentO));
-            for (int j=0;j<9;j++) sb.append("        ");
+            for (int j=0;j<9;j++) sb.append("        ");//Lado este
             Casilla e = posiciones.get(3).get(8-i);
             String nameE = e.getNombre();
             String avsE = jugadoresTablero(e);
             String contentE = avsE.isEmpty() ? nameE : nameE + " " + avsE;
             sb.append(String.format("|%-10s|\n", contentE));
         }
-        // south
+        // lado sur
         sb.append("|");
         for (int i=0;i<=10;i++){
             Casilla c = posiciones.get(0).get(i);
