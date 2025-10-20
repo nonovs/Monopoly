@@ -55,13 +55,16 @@ public class Solar extends Casilla {
 
     @Override
     public String infoCasilla() {
+        String color = (grupo != null) ? grupo.getColor() : "N/A";
+        String duenho = "-";
+        if (getDuenho() != null && getDuenho().getNombre() != null && !getDuenho().getNombre().isEmpty()) {
+            duenho = getDuenho().getNombre();
+        }
         return String.format(
                 "{tipo: solar, grupo: %s, propietario: %s, valor: %.0f, hipoteca: %.0f, alquiler base: %.0f, casas: %d, hotel: %b, piscina: %b, pista: %b}",
-                grupo.getColor(), getDuenho() != null ? getDuenho().getNombre() : "banca", getValor(), hipoteca, alquilerBase,
-                casas, hotel, piscina, pistaDeporte
+                color, duenho, getValor(), hipoteca, alquilerBase, casas, hotel, piscina, pistaDeporte
         );
     }
-
     @Override
     public String casEnVenta() {
         return String.format("{tipo: solar, grupo: %s, valor: %.0f}", grupo.getColor(), getValor());

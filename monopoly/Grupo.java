@@ -18,6 +18,14 @@ public class Grupo {
     private float alquilerPista;
     private ArrayList<Solar> solares; //Rferencia directa a los solares del grupo
 
+    /// Valores para construir edificios
+    private float valorCasa;
+    private float valorHotel;
+    private float valorPiscina;
+    private float valorPista;
+
+
+
     //Constructor vacío.
     public Grupo() {
         this.miembros = new ArrayList<>();
@@ -71,8 +79,8 @@ public class Grupo {
     public boolean esDuenhoGrupo(Jugador jugador) {
         if (jugador == null) return false;
 
-        for (Casilla c : miembros) {
-            if (c.getDuenho() != jugador){
+        for (Solar s : solares) {
+            if (s.getDuenho() != jugador){
                 return false;
             }
         }
@@ -112,7 +120,16 @@ public class Grupo {
         this.alquilerPiscina = piscina;
         this.alquilerPista = pista;
     }
-
+    public Float getValorCasa(){ return valorCasa;}
+    public Float getValorHotel(){ return valorHotel;}
+    public Float getValorPiscina(){ return valorPiscina;}
+    public Float getValorPista(){ return valorPista;}
+    public void setValorConstruccion(float casa, float hotel, float piscina, float pista){
+        this.valorCasa = casa;
+        this.valorHotel = hotel;
+        this.valorPiscina = piscina;
+        this.valorPista = pista;
+    }
     public String toString(){
         return String.format("Grupo %s (%d solares)", colorGrupo, miembros.size());
     }
