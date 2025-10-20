@@ -2,6 +2,9 @@ package monopoly.casillas;
 
 import partida.*;
 
+/**
+ * Casilla de impuesto.
+ */
 public class Impuestos extends Casilla {
 
     private float impuesto;
@@ -31,10 +34,15 @@ public class Impuestos extends Casilla {
 
     @Override
     public String infoCasilla() {
-        return String.format(
-                "{tipo: impuesto, nombre: %s, posicion: %d, cantidad: %.0f}",
-                getNombre(), getPosicion(), impuesto
-        );
+        // Devuelve solo el bloque solicitado:
+        // {
+        // tipo: impuesto,
+        // apagar: <cantidad>
+        // }
+        return String.format("{%n" +
+                "tipo: impuesto,%n" +
+                "apagar: %.0f%n" +
+                "}", impuesto);
     }
 
     @Override

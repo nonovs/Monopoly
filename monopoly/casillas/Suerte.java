@@ -1,6 +1,6 @@
 package monopoly.casillas;
 
-import partida.*;
+import partida.Jugador;
 
 public class Suerte extends Casilla {
 
@@ -11,26 +11,35 @@ public class Suerte extends Casilla {
 
     @Override
     public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {
-        // En esta entrega, no hay lógica de cartas, solo se notifica
-        System.out.println(actual.getNombre() + " ha caído en una casilla de Suerte.");
+        System.out.printf("%s ha caído en una casilla de Suerte.%n", actual.getNombre());
+        // En futuras versiones se podría implementar aquí la lógica de cartas
         return true;
     }
 
     @Override
     public void comprarCasilla(Jugador solicitante, Jugador banca) {
         // No se puede comprar una casilla de suerte
+        System.out.printf("La casilla %s no se puede comprar.%n", getNombre());
     }
 
     @Override
     public String infoCasilla() {
         return String.format(
-                "{tipo: suerte, nombre: %s, posicion: %d}",
-                getNombre(), getPosicion()
+                "{%n" +
+                        " tipo: Suerte,%n" +
+                        " nombre: %s,%n" +
+                        " posicion: %d,%n" +
+                        " propietario: %s%n" +
+                        "}",
+                getNombre(),
+                getPosicion(),
+                getDuenho() != null ? getDuenho().getNombre() : "banca"
         );
     }
 
     @Override
     public String casEnVenta() {
-        return ""; // No está en venta
+        // Las casillas de Suerte nunca están en venta
+        return null;
     }
 }

@@ -1,34 +1,63 @@
 package monopoly.casillas;
-import monopoly.Tablero;
-import partida.*;
 
+import monopoly.Tablero;
+import partida.Jugador;
+
+/**
+ * Casilla especial: Salida, Carcel, Parking, IrCarcel, ...
+ * Necesita referencia al Tablero para localizar otras casillas (p. ej. la cárcel).
+ */
 public class Especial extends Casilla {
-    public Tablero tablero;
-    // Constructor
-    public Especial(String nombre, int posicion, Jugador duenho) {
+    private Tablero tablero;
+
+    // Constructor que recibe la referencia al tablero
+    public Especial(String nombre, int posicion, Jugador duenho, Tablero tablero) {
         super(nombre, "Especial", posicion, duenho);
+        this.tablero = tablero;
     }
 
     @Override
     public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {
-        switch (getNombre()) {
-            case "Ir a la cárcel":
-                actual.enviarACarcel(tablero.getCasilla(10)); // Método que deberías tener en Jugador
-                System.out.println(actual.getNombre() + " ha sido enviado a la cárcel.");
-                return true;
+        // Usamos la posición para decidir la acción y así no dependemos del texto exacto del nombre.
+        int pos = getPosicion();
 
-            case "Parking gratuito":
-                float bote = getValor(); // Usa el valor acumulado en la casilla
-                actual.recibir(bote);
-                setValor(0); // Se vacía el bote
-                System.out.println(actual.getNombre() + " ha recibido " + bote + "€ del Parking.");
-                return true;
-
-            case "Salida":
+        switch (pos) {
+            case 0: // Salida
+                // Normalmente pasar por salida se gestiona en moverYEvaluar (suma de vuelta),
+                // aquí solo informamos al jugador de que ha caído/pasado por Salida.
                 System.out.println(actual.getNombre() + " ha pasado por la salida.");
                 return true;
 
+            case 10: // Carcel (casilla de visita / carcel)
+                // Caer en la casilla de la cárcel no suele enviar a la cárcel, es visita.
+                System.out.println(actual.getNombre() + " está en la casilla de la cárcel (visita).");
+                return true;
+
+            case 20: // Parking (bote)
+                // Si quieres usar la casilla Parking como depósito, usa getValor()/setValor.
+                float bote = getValor();
+                if (bote > 0) {
+                    actual.recibir(bote);
+                    setValor(0f);
+                    System.out.printf("%s ha recibido %.0f del Parking gratuito.%n", actual.getNombre(), bote);
+                } else {
+                    System.out.println(actual.getNombre() + " ha caído en Parking (sin bote).");
+                }
+                return true;
+
+            case 30: // Ir a la cárcel
+                // Enviar a la cárcel: buscamos la casilla de la cárcel (pos 10) y la pasamos al jugador.
+                Casilla carcel = tablero.getCasilla(10);
+                if (carcel != null) {
+                    actual.enviarACarcel(carcel);
+                    System.out.println(actual.getNombre() + " ha sido enviado a la cárcel.");
+                } else {
+                    System.out.println("No se pudo encontrar la casilla cárcel en el tablero.");
+                }
+                return true;
+
             default:
+                // Comportamiento por defecto para otras casillas especiales
                 System.out.println(actual.getNombre() + " ha caído en una casilla especial: " + getNombre());
                 return true;
         }
@@ -41,10 +70,7 @@ public class Especial extends Casilla {
 
     @Override
     public String infoCasilla() {
-        return String.format(
-                "{tipo: especial, nombre: %s, posicion: %d}",
-                getNombre(), getPosicion()
-        );
+        return String.format("{tipo: especial, nombre: %s, posicion: %d}", getNombre(), getPosicion());
     }
 
     @Override
