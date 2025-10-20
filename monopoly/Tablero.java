@@ -302,7 +302,7 @@ public class Tablero {
         }
         sb.append("\n");
         // centro
-        for (int i=0;i<=8;i++){//Lado oeste
+        for (int i=8;i>=0;i--){//Lado oeste
             Casilla o = posiciones.get(1).get(i);
             String nameO = o.getNombre();
             String avsO = jugadoresTablero(o);
