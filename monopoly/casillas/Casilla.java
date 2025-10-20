@@ -17,6 +17,7 @@ public class Casilla {
     private float impuesto; //Cantidad a pagar por caer en la casilla: el alquiler en solares/servicios/transportes o impuestos.
     private float hipoteca; //Valor otorgado por hipotecar una casilla
     private ArrayList<Avatar> avatares; //Avatares que están situados en la casilla.
+    private String colorGrupo;
 
     //Constructores:
     public Casilla() {
@@ -108,17 +109,16 @@ public class Casilla {
      */
     public String casEnVenta() {
         //Solo se muestran casillas que son comprables
-        if (tipo.equalsIgnoreCase("Solar") ||
-            tipo.equalsIgnoreCase("Transporte") ||
-            tipo.equalsIgnoreCase("Servicio")) {
+        if (!(tipo.equalsIgnoreCase("Solar") ||
+                tipo.equalsIgnoreCase("Transporte") ||
+                tipo.equalsIgnoreCase("Servicio"))) {
 
-            return String.format(
-                    "{nombre: %s, tipo: %s, valor: %.0f}",
-                    nombre, tipo, valor
-            );
+            return ""; //No se puede vender
         }
-        //Si no se puede vender, no mostramos nada
-        return "";
+        return String.format(
+                "{tipo: %s, valor: %.0f}",
+                tipo, valor
+        );
     }
 
     // Getters y setters necesarios para subclases
@@ -136,4 +136,8 @@ public class Casilla {
     public float getHipoteca() { return hipoteca; }
     public void setHipoteca(float h) { this.hipoteca = h; }
     public ArrayList<Avatar> getAvatares() {  return avatares == null ? new ArrayList<>(): new ArrayList<>(avatares);}
+
+    //getter y setter utilizados en casEnVenta
+    public String getColorGrupo() { return colorGrupo; }
+    public void setColorGrupo(String colorGrupo) { this.colorGrupo = colorGrupo; }
 }

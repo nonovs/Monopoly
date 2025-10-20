@@ -29,43 +29,52 @@ public class Tablero {
     private void insertarLadoSur() {
         ArrayList<Casilla> ladoSur = new ArrayList<>(11);
 
-        // pos 10 .. 0 (sur)
-        Casilla c;
+        // Casillas (posición 10 -> 0)
+        Casilla casilla = new Especial(Valor.WHITE + "Carcel", 10, banca, this);
+        ladoSur.add(casilla);
+        banca.anhadirPropiedad(casilla);
 
-        c = new Especial(Valor.WHITE + "Carcel", 10, banca, this); // 10
-        ladoSur.add(c); banca.anhadirPropiedad(c);
+        casilla = new Solar(Valor.CYAN + "Solar5", 9, 520000, 200000, 50000, banca, null);
+        ladoSur.add(casilla);
+        banca.anhadirPropiedad(casilla);
 
-        c = new Solar(Valor.CYAN + "Solar5", 9, 520000f, 200000f, 50000f, banca, null); // 9
-        ladoSur.add(c); banca.anhadirPropiedad(c);
+        casilla = new Solar(Valor.CYAN + "Solar4", 8, 520000, 200000, 50000, banca, null);
+        ladoSur.add(casilla);
+        banca.anhadirPropiedad(casilla);
 
-        c = new Solar(Valor.CYAN + "Solar4", 8, 520000f, 200000f, 50000f, banca, null); // 8
-        ladoSur.add(c); banca.anhadirPropiedad(c);
+        casilla = new Suerte(Valor.WHITE + "Suerte", 7, banca);
+        ladoSur.add(casilla);
+        banca.anhadirPropiedad(casilla);
 
-        c = new Suerte(Valor.WHITE + "Suerte", 7, banca); // 7
-        ladoSur.add(c); banca.anhadirPropiedad(c);
+        casilla = new Solar(Valor.CYAN + "Solar3", 6, 520000, 200000, 50000, banca, null);
+        ladoSur.add(casilla);
+        banca.anhadirPropiedad(casilla);
 
-        c = new Solar(Valor.CYAN + "Solar3", 6, 520000f, 200000f, 50000f, banca, null); // 6
-        ladoSur.add(c); banca.anhadirPropiedad(c);
+        casilla = new Transporte(Valor.WHITE + "Trans1", 5, 1301328.584f, 50000, banca);
+        ladoSur.add(casilla);
+        banca.anhadirPropiedad(casilla);
 
-        c = new Transporte(Valor.WHITE + "Trans1", 5, 1301328.584f, 50000f, banca); // 5
-        ladoSur.add(c); banca.anhadirPropiedad(c);
+        casilla = new Casilla(Valor.WHITE + "Imp1", 4, 650664.292f, banca); // impuesto
+        ladoSur.add(casilla);
+        banca.anhadirPropiedad(casilla);
 
-        c = new Impuestos(Valor.WHITE + "Imp1", 4, 650664.292f, banca); // 4 impuesto
-        ladoSur.add(c); banca.anhadirPropiedad(c);
+        casilla = new Solar(Valor.BLACK + "Solar2", 3, 600000, 250000, 60000, banca, null);
+        ladoSur.add(casilla);
+        banca.anhadirPropiedad(casilla);
 
-        c = new Solar(Valor.BLACK + "Solar2", 3, 600000f, 250000f, 60000f, banca, null); // 3
-        ladoSur.add(c); banca.anhadirPropiedad(c);
+        casilla = new Casilla(Valor.WHITE + "Caja", "Comunidad", 2, banca);
+        ladoSur.add(casilla);
+        banca.anhadirPropiedad(casilla);
 
-        c = new CajaComunidad(Valor.WHITE + "Caja Comunidad", 2, banca);
-        ladoSur.add(c); banca.anhadirPropiedad(c);
+        casilla = new Solar(Valor.BLACK + "Solar1", 1, 600000, 250000, 60000, banca, null);
+        ladoSur.add(casilla);
+        banca.anhadirPropiedad(casilla);
 
-        c = new Solar(Valor.BLACK + "Solar1", 1, 600000f, 250000f, 60000f, banca, null); // 1
-        ladoSur.add(c); banca.anhadirPropiedad(c);
+        casilla = new Especial("Salida", 0, banca, this);
+        ladoSur.add(casilla);
+        banca.anhadirPropiedad(casilla);
 
-        c = new Especial("Salida", 0, banca, this); // 0 (asegúrate que existe)
-        ladoSur.add(c); banca.anhadirPropiedad(c);
-
-        // Grupos (índices correctos)
+        // Grupos (usar índices correctos ahora que hay 11 entradas)
         Grupo grupoCyan = new Grupo(ladoSur.get(1), ladoSur.get(2), ladoSur.get(4), "CYAN");
         ladoSur.get(1).setGrupo(grupoCyan);
         ladoSur.get(2).setGrupo(grupoCyan);
@@ -85,7 +94,7 @@ public class Tablero {
 
         ladoOeste.add(new Solar(Valor.ORANGE + "Solar11", 19, 878800, 300000, 70000, banca, null));
         ladoOeste.add(new Solar(Valor.ORANGE + "Solar10", 18, 878800, 300000, 70000, banca, null));
-        ladoOeste.add(new CajaComunidad(Valor.WHITE + "Caja Comunidad", 17, banca));
+        ladoOeste.add(new Casilla(Valor.WHITE + "Caja", "Comunidad", 17, banca));
         ladoOeste.add(new Solar(Valor.ORANGE + "Solar9", 16, 878800, 300000, 70000, banca, null));
         ladoOeste.add(new Transporte(Valor.WHITE + "Trans2", 15, 1301328.584f, 50000, banca));
         ladoOeste.add(new Solar(Valor.PURPLE + "Solar8", 14, 676000, 200000, 50000, banca, null));
@@ -147,13 +156,13 @@ public class Tablero {
 
         ladoEste.add(new Solar(Valor.GREEN + "Solar18", 31, 1930723.6f, 600000, 120000, banca, null));
         ladoEste.add(new Solar(Valor.GREEN + "Solar19", 32, 1930723.6f, 600000, 120000, banca, null));
-        ladoEste.add(new CajaComunidad(Valor.WHITE + "Caja Comunidad", 33, banca));
+        ladoEste.add(new Casilla(Valor.WHITE + "Caja", "Comunidad", 33, banca));
         ladoEste.add(new Solar(Valor.GREEN + "Solar20", 34, 1930723.6f, 600000, 120000, banca, null));
         ladoEste.add(new Transporte(Valor.WHITE + "Trans4", 35, 1301328.584f, 50000, banca));
         ladoEste.add(new Suerte(Valor.WHITE + "Suerte", 36, banca));
         ladoEste.add(new Solar(Valor.BLUE + "Solar21", 37, 3764911.02f, 800000, 200000, banca, null));
-        ladoEste.add(new Impuestos(Valor.WHITE + "Imp2", 38,650664.292f, banca));
-        ladoEste.add(new Solar(Valor.BLUE + "Solar22", 39, 3764911.02f,800000 ,200000,banca,null));
+        ladoEste.add(new Casilla(Valor.WHITE + "Imp2", "Impuesto", 38, banca));
+        ladoEste.add(new Solar(Valor.BLUE + "Solar22", 39, 3764911.02f, 800000, 200000, banca, null));
 
         for (Casilla c : ladoEste) banca.anhadirPropiedad(c);
 
@@ -197,13 +206,13 @@ public class Tablero {
         }
         sb.append("\n");
         // centro
-        for (int i=0;i<=8;i++){//Lado oeste
+        for (int i=8;i>=0;i--){//Lado oeste
             Casilla o = posiciones.get(1).get(i);
             String nameO = o.getNombre();
             String avsO = jugadoresTablero(o);
             String contentO = avsO.isEmpty() ? nameO : nameO + " " + avsO;
             sb.append(String.format("|%-12s|", contentO));
-            for (int j=9;j>=0;j--) sb.append("        ");//Lado este
+            for (int j=0;j<9;j++) sb.append("        ");//Lado este
             Casilla e = posiciones.get(3).get(8-i);
             String nameE = e.getNombre();
             String avsE = jugadoresTablero(e);

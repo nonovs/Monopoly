@@ -11,6 +11,7 @@ public class Solar extends Casilla {
     private boolean piscina;
     private boolean pistaDeporte;
 
+
     // Constructor
     public Solar(String nombre, int posicion, float valor, float hipoteca, float alquilerBase, Jugador duenho, Grupo grupo) {
         super(nombre, "Solar", posicion, valor, duenho);
@@ -45,6 +46,11 @@ public class Solar extends Casilla {
     public void comprarCasilla(Jugador solicitante, Jugador banca) {
         if (getDuenho() != banca) {
             System.out.println("Este solar ya tiene dueño.");
+            return;
+        }
+
+        if (solicitante.getPosicion() != this.getPosicion()) {
+            System.out.println("Solo puedes comprar la casilla en la que estás situado.");
             return;
         }
 
@@ -107,8 +113,14 @@ public class Solar extends Casilla {
 
     @Override
     public String casEnVenta() {
-        Grupo g = getGrupo();
-        return String.format("{tipo: Solar, grupo: %s, valor: %.0f}", g != null ? g.getColor() : "N/A", getValor());
+        if (getDuenho() != null && !"Banca".equalsIgnoreCase(getDuenho().getNombre())) {
+            return ""; // no está en venta
+        }
+
+        return String.format(
+                "{\n    tipo: solar,\n  grupo: %s,\n    valor: %.0f\n}",
+                getColorGrupo(), getValor()
+        );
     }
 
     // --- Cálculo de alquiler ---
@@ -165,3 +177,5 @@ public class Solar extends Casilla {
         return false;
     }
 }
+
+

@@ -107,7 +107,6 @@ public class Especial extends Casilla {
 
     @Override
     public String casEnVenta() {
-        System.out.println("No esta en venta.");
-        return null;
+        return ""; //No se puede vender
     }
 }

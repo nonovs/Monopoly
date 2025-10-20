@@ -40,6 +40,11 @@ public class Servicios extends Casilla {
             return;
         }
 
+        if (solicitante.getPosicion() != this.getPosicion()) {
+            System.out.println("Solo puedes comprar la casilla en la que estás situado.");
+            return;
+        }
+
         if (solicitante.getFortuna() < getValor()) {
             System.out.println(solicitante.getNombre() + " no tiene suficiente dinero para comprar " + getNombre());
             return;
@@ -73,9 +78,12 @@ public class Servicios extends Casilla {
 
     @Override
     public String casEnVenta() {
+        if (getDuenho() != null && !"Banca".equalsIgnoreCase(getDuenho().getNombre())) {
+            return "";
+        }
         return String.format(
-                "{tipo: Servicio, nombre: %s, valor: %.0f}",
-                getNombre(), getValor()
+                "{\n    tipo: servicio,\n   valor: %.0f\n}",
+                getValor()
         );
     }
 }

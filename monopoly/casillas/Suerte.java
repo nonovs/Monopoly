@@ -39,7 +39,6 @@ public class Suerte extends Casilla {
 
     @Override
     public String casEnVenta() {
-        // Las casillas de Suerte nunca están en venta
-        return null;
+        return ""; //No esta en venta
     }
 }

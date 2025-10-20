@@ -40,6 +40,11 @@ public class Transporte extends Casilla {
             return;
         }
 
+        if (solicitante.getPosicion() != this.getPosicion()) {
+            System.out.println("Solo puedes comprar la casilla en la que estás situado.");
+            return;
+        }
+
         if (solicitante.getFortuna() < getValor()) {
             System.out.println(solicitante.getNombre() + " no tiene suficiente dinero para comprar " + getNombre());
             return;
@@ -76,10 +81,13 @@ public class Transporte extends Casilla {
 
     @Override
     public String casEnVenta() {
+        if (getDuenho() != null && !"Banca".equalsIgnoreCase(getDuenho().getNombre())) {
+            return "";
+        }
+
         return String.format(
-                "{tipo: transporte, nombre: %s, valor: %.0f}",
-                getNombre(),
-                valor
+                "{\n    tipo: transporte,\n valor: %.0f\n}",
+                getValor()
         );
     }
 }

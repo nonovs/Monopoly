@@ -8,8 +8,6 @@ import java.util.*;
 import partida.*;
 import monopoly.casillas.Casilla;
 
-//COMENTARIO DE PRUEBA PARA ANTONIO
-
 public class Menu {
 
     // Atributos
@@ -491,7 +489,10 @@ public class Menu {
     private void listarVenta() {
         for (Casilla c : tablero.getCasillas()) {
             if (c.getDuenho() == banca) {
-                System.out.println(c.casEnVenta());
+                String info = c.casEnVenta();
+                if (!info.isEmpty()) {
+                    System.out.println(info + ",");
+                }
             }
         }
     }
