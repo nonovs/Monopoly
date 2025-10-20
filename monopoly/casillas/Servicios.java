@@ -35,12 +35,24 @@ public class Servicios extends Casilla {
 
     @Override
     public void comprarCasilla(Jugador solicitante, Jugador banca) {
-        if (getDuenho() == banca && solicitante.getFortuna() >= getValor()) {
-            solicitante.pagar(getValor());
-            setDuenho(solicitante);
-            System.out.printf("%s ha comprado el servicio %s por %.0f.%n",
-                    solicitante.getNombre(), getNombre(), getValor());
+        if (getDuenho() != banca) {
+            System.out.println("Este servicio ya tiene dueño.");
+            return;
         }
+
+        if (solicitante.getFortuna() < getValor()) {
+            System.out.println(solicitante.getNombre() + " no tiene suficiente dinero para comprar " + getNombre());
+            return;
+        }
+
+        solicitante.pagar(getValor());
+        setDuenho(solicitante);
+        solicitante.anhadirPropiedad(this);
+
+        System.out.printf(
+                "El jugador %s compra el servicio %s por %.0f€. Su fortuna actual es %.0f€.\n",
+                solicitante.getNombre(), getNombre(), getValor(), solicitante.getFortuna()
+        );
     }
 
     @Override

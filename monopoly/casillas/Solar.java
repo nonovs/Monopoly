@@ -43,11 +43,24 @@ public class Solar extends Casilla {
 
     @Override
     public void comprarCasilla(Jugador solicitante, Jugador banca) {
-        if (getDuenho() == banca && solicitante.getFortuna() >= getValor()) {
-            solicitante.pagar(getValor());
-            setDuenho(solicitante);
-            System.out.println(solicitante.getNombre() + " ha comprado " + getNombre());
+        if (getDuenho() != banca) {
+            System.out.println("Este solar ya tiene dueño.");
+            return;
         }
+
+        if (solicitante.getFortuna() < getValor()) {
+            System.out.println(solicitante.getNombre() + " no tiene suficiente dinero para comprar " + getNombre());
+            return;
+        }
+
+        solicitante.pagar(getValor());
+        setDuenho(solicitante);
+        solicitante.anhadirPropiedad(this);
+
+        System.out.printf(
+                "El jugador %s compra la casilla %s por %.0f€. Su fortuna actual es %.0f€.\n",
+                solicitante.getNombre(), getNombre(), getValor(), solicitante.getFortuna()
+        );
     }
 
     // --- POLIMORFISMO: esta versión sustituye la infoCasilla() de Casilla ---
@@ -75,24 +88,18 @@ public class Solar extends Casilla {
                         " grupo: %s,%n" +
                         " propietario: %s,%n" +
                         " valor: %.0f,%n" +
-                        " hipoteca: %.0f,%n" +
-                        " alquiler base: %.0f,%n" +
-                        " casas: %d, " +
-                        "hotel: %b, " +
-                        "piscina: %b," +
-                        "pista deporte: %b,%n" +
-                        "valor casa: %.0f," +
-                        "valor hotel: %.0f, " +
-                        "valor piscina: %.0f, " +
+                        " alquiler : %.0f,%n" +
+                        "valor casa: %.0f,%n" +
+                        "valor hotel: %.0f,%n " +
+                        "valor piscina: %.0f,%n " +
                         "valor pista: %.0f,%n" +
-                        " alquiler casa: %.0f, " +
-                        "alquiler hotel: %.0f, " +
-                        "alquiler piscina: %.0f, " +
-                        "alquiler pista: %.0f%n" +
+                        " alquiler casa: %.0f,%n " +
+                        "alquiler hotel: %.0f,%n " +
+                        "alquiler piscina: %.0f,%n " +
+                        "alquiler pista dporte: %.0f%n" +
                         "}",
                 color, duenhoStr,
-                getValor(), getHipoteca(), alquilerBase,
-                casas, hotel, piscina, pistaDeporte,
+                getValor(), alquilerBase,
                 vCasa, vHotel, vPiscina, vPista,
                 aCasa, aHotel, aPiscina, aPista
         );

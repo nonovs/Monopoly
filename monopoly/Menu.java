@@ -254,21 +254,36 @@ public class Menu {
         return false;
     }
 
-
-
     /* describir jugador <nombre> */
     private void descJugador(String[] partes) {
         String nombre = partes[2];
         for (Jugador j : jugadores) {
             if (j.getNombre().equalsIgnoreCase(nombre)) {
+
                 String avatarId = (j.getAvatar() != null) ? j.getAvatar().getId() : "-";
-                float fortuna = 0f;
-                try {
-                    fortuna = j.getFortuna(); // si existe getFortuna()
-                } catch (Throwable _e) {
-                    // si no existe, dejamos 0 o adapta según tu API
-                }
-                System.out.println(j);
+
+                //Propiedades
+                ArrayList<String> props = new ArrayList<>();
+                for (Casilla c : j.getPropiedades())
+                    props.add((c.getNombre()));
+
+                // Hipotecas
+                ArrayList<String> hips = new ArrayList<>();
+                for (Casilla c : j.getHipotecadas())
+                    hips.add(c.getNombre());
+
+                // Edificios (en esta entrega no están implementados, lo dejamos vacío o placeholder)
+                ArrayList<String> edifs = new ArrayList<>();
+                // si más adelante tienes una lista de edificios, puedes recorrerla igual que las anteriores
+
+                System.out.println("{");
+                System.out.println("  nombre: " + j.getNombre() + ",");
+                System.out.println("  avatar: " + avatarId + ",");
+                System.out.println("  fortuna: " + String.format("%.0f", j.getFortuna()) + ",");
+                System.out.println("  propiedades: " + (props.isEmpty() ? "-" : props) + ",");
+                System.out.println("  hipotecas: " + (hips.isEmpty() ? "-" : hips) + ",");
+                System.out.println("  edificios: " + (edifs.isEmpty() ? "-" : edifs));
+                System.out.println("}");
                 return;
             }
         }
@@ -483,8 +498,44 @@ public class Menu {
 
     // listar jugadores
     private void listarJugadores() {
-        for (Jugador j : jugadores) {
-            System.out.println(j);
+        if (jugadores.isEmpty()){
+            System.out.println("No hay jugadores en la partida.");
+            return;
+        }
+        for (int i = 0; i < jugadores.size(); i++) {
+            Jugador j = jugadores.get(i);
+
+            String avatarId = (j.getAvatar() != null) ? j.getAvatar().getId() : "-";
+
+            // Propiedades
+            ArrayList<String> props = new ArrayList<>();
+            for (Casilla c : j.getPropiedades())
+                props.add(c.getNombre());
+
+            // Hipotecas
+            ArrayList<String> hips = new ArrayList<>();
+            for (Casilla c : j.getHipotecadas())
+                hips.add(c.getNombre());
+
+            // Edificios (placeholder)
+            ArrayList<String> edifs = new ArrayList<>();
+            // si más adelante implementas edificios, los añades aquí
+
+            System.out.println("{");
+            System.out.println("  nombre: " + j.getNombre() + ",");
+            System.out.println("  avatar: " + avatarId + ",");
+            System.out.println("  fortuna: " + String.format("%.0f", j.getFortuna()) + ",");
+            System.out.println("  propiedades: " + (props.isEmpty() ? "-" : props) + ",");
+            System.out.println("  hipotecas: " + (hips.isEmpty() ? "-" : hips) + ",");
+            System.out.println("  edificios: " + (edifs.isEmpty() ? "-" : edifs));
+            System.out.print("}");
+
+            // Si no es el último jugador, añadir coma
+            if (i < jugadores.size() - 1) {
+                System.out.println(",");
+            } else {
+                System.out.println();
+            }
         }
     }
 

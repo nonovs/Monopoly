@@ -1,6 +1,7 @@
 package monopoly.casillas;
 
-import partida.*;
+import monopoly.Menu.*;
+import partida.Jugador;
 
 /**
  * Casilla de impuesto.
@@ -8,11 +9,15 @@ import partida.*;
 public class Impuestos extends Casilla {
 
     private float impuesto;
-
+    private float bote=0;
     // Constructor
     public Impuestos(String nombre, int posicion, float impuesto, Jugador duenho) {
         super(nombre, posicion, impuesto, duenho); // usa el constructor específico de impuestos
         this.impuesto = impuesto;
+    }
+
+    public Impuestos() {
+        super();
     }
 
     @Override
@@ -26,10 +31,12 @@ public class Impuestos extends Casilla {
             return false;
         }
     }
-
+    public float setBote(float impuesto){
+        return bote+=impuesto;
+    }
     @Override
     public void comprarCasilla(Jugador solicitante, Jugador banca) {
-        // No se puede comprar una casilla de impuesto
+        System.out.println("No puedes comprar una casilla de impuestos.");
     }
 
     @Override
@@ -49,4 +56,9 @@ public class Impuestos extends Casilla {
     public String casEnVenta() {
         return ""; // No está en venta
     }
+    public float getBote() {
+        return bote;
+}
+
+
 }

@@ -1,7 +1,11 @@
 package monopoly.casillas;
 
 import monopoly.Tablero;
+import monopoly.Valor;
+import partida.Avatar;
 import partida.Jugador;
+
+import java.util.List;
 
 /**
  * Casilla especial: Salida, Carcel, Parking, IrCarcel, ...
@@ -65,16 +69,45 @@ public class Especial extends Casilla {
 
     @Override
     public void comprarCasilla(Jugador solicitante, Jugador banca) {
-        // No se puede comprar una casilla especial
+        System.out.println("No puedes comprar una casilla de especial.");
     }
-
     @Override
     public String infoCasilla() {
-        return String.format("{tipo: especial, nombre: %s, posicion: %d}", getNombre(), getPosicion());
+        StringBuilder sb = new StringBuilder();
+        sb.append("{ ");
+
+        switch (getPosicion()) {
+            case 10: // Carcel
+                sb.append("salir: ").append(Valor.SALIR_CARCEL).append(", ");
+                break;
+            case 20: // Parking
+                Impuestos impuesto=new Impuestos();
+                sb.append("bote: ").append(impuesto.getBote()).append(", ");
+                break;
+            default:
+                // para otras casillas especiales, no añadimos campos extra
+                break;
+        }
+
+        sb.append("jugadores: [");
+        List<Avatar> avs = getAvatares();
+        for (int i = 0; i < avs.size(); i++) {
+            Avatar a = avs.get(i);
+            sb.append(a.getId());
+            // si es cárcel, añadimos turnos
+            if (getPosicion() == 10) {
+                sb.append(",").append(a.getJugador().getTurnosEnCarcel());
+            }
+            if (i < avs.size() - 1) sb.append("] [");
+        }
+        sb.append("] }");
+
+        return sb.toString();
     }
 
     @Override
     public String casEnVenta() {
-        return ""; // No está en venta
+        System.out.println("No esta en venta.");
+        return null;
     }
 }

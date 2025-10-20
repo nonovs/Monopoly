@@ -16,7 +16,8 @@ public class Grupo {
     private float alquilerHotel;
     private float alquilerPiscina;
     private float alquilerPista;
-    private ArrayList<Solar> solares; //Rferencia directa a los solares del grupo
+    private ArrayList<Solar> solares;
+    private ArrayList<Especial>especiales;//Rferencia directa a los solares del grupo
 
     /// Valores para construir edificios
     private float valorCasa;
@@ -30,6 +31,7 @@ public class Grupo {
     public Grupo() {
         this.miembros = new ArrayList<>();
         this.solares = new ArrayList<>();
+        this.especiales = new ArrayList<>();
     }
 
     /*Constructor para cuando el grupo está formado por DOS CASILLAS:

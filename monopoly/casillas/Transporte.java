@@ -35,15 +35,24 @@ public class Transporte extends Casilla {
 
     @Override
     public void comprarCasilla(Jugador solicitante, Jugador banca) {
-        if (getDuenho() == banca && solicitante.getFortuna() >= valor) {
-            solicitante.pagar(valor);
-            setDuenho(solicitante);
-            System.out.printf("%s ha comprado el transporte %s por %.0f.%n", solicitante.getNombre(), getNombre(), valor);
-        } else if (getDuenho() != banca) {
-            System.out.printf("El transporte %s ya pertenece a %s.%n", getNombre(), getDuenho().getNombre());
-        } else {
-            System.out.printf("%s no tiene suficiente dinero para comprar %s.%n", solicitante.getNombre(), getNombre());
+        if (getDuenho() != banca) {
+            System.out.println("Este transporte ya tiene dueño.");
+            return;
         }
+
+        if (solicitante.getFortuna() < getValor()) {
+            System.out.println(solicitante.getNombre() + " no tiene suficiente dinero para comprar " + getNombre());
+            return;
+        }
+
+        solicitante.pagar(getValor());
+        setDuenho(solicitante);
+        solicitante.anhadirPropiedad(this);
+
+        System.out.printf(
+                "El jugador %s compra el transporte %s por %.0f€. Su fortuna actual es %.0f€.\n",
+                solicitante.getNombre(), getNombre(), getValor(), solicitante.getFortuna()
+        );
     }
 
     @Override
