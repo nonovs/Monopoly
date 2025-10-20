@@ -53,16 +53,17 @@ public class Tablero {
         casilla = new Transporte(Valor.WHITE + "Trans1", 5, 1301328.584f, 50000, banca);
         ladoSur.add(casilla);
         banca.anhadirPropiedad(casilla);
-
-        casilla = new Casilla(Valor.WHITE + "Imp1", 4, 650664.292f, banca); // impuesto
+        casilla = new Impuestos(Valor.WHITE + "Imp1", 4, 650664.292f, banca);
+        ladoSur.add(casilla);
+        //casilla = new Casilla(Valor.WHITE + "Imp1", 4, 650664.292f, banca); // impuesto
         ladoSur.add(casilla);
         banca.anhadirPropiedad(casilla);
 
         casilla = new Solar(Valor.BLACK + "Solar2", 3, 600000, 250000, 60000, banca, null);
         ladoSur.add(casilla);
         banca.anhadirPropiedad(casilla);
-
-        casilla = new Casilla(Valor.WHITE + "Caja", "Comunidad", 2, banca);
+//Esta mal e comunidad
+        casilla = new Especial(Valor.WHITE + "Caja", 2, banca,this);
         ladoSur.add(casilla);
         banca.anhadirPropiedad(casilla);
 
@@ -94,7 +95,7 @@ public class Tablero {
 
         ladoOeste.add(new Solar(Valor.ORANGE + "Solar11", 19, 878800, 300000, 70000, banca, null));
         ladoOeste.add(new Solar(Valor.ORANGE + "Solar10", 18, 878800, 300000, 70000, banca, null));
-        ladoOeste.add(new Casilla(Valor.WHITE + "Caja", "Comunidad", 17, banca));
+        ladoOeste.add(new Especial(Valor.WHITE + "Caja", 17, banca,this));
         ladoOeste.add(new Solar(Valor.ORANGE + "Solar9", 16, 878800, 300000, 70000, banca, null));
         ladoOeste.add(new Transporte(Valor.WHITE + "Trans2", 15, 1301328.584f, 50000, banca));
         ladoOeste.add(new Solar(Valor.PURPLE + "Solar8", 14, 676000, 200000, 50000, banca, null));
@@ -156,13 +157,13 @@ public class Tablero {
 
         ladoEste.add(new Solar(Valor.GREEN + "Solar18", 31, 1930723.6f, 600000, 120000, banca, null));
         ladoEste.add(new Solar(Valor.GREEN + "Solar19", 32, 1930723.6f, 600000, 120000, banca, null));
-        ladoEste.add(new Casilla(Valor.WHITE + "Caja", "Comunidad", 33, banca));
+        ladoEste.add(new Especial(Valor.WHITE + "Caja", 33, banca,this));
         ladoEste.add(new Solar(Valor.GREEN + "Solar20", 34, 1930723.6f, 600000, 120000, banca, null));
         ladoEste.add(new Transporte(Valor.WHITE + "Trans4", 35, 1301328.584f, 50000, banca));
         ladoEste.add(new Suerte(Valor.WHITE + "Suerte", 36, banca));
         ladoEste.add(new Solar(Valor.BLUE + "Solar21", 37, 3764911.02f, 800000, 200000, banca, null));
         ladoEste.add(new Casilla(Valor.WHITE + "Imp2", "Impuesto", 38, banca));
-        ladoEste.add(new Solar(Valor.BLUE + "Solar22", 39, 3764911.02f, 800000, 200000, banca, null));
+        ladoEste.add(new Impuestos(Valor.BLUE + "Solar22", 39, 3764911.02f, banca));
 
         for (Casilla c : ladoEste) banca.anhadirPropiedad(c);
 
