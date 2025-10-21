@@ -72,6 +72,7 @@ public class Solar extends Casilla {
     // --- POLIMORFISMO: esta versión sustituye la infoCasilla() de Casilla ---
     @Override
     public String infoCasilla() {
+
         Grupo g = getGrupo();
         String color = (g != null && g.getColor() != null) ? g.getColor() : "N/A";
         String duenhoStr = (getDuenho() != null) ? getDuenho().getNombre() : "banca";
@@ -119,7 +120,7 @@ public class Solar extends Casilla {
 
         return String.format(
                 "{\n    tipo: solar,\n  grupo: %s,\n    valor: %.0f\n}",
-                getColorGrupo(), getValor()
+                getGrupo(), getValor()
         );
     }
 

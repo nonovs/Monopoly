@@ -456,10 +456,10 @@ public class Menu {
     // --- ir a carcel: lleva al jugador a la posicion 10 ---
     private void irACarcel(Jugador j) {
         Casilla carcel = tablero.getCasilla(10); // tu carcel es la pos 10
-        if (carcel == null) {
+        /*if (carcel == null) {
             System.out.println("No se encontro la casilla de carcel");
             return;
-        }
+        }*/
         j.enviarACarcel(carcel); // marca flag, posiciona, mueve avatar y reinicia contadores
     }
 

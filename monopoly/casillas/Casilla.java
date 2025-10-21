@@ -137,9 +137,6 @@ public class Casilla {
     public void setHipoteca(float h) { this.hipoteca = h; }
     public ArrayList<Avatar> getAvatares() {  return avatares == null ? new ArrayList<>(): new ArrayList<>(avatares);}
 
-    //getter y setter utilizados en casEnVenta
-    public String getColorGrupo() { return colorGrupo; }
-    public void setColorGrupo(String colorGrupo) { this.colorGrupo = colorGrupo; }
 
     // Detectar robustamente la casilla "Ir a la carcel" por nombre, tolerando códigos ANSI y espacios
     public boolean esIrACarcel() {
