@@ -133,7 +133,7 @@ public class Tablero {
                 1850000, 9500000, 1900000, 1900000,
                 banca, null));
 
-        ladoOeste.add(new Transporte(Valor.WHITE + "Trans2", 15, 1301328, 50000, banca));
+        ladoOeste.add(new Transporte(Valor.WHITE + "Trans2", 15, 500000, 250000, banca));
 
         ladoOeste.add(new Solar(Valor.PURPLE + "Solar8", 14,
                 1600000, 800000, 120000,
@@ -198,7 +198,7 @@ public class Tablero {
                 2325000, 11000000, 2200000, 2200000,
                 banca, null));
 
-        ladoNorte.add(new Transporte(Valor.WHITE + "Trans3", 25, 1301328, 50000, banca));
+        ladoNorte.add(new Transporte(Valor.WHITE + "Trans3", 25, 500000, 250000, banca));
 
         ladoNorte.add(new Solar(Valor.BROWN + "Solar15", 26,
                 2600000, 1300000, 220000,
@@ -263,7 +263,7 @@ public class Tablero {
                 3000000, 14000000, 2800000, 2800000,
                 banca, null));
 
-        ladoEste.add(new Transporte(Valor.WHITE + "Trans4", 35, 1301328, 50000, banca));
+        ladoEste.add(new Transporte(Valor.WHITE + "Trans4", 35, 500000, 250000, banca));
         ladoEste.add(new Suerte(Valor.WHITE + "Suerte", 36, banca));
 
         ladoEste.add(new Solar(Valor.BLUE + "Solar21", 37,

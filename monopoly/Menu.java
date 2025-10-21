@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.*;
 import partida.*;
 import monopoly.casillas.Casilla;
+import java.text.Normalizer;
+
 
 public class Menu {
 
@@ -117,7 +119,7 @@ public class Menu {
                 break;
 
             case "salir":
-                if (partes.length >= 2 && partes[1].equalsIgnoreCase("carcel"))
+                if (partes.length >= 2 && partes[1].equalsIgnoreCase("cárcel"))
                     salirCarcel();
                 break;
 
@@ -577,7 +579,7 @@ public class Menu {
             if (j.getFortuna() >= 500000) {
                 j.pagar(500000);
                 j.salirDeCarcel();
-                System.out.println(j.getNombre() + " paga 500000 y sale de la carcel");
+                System.out.println(j.getNombre() + " paga 500000 y sale de la carcel tras pagar la fianza de 500000");
                 return true; // ya puede jugar
             } else {
                 System.out.println("No tienes suficiente dinero para pagar la fianza. No puedes lanzar los dados");
