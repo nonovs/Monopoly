@@ -323,14 +323,14 @@ public class Tablero {
         }
         sb.append("\n");
         // centro
-        for (int i=8;i>=0;i--){//Lado oeste
+        for (int i=0;i<=8;i++){//Lado oeste
             Casilla o = posiciones.get(1).get(i);
             String nameO = o.getNombre();
             String avsO = jugadoresTablero(o);
             String contentO = avsO.isEmpty() ? nameO : nameO + " " + avsO;
             sb.append(String.format("|%-12s|", contentO));
             for (int j=0;j<9;j++) sb.append("        ");//Lado este
-            Casilla e = posiciones.get(3).get(8-i);
+            Casilla e = posiciones.get(3).get(i);
             String nameE = e.getNombre();
             String avsE = jugadoresTablero(e);
             String contentE = avsE.isEmpty() ? nameE : nameE + " " + avsE;
