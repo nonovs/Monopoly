@@ -213,7 +213,7 @@ public class Tablero {
             String contentO = avsO.isEmpty() ? nameO : nameO + " " + avsO;
             sb.append(String.format("|%-12s|", contentO));
             for (int j=0;j<9;j++) sb.append("        ");//Lado este
-            Casilla e = posiciones.get(3).get(8-i);
+            Casilla e = posiciones.get(3).get(i);
             String nameE = e.getNombre();
             String avsE = jugadoresTablero(e);
             String contentE = avsE.isEmpty() ? nameE : nameE + " " + avsE;

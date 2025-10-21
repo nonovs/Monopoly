@@ -30,7 +30,7 @@ public class Valor {
     public static final String PURPLE = "\u001B[35m";
     public static final String CYAN = "\u001B[36m";
     public static final String WHITE = "\u001B[37m";
-    public static final String BROWN = "\u001B[38;2;165;42;42m";
+    public static final String BROWN = "\u001B[38;2;139;69;19m";
     public static final String ORANGE = "\u001B[38;2;255;165;0m";
     public static final String BOLD_STRING = "\u001B[1m";
     public static final String SUBRAYADO   = "\u001B[4m";
