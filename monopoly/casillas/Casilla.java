@@ -11,7 +11,7 @@ public class Casilla {
     private String nombre; //Nombre de la casilla
     private String tipo; //Tipo de casilla (Solar, Especial, Transporte, Servicios, Comunidad, Suerte y Impuesto).
     private float valor; //Valor de esa casilla (en la mayoría será valor de compra, en la casilla parking se usará como el bote).
-    private int posicion; //Posición que ocupa la casilla en el tablero (entero entre 1 y 40).
+    private int posicion; //Posición que ocupa la casilla en el tablero (entero entre 0 y 39).
     private Jugador duenho; //Dueño de la casilla (por defecto sería la banca).
     private Grupo grupo; //Grupo al que pertenece la casilla (si es solar).
     private float impuesto; //Cantidad a pagar por caer en la casilla: el alquiler en solares/servicios/transportes o impuestos.
@@ -25,7 +25,7 @@ public class Casilla {
     }
 
     /*Constructor para casillas tipo Solar, Servicios o Transporte:
-    * Parámetros: nombre casilla, tipo (debe ser solar, serv. o transporte), posición en el tablero, valor y dueño.
+     * Parámetros: nombre casilla, tipo (debe ser solar, serv. o transporte), posición en el tablero, valor y dueño.
      */
     public Casilla(String nombre, String tipo, int posicion, float valor, Jugador duenho) {
         this.nombre = nombre;
@@ -37,7 +37,7 @@ public class Casilla {
     }
 
     /*Constructor utilizado para inicializar las casillas de tipo IMPUESTOS.
-    * Parámetros: nombre, posición en el tablero, impuesto establecido y dueño.
+     * Parámetros: nombre, posición en el tablero, impuesto establecido y dueño.
      */
     public Casilla(String nombre, int posicion, float impuesto, Jugador duenho) {
         this.nombre = nombre;
@@ -49,7 +49,7 @@ public class Casilla {
     }
 
     /*Constructor utilizado para crear las otras casillas (Suerte, Caja de comunidad y Especiales):
-    * Parámetros: nombre, tipo de la casilla (será uno de los que queda), posición en el tablero y dueño.
+     * Parámetros: nombre, tipo de la casilla (será uno de los que queda), posición en el tablero y dueño.
      */
     public Casilla(String nombre, String tipo, int posicion, Jugador duenho) {
         this.nombre = nombre;
@@ -70,33 +70,33 @@ public class Casilla {
     }
 
     /*Método para evaluar qué hacer en una casilla concreta. Parámetros:
-    * - Jugador cuyo avatar está en esa casilla.
-    * - La banca (para ciertas comprobaciones).
-    * - El valor de la tirada: para determinar impuesto a pagar en casillas de servicios.
-    * Valor devuelto: true en caso de ser solvente (es decir, de cumplir las deudas), y false
-    * en caso de no cumplirlas.*/
+     * - Jugador cuyo avatar está en esa casilla.
+     * - La banca (para ciertas comprobaciones).
+     * - El valor de la tirada: para determinar impuesto a pagar en casillas de servicios.
+     * Valor devuelto: true en caso de ser solvente (es decir, de cumplir las deudas), y false
+     * en caso de no cumplirlas.*/
     public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {
         // Este método se sobreescribirá en subclases
         return true;
     }
 
     /*Método usado para comprar una casilla determinada. Parámetros:
-    * - Jugador que solicita la compra de la casilla.
-    * - Banca del monopoly (es el dueño de las casillas no compradas aún).*/
+     * - Jugador que solicita la compra de la casilla.
+     * - Banca del monopoly (es el dueño de las casillas no compradas aún).*/
     public void comprarCasilla(Jugador solicitante, Jugador banca) {
         System.out.println("Esta casilla no se puede comprar o no tiene comportamiento definido.");
     }
 
     /*Método para añadir valor a una casilla. Utilidad:
-    * - Sumar valor a la casilla de parking.
-    * - Sumar valor a las casillas de solar al no comprarlas tras cuatro vueltas de todos los jugadores.
-    * Este método toma como argumento la cantidad a añadir del valor de la casilla.*/
+     * - Sumar valor a la casilla de parking.
+     * - Sumar valor a las casillas de solar al no comprarlas tras cuatro vueltas de todos los jugadores.
+     * Este método toma como argumento la cantidad a añadir del valor de la casilla.*/
     public void sumarValor(float suma) {
         this.valor += suma;
     }
 
     /*Método para mostrar información sobre una casilla.
-    * Devuelve una cadena con información específica de cada tipo de casilla.*/
+     * Devuelve una cadena con información específica de cada tipo de casilla.*/
     public String infoCasilla() {
         return String.format(
                 "{nombre: %s, tipo: %s, posicion: %d, propietario: %s}",
@@ -127,7 +127,7 @@ public class Casilla {
     public float getValor() { return valor; }
     public void setValor(float valor){ this.valor = valor; }
     public int getPosicion() { return posicion; }
-    public int setPosicion(int posicion) {return this.posicion=posicion;}
+    public void setPosicion(int posicion) { this.posicion = posicion; }
     public Jugador getDuenho() { return duenho; }
     public void setDuenho(Jugador j) { this.duenho = j; }
     public Grupo getGrupo() { return grupo; }
@@ -140,4 +140,27 @@ public class Casilla {
     //getter y setter utilizados en casEnVenta
     public String getColorGrupo() { return colorGrupo; }
     public void setColorGrupo(String colorGrupo) { this.colorGrupo = colorGrupo; }
+
+    // Detectar robustamente la casilla "Ir a la carcel" por nombre, tolerando códigos ANSI y espacios
+    public boolean esIrACarcel() {
+        if (this.nombre == null) return false;
+
+        // quitar códigos ANSI y normalizar (minúsculas, sin espacios, sin acentos)
+        String clean = this.nombre.replaceAll("\\u001B\\[[;\\d]*m", "").toLowerCase().trim();
+        // quitar acentos básicos
+        clean = clean.replace("á","a").replace("é","e").replace("í","i").replace("ó","o").replace("ú","u");
+        // eliminar espacios
+        String compact = clean.replaceAll("\\s+", "");
+
+        // si es exactamente "carcel" -> NO es "Ir a la carcel"
+        if (compact.equals("carcel")) return false;
+
+        // detectar variantes de "ir a la carcel"
+        // - "iracarcel" (sin espacios), "iracarcel" (si el original ya estaba así)
+        // - o bien nombres que contengan tanto "ir" como "carcel" (p. ej. "ir a la carcel")
+        if (compact.contains("iracarcel")) return true;
+        if (compact.contains("ir") && compact.contains("carcel")) return true;
+
+        return false;
+    }
 }

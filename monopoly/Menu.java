@@ -197,6 +197,8 @@ public class Menu {
         }
         if (!presente) {
             salida.anhadirAvatar(avatar);
+            // sincronizar lugar del avatar (muy importante para que enviarACarcel elimine correctamente)
+            avatar.setLugar(salida);
         }
 
         // sincronizar posicion del jugador
@@ -413,13 +415,20 @@ public class Menu {
         // actualizar casillas: quitar avatar de la actual y poner en destino
         Casilla origen = tablero.getCasilla(posIni);
         Casilla destino = tablero.getCasilla(posFin);
-        if (origen != null && j.getAvatar() != null) origen.eliminarAvatar(j.getAvatar());
-        if (destino != null && j.getAvatar() != null) destino.anhadirAvatar(j.getAvatar());
+        if (origen != null && j.getAvatar() != null) {
+            origen.eliminarAvatar(j.getAvatar());
+        }
+        if (destino != null && j.getAvatar() != null) {
+            destino.anhadirAvatar(j.getAvatar());
+            // sincronizar lugar del avatar para mantener coherencia entre Avatar y Casilla
+            j.getAvatar().setLugar(destino);
+        }
 
         // actualizar posicion en jugador
         j.setPosicion(posFin);
 
-        if(posFin == 30) { // IrCarcel
+        // Detectar "Ir a la carcel" usando el método de Casilla (más robusto que comparar con 30).
+        if (destino != null && destino.esIrACarcel()) {
             System.out.println("Vas a la carcel");
             irACarcel(j);
             mostrarTablero();
