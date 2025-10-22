@@ -110,7 +110,12 @@ public class Menu {
                     System.out.println("Uso: lanzar dados");
                 }
                 break;
-
+            case "listargrupo":
+                Scanner sc = new Scanner(System.in);
+                System.out.print("Ingrese el nombre del grupo: ");
+                String grupo = sc.nextLine().trim();
+                listarCasillasGrupo(grupo);
+                break;
             case "comprar":
                 if (partes.length >= 2)
                     comprar(partes[1]);
@@ -514,7 +519,20 @@ public class Menu {
             }
         }
     }
+    /*Listar en venta pero que eu lle mande a cor do grupo(cales do grupoo azul estan en venta)*/
+    private void listarCasillasGrupo(String colorgrupo){
 
+        for (Casilla c : tablero.getCasillas()){
+            if (c.getGrupo()!= null && c.getGrupo().getColor().equalsIgnoreCase(colorgrupo) && c.getDuenho() == banca){
+                String info = c.casEnVenta();
+                if (!info.isEmpty()) {
+                    System.out.println(info + ",");
+                }
+            }
+        }
+
+
+    }
     // listar jugadores
     private void listarJugadores() {
         if (jugadores.isEmpty()){

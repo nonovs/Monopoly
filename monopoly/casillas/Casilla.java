@@ -116,7 +116,7 @@ public class Casilla {
             return ""; //No se puede vender
         }
         return String.format(
-                "{tipo: %s, valor: %.0f}",
+                "{Nombre: %s, tipo: %s, valor: %.0f}",nombre,
                 tipo, valor
         );
     }
