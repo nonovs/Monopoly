@@ -68,7 +68,7 @@ public class Tablero {
         ladoSur.add(casilla);
         banca.anhadirPropiedad(casilla);
 
-        casilla = new Casilla(Valor.WHITE + "Imp1", 4, 1000000, banca);
+        casilla = new Impuestos(Valor.WHITE + "Imp1", 4, 1000000, banca);
         ladoSur.add(casilla);
         banca.anhadirPropiedad(casilla);
 
@@ -80,7 +80,7 @@ public class Tablero {
         ladoSur.add(casilla);
         banca.anhadirPropiedad(casilla);
 
-        casilla = new Casilla(Valor.WHITE + "Caja", "Comunidad", 2, banca);
+        casilla = new CajaComunidad(Valor.WHITE + "Caja Comunidad", 2, banca);
         ladoSur.add(casilla);
         banca.anhadirPropiedad(casilla);
 
@@ -125,7 +125,7 @@ public class Tablero {
                 1850000, 9500000, 1900000, 1900000,
                 banca, null));
 
-        ladoOeste.add(new Casilla(Valor.WHITE + "Caja", "Comunidad", 17, banca));
+        ladoOeste.add(new CajaComunidad(Valor.WHITE + "Caja Comunidad", 17, banca));
 
         ladoOeste.add(new Solar(Valor.ORANGE + "Solar9", 16,
                 1800000, 900000, 140000,
@@ -255,7 +255,7 @@ public class Tablero {
                 2750000, 12750000, 2550000, 2550000,
                 banca, null));
 
-        ladoEste.add(new Casilla(Valor.WHITE + "Caja", "Comunidad", 33, banca));
+        ladoEste.add(new CajaComunidad(Valor.WHITE + "Caja Comunidad", 33, banca));
 
         ladoEste.add(new Solar(Valor.GREEN + "Solar20", 34,
                 3200000, 1600000, 280000,
@@ -272,7 +272,7 @@ public class Tablero {
                 3250000, 17000000, 3400000, 3400000,
                 banca, null));
 
-        ladoEste.add(new Casilla(Valor.WHITE + "Imp2", "Impuesto", 38, banca));
+        ladoEste.add(new Impuestos(Valor.WHITE + "Imp2",  38,2000000, banca));
 
         ladoEste.add(new Solar(Valor.BLUE + "Solar22", 39,
                 4000000, 2000000, 500000,

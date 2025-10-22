@@ -9,7 +9,7 @@ import partida.Jugador;
 public class Impuestos extends Casilla {
 
     private float impuesto;
-    private float bote=0;
+    private static float bote=0;//Static para que todas as instancias o compartan
     // Constructor
     public Impuestos(String nombre, int posicion, float impuesto, Jugador duenho) {
         super(nombre, posicion, impuesto, duenho); // usa el constructor específico de impuestos
@@ -24,14 +24,16 @@ public class Impuestos extends Casilla {
     public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {
         if (actual.getFortuna() >= impuesto) {
             actual.pagar(impuesto);
+            setBote(impuesto);
+            System.out.println("El jugador paga "+ impuesto +"€ que se depositan en el Parking.");
             banca.recibir(impuesto);
             return true;
         } else {
-            // Aquí podrías invocar lógica de bancarrota
+
             return false;
         }
     }
-    public float setBote(float impuesto){
+    public static float setBote(float impuesto){
         return bote+=impuesto;
     }
     @Override
@@ -41,11 +43,7 @@ public class Impuestos extends Casilla {
 
     @Override
     public String infoCasilla() {
-        // Devuelve solo el bloque solicitado:
-        // {
-        // tipo: impuesto,
-        // apagar: <cantidad>
-        // }
+
         return String.format("{%n" +
                 "tipo: impuesto,%n" +
                 "apagar: %.0f%n" +
@@ -57,9 +55,10 @@ public class Impuestos extends Casilla {
         return ""; // No está en venta
     }
 
-    public float getBote() {
+    public static float getBote() {
         return bote;
 }
+
 
 
 }

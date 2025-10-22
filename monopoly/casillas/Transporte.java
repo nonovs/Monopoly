@@ -8,7 +8,7 @@ public class Transporte extends Casilla {
     private final float alquiler;
 
     // Constructor
-    public Transporte(String nombre, int posicion, float valor, float alquiler, Jugador duenho) {
+    public Transporte(String nombre, int posicion, int valor, float alquiler, Jugador duenho) {
         super(nombre, "Transporte", posicion, valor, duenho);
         this.valor = valor;
         this.alquiler = alquiler;

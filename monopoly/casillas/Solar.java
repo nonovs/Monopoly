@@ -26,7 +26,7 @@ public class Solar extends Casilla {
 
     public Solar(
             String nombre, int posicion,
-            float valor, float hipoteca, float alquilerBase,
+            int valor, float hipoteca, float alquilerBase,
             float precioCasa, float precioHotel, float precioPiscina, float precioPista,
             float alquilerCasa, float alquilerHotel, float alquilerPiscina, float alquilerPista,
             Jugador duenho, Grupo grupo

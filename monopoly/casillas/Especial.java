@@ -39,10 +39,10 @@ public class Especial extends Casilla {
 
             case 20: // Parking (bote)
                 // Si quieres usar la casilla Parking como depósito, usa getValor()/setValor.
-                float bote = getValor();
+                float bote = Impuestos.getBote();
                 if (bote > 0) {
                     actual.recibir(bote);
-                    setValor(0f);
+                    Impuestos.setBote(0);//Vaciamos o bote
                     System.out.printf("%s ha recibido %.0f del Parking gratuito.%n", actual.getNombre(), bote);
                 } else {
                     System.out.println(actual.getNombre() + " ha caído en Parking (sin bote).");
@@ -85,7 +85,7 @@ public class Especial extends Casilla {
                 sb.append("bote: ").append(impuesto.getBote()).append(", ");
                 break;
             default:
-                // para otras casillas especiales, no añadimos campos extra
+
                 break;
         }
 
