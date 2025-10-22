@@ -144,17 +144,12 @@ public class Casilla {
 
         // quitar códigos ANSI y normalizar (minúsculas, sin espacios, sin acentos)
         String clean = this.nombre.replaceAll("\\u001B\\[[;\\d]*m", "").toLowerCase().trim();
-        // quitar acentos básicos
-        clean = clean.replace("á","a").replace("é","e").replace("í","i").replace("ó","o").replace("ú","u");
-        // eliminar espacios
         String compact = clean.replaceAll("\\s+", "");
 
-        // si es exactamente "carcel" -> NO es "Ir a la carcel"
+
         if (compact.equals("carcel")) return false;
 
-        // detectar variantes de "ir a la carcel"
-        // - "iracarcel" (sin espacios), "iracarcel" (si el original ya estaba así)
-        // - o bien nombres que contengan tanto "ir" como "carcel" (p. ej. "ir a la carcel")
+
         if (compact.contains("iracarcel")) return true;
         if (compact.contains("ir") && compact.contains("carcel")) return true;
 

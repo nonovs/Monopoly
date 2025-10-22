@@ -31,8 +31,8 @@ public class Solar extends Casilla {
             float alquilerCasa, float alquilerHotel, float alquilerPiscina, float alquilerPista,
             Jugador duenho, Grupo grupo
     ) {
-        super(nombre, "Solar", posicion, valor, duenho);
-        this.setHipoteca(hipoteca);
+        super(nombre, "Solar", posicion, valor, duenho);// Llama al constructor de Casilla,
+        // this.setHipoteca(hipoteca);
         this.alquilerBase = alquilerBase;
         this.setGrupo(grupo);
 

@@ -167,6 +167,12 @@ public class Menu {
             System.out.println("No se pueden crear más de 4 jugadores.");
             return;
         }
+        if (!tipoAvatar.equalsIgnoreCase("Coche") && !tipoAvatar.equalsIgnoreCase("Esfinge") && !tipoAvatar.equalsIgnoreCase("Sombrero") && !tipoAvatar.equalsIgnoreCase("Pelota")) {
+            System.out.println("No se puede crear un jugador con ese tipo de avatar.");
+
+            return;
+
+        }
 
         Casilla salida = tablero.encontrar_casilla("Salida");
         if (salida == null) {
@@ -394,6 +400,7 @@ public class Menu {
             if (lanzamientos >= 3) {
                 System.out.println("Tres dobles en el mismo turno. Vas a la carcel");
                 irACarcel(actual);
+                mostrarTablero();
                 acabarTurno();
             } else {
                 System.out.println("Has sacado dobles, puedes volver a lanzar");
