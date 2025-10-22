@@ -498,8 +498,8 @@ public class Menu {
         }
 
         // pagar y salir
-        actual.pagar(500000);
-        actual.salirDeCarcel(); // este metodo ya imprime el mensaje de salida
+
+        comprobarCarcel(actual.getAvatar().getJugador());// este metodo ya imprime el mensaje de salida
     }
 
 

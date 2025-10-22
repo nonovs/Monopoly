@@ -14,9 +14,7 @@ public class Avatar {
     private Jugador jugador; //Un jugador al que pertenece ese avatar.
     private Casilla lugar; //Los avatares se sitúan en casillas del tablero.
 
-    //Constructor vacío
-    //public Avatar() {
-    //}
+
 
     /*Constructor principal. Requiere éstos parámetros:
     * Tipo del avatar, jugador al que pertenece, lugar en el que estará ubicado, y un arraylist con los
@@ -108,7 +106,7 @@ public class Avatar {
                 return;
             }
         }
-        //throw new Exception("No hay mas identificadores de avatares");
+
     }
 
 }

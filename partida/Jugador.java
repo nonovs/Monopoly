@@ -2,6 +2,7 @@ package partida;
 
 import java.util.ArrayList;
 
+import monopoly.Menu;
 import monopoly.casillas.Casilla;
 
 
@@ -130,6 +131,7 @@ public class Jugador {
         this.enCarcel = false;
         this.turnosEnCarcel = 0;
         this.tiradasCarcel=0;
+
         System.out.println(nombre + "  sale de la Carcel");
     }
     @Override//Esto método para que me funcione ben listar jugadores

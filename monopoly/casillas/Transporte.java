@@ -28,7 +28,7 @@ public class Transporte extends Casilla {
         } else {
             System.out.printf("%s no puede pagar el alquiler de %.0f por %s.%n",
                     actual.getNombre(), alquiler, getNombre());
-            // Aquí podrías llamar lógica de hipoteca o bancarrota
+
             return false;
         }
     }
