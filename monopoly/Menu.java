@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.*;
 import partida.*;
 import monopoly.casillas.Casilla;
+import monopoly.casillas.Solar;
+import monopoly.Construccion.Edificio;
 import java.text.Normalizer;
 
 
@@ -137,6 +139,15 @@ public class Menu {
                     mostrarTablero();
                 break;
 
+            case "edificar":
+                // nuevo comando: edificar <tipo>
+                if (partes.length >= 2) {
+                    edificar(partes[1]);
+                } else {
+                    System.out.println("Uso: edificar <casa|hotel|piscina|pista_deporte>");
+                }
+                break;
+
             default:
                 System.out.println("Comando no reconocido.");
                 System.out.println(" COMANDOS DISPONIBLES:");
@@ -152,7 +163,7 @@ public class Menu {
                 System.out.println("  salir carcel");
                 System.out.println("  acabar turno");
                 System.out.println("  ver tablero");
-
+                System.out.println("  edificar <casa|hotel|piscina|pista_deporte>");
         }
     }
 
@@ -239,6 +250,19 @@ public class Menu {
         }
     }
 
+    /**
+     * Nuevo método: edificar el tipo pedido para el jugador que tiene el turno.
+     * Delegamos la lógica en GestorEdificaciones.
+     */
+    private void edificar(String tipo) {
+        if (jugadores == null || jugadores.isEmpty()) {
+            System.out.println("No hay jugadores en la partida.");
+            return;
+        }
+        Jugador actual = jugadores.get(turno);
+        // Delegar en GestorEdificaciones
+        GestorEdificaciones.edificar(actual, tipo);
+    }
 
     public boolean procesarFichero(String fichero) {
         try (BufferedReader buffer = new BufferedReader(new FileReader(fichero))) {
@@ -285,9 +309,16 @@ public class Menu {
                 for (Casilla c : j.getHipotecadas())
                     hips.add(c.getNombre());
 
-                // Edificios (en esta entrega no están implementados, lo dejamos vacío o placeholder)
+                // Edificios: extraemos desde las propiedades tipo Solar
                 ArrayList<String> edifs = new ArrayList<>();
-                // si más adelante tienes una lista de edificios, puedes recorrerla igual que las anteriores
+                for (Casilla c : j.getPropiedades()) {
+                    if (c instanceof Solar) {
+                        Solar s = (Solar) c;
+                        for (Edificio e : s.getEdificaciones()) {
+                            edifs.add(e.getId());
+                        }
+                    }
+                }
 
                 System.out.println("{");
                 System.out.println("  nombre: " + j.getNombre() + ",");
@@ -554,9 +585,16 @@ public class Menu {
             for (Casilla c : j.getHipotecadas())
                 hips.add(c.getNombre());
 
-            // Edificios (placeholder)
+            // Edificios: extraer ids desde las propiedades tipo Solar
             ArrayList<String> edifs = new ArrayList<>();
-            // si más adelante implementas edificios, los añades aquí
+            for (Casilla c : j.getPropiedades()) {
+                if (c instanceof Solar) {
+                    Solar s = (Solar) c;
+                    for (Edificio e : s.getEdificaciones()) {
+                        edifs.add(e.getId());
+                    }
+                }
+            }
 
             System.out.println("{");
             System.out.println("  nombre: " + j.getNombre() + ",");

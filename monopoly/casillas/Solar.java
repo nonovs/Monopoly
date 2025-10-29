@@ -2,6 +2,9 @@ package monopoly.casillas;
 
 import monopoly.Grupo;
 import partida.Jugador;
+import monopoly.Construccion.Edificio; // <-- novo
+import java.util.ArrayList;          // <-- novo
+import java.util.List;               // <-- novo
 
 public class Solar extends Casilla {
 
@@ -22,7 +25,8 @@ public class Solar extends Casilla {
     private float alquilerPiscina;
     private float alquilerPista;
 
-
+    // Rexistro de edificacions construídas neste solar
+    private final List<Edificio> edificaciones; // <-- novo
 
     public Solar(
             String nombre, int posicion,
@@ -50,6 +54,8 @@ public class Solar extends Casilla {
         this.hotel = false;
         this.piscina = false;
         this.pistaDeporte = false;
+
+        this.edificaciones = new ArrayList<>(); // <-- inicializar
     }
 
 
@@ -143,6 +149,31 @@ public class Solar extends Casilla {
         return false;
     }
 
+    // ===============================
+    // Métodos para xestionar edificacions (engadidos)
+    // ===============================
+    /**
+     * Engade a edificacion ao rexistro do solar.
+     */
+    public void anhadirEdificacion(Edificio e) {
+        if (e != null) {
+            edificaciones.add(e);
+        }
+    }
+
+    /**
+     * Devolve unha copia da lista de edificacions deste solar.
+     */
+    public List<Edificio> getEdificaciones() {
+        return new ArrayList<>(edificaciones);
+    }
+
+    /**
+     * Conveniencia: saber se o solar está "completo" (criterio: hotel+piscina+pista).
+     */
+    public boolean estaCompleto() {
+        return hotel && piscina && pistaDeporte;
+    }
 
     @Override
     public String infoCasilla() {
@@ -150,26 +181,26 @@ public class Solar extends Casilla {
         String duenhoStr = (getDuenho() != null) ? getDuenho().getNombre() : "banca";
 
         return String.format(
-            "{%n" +
-            " tipo: Solar,%n" +
-            " grupo: %s,%n" +
-            " propietario: %s,%n" +
-            " valor: %.0f,%n" +
-            " hipoteca: %.0f,%n" +
-            " alquiler base: %.0f,%n" +
-            " precio casa: %.0f,%n" +
-            " precio hotel: %.0f,%n" +
-            " precio piscina: %.0f,%n" +
-            " precio pista: %.0f,%n" +
-            " alquiler casa: %.0f,%n" +
-            " alquiler hotel: %.0f,%n" +
-            " alquiler piscina: %.0f,%n" +
-            " alquiler pista: %.0f%n" +
-            "}",
-            color, duenhoStr,
-            getValor(), getHipoteca(), alquilerBase,
-            precioCasa, precioHotel, precioPiscina, precioPista,
-            alquilerCasa, alquilerHotel, alquilerPiscina, alquilerPista
+                "{%n" +
+                        " tipo: Solar,%n" +
+                        " grupo: %s,%n" +
+                        " propietario: %s,%n" +
+                        " valor: %.0f,%n" +
+                        " hipoteca: %.0f,%n" +
+                        " alquiler base: %.0f,%n" +
+                        " precio casa: %.0f,%n" +
+                        " precio hotel: %.0f,%n" +
+                        " precio piscina: %.0f,%n" +
+                        " precio pista: %.0f,%n" +
+                        " alquiler casa: %.0f,%n" +
+                        " alquiler hotel: %.0f,%n" +
+                        " alquiler piscina: %.0f,%n" +
+                        " alquiler pista: %.0f%n" +
+                        "}",
+                color, duenhoStr,
+                getValor(), getHipoteca(), alquilerBase,
+                precioCasa, precioHotel, precioPiscina, precioPista,
+                alquilerCasa, alquilerHotel, alquilerPiscina, alquilerPista
         );
     }
 
