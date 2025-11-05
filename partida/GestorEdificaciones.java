@@ -135,7 +135,7 @@ public class GestorEdificaciones {
 
             case "pista":
             case "pista_deporte": {
-                // Pista suele requerir hotel y piscina; la propiedad del grupo no suele ser necesaria.
+
                 float precio = solar.getPrecioPista();
                 if (jugador.getFortuna() < precio) {
                     System.out.printf("La fortuna de %s no es suficiente para edificar una pista de deporte en la casilla %s.%n", jugadorNombre, nombreSolar);

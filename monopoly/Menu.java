@@ -80,7 +80,11 @@ public class Menu {
                     if (partes[1].equalsIgnoreCase("jugadores")) listarJugadores();
                     else if (partes[1].equalsIgnoreCase("enventa")) listarVenta();
                     else if (partes[1].equalsIgnoreCase("avatares")) listarAvatares();
-                    else if (partes[1].equalsIgnoreCase("edificios")) listarEdificios();
+                    else if (partes[1].equalsIgnoreCase("edificios")) {
+                        if (partes.length >= 3){
+                            listarEdificiosGrupo(partes[2]);
+                        }else listarEdificios();
+                    }
                 }
                 break;
 
@@ -611,7 +615,11 @@ public class Menu {
                 if (c instanceof Solar) {
                     Solar s = (Solar) c;
                     for (Edificio e : s.getEdificaciones()) {
-                        edifs.add(e.getId());
+                        String casillaNombre = (e.getSolar() != null) ? e.getSolar().getNombre() : s.getNombre();
+                        String tipo = (e.getTipo() != null) ? e.getTipo() : "-";
+                        String detalle = String.format("{id:%s, tipo:%s, casilla:%s, coste:%.0f } %n",
+                                e.getId(), tipo, casillaNombre, e.getPrecio());
+                        edifs.add(detalle);
                     }
                 }
             }
@@ -678,6 +686,162 @@ public class Menu {
 
         if (!encontrado) {
             System.out.println("No hay edificios construidos.");
+        }
+    }
+
+
+    private void listarEdificiosGrupo(String colorGrupo) {
+        if (colorGrupo == null || colorGrupo.trim().isEmpty()) {
+            System.out.println("Uso: listar edificios <color_grupo>");
+            return;
+        }
+        colorGrupo = colorGrupo.trim();
+
+        List<Casilla> casillas = tablero.getCasillas();
+        if (casillas == null || casillas.isEmpty()) {
+            System.out.println("No hay casillas en el tablero.");
+            return;
+        }
+
+        boolean tienealgo = false;
+
+        // Flags para saber si a nivel de grupo queda posibilidad de construir cada tipo
+        boolean puedeCasa = false;
+        boolean puedeHotel = false;
+        boolean puedePiscina = false;
+        boolean puedePista = false;
+
+        // Lista de solares del grupo para imprimir en el mismo orden del tablero
+        List<Solar> solaresGrupo = new ArrayList<>();
+
+        for (Casilla c : casillas) {
+            if (c instanceof Solar) {
+                Solar s = (Solar) c;
+                if (s.getGrupo() != null && s.getGrupo().getColor() != null
+                        && s.getGrupo().getColor().equalsIgnoreCase(colorGrupo)) {
+                    tienealgo = true;
+                    solaresGrupo.add(s);
+                }
+            }
+        }
+
+        if (!tienealgo || solaresGrupo.isEmpty()) {
+            System.out.println("No se encontraron solares del grupo: " + colorGrupo);
+            return;
+        }
+
+        // Imprimir por cada solar sus edificaciones y calcular posibilidades
+        for (Solar s : solaresGrupo) {
+            List<Edificio> eds = s.getEdificaciones();
+            List<String> casasIds = new ArrayList<>();
+            List<String> hotelesIds = new ArrayList<>();
+            List<String> piscinasIds = new ArrayList<>();
+            List<String> pistasIds = new ArrayList<>();
+
+            if (eds != null) {
+                for (Edificio e : eds) {
+                    String tipo = e.getTipo() != null ? e.getTipo().toLowerCase() : "";
+                    switch (tipo) {
+                        case "casa":
+                            casasIds.add(e.getId());
+                            break;
+                        case "hotel":
+                            hotelesIds.add(e.getId());
+                            break;
+                        case "piscina":
+                            piscinasIds.add(e.getId());
+                            break;
+                        case "pista":
+                        case "pistadeporte":
+                        case "pista_deporte":
+                        case "pista_deportes":
+                        case "pistadeportes":
+                            pistasIds.add(e.getId());
+                            break;
+                        default:
+                            // si hay otros tipos, ignorar o añadir según necesites
+                    }
+                }
+            }
+
+            // Imprimir bloque del solar
+            System.out.println("{");
+            System.out.println(" propiedad: " + s.getNombre() + ",");
+            System.out.println(" hoteles: " + (hotelesIds.isEmpty() ? "-" : hotelesIds.toString()) + ",");
+            System.out.println(" casas: " + (casasIds.isEmpty() ? "-" : casasIds.toString()) + ",");
+            System.out.println(" piscinas: " + (piscinasIds.isEmpty() ? "-" : piscinasIds.toString()) + ",");
+            System.out.println(" pistasDeDeporte: " + (pistasIds.isEmpty() ? "-" : pistasIds.toString()) + ",");
+            // alquiler actual calculado por Solar
+            float alquiler = s.calcularAlquiler();
+            System.out.println(" alquiler: " + String.format("%.0f", alquiler));
+            System.out.println("},");
+
+            // Determinar posibilidades para este solar (según reglas ya implementadas en GestorEdificaciones/Solar)
+            Jugador duenho = s.getDuenho();
+            Grupo grupo = s.getGrupo();
+
+            // Casas: necesita ser dueño del grupo, no tener hotel y tener <4 casas
+            if (duenho != null && grupo != null && grupo.esDuenhoGrupo(duenho) && s.getCasas() < 4 && !s.hasHotel()) {
+                puedeCasa = true;
+            }
+
+            // Hotel: necesita 4 casas y no tener hotel y ser dueño del grupo
+            if (duenho != null && grupo != null && grupo.esDuenhoGrupo(duenho) && s.getCasas() == 4 && !s.hasHotel()) {
+                puedeHotel = true;
+            }
+
+            // Piscina: necesita hotel y no tener piscina (propietario no se requiere que tenga todo el grupo)
+            if (s.hasHotel() && !s.hasPiscina()) {
+                // además, normalmente debe pertenecer al dueño que construyó el hotel;
+                // comprobamos que exista dueño (si no hay dueño no se puede edificar)
+                if (duenho != null) puedePiscina = true;
+            }
+
+            // Pista: necesita hotel y piscina y no tener pista
+            if (s.hasHotel() && s.hasPiscina() && !s.hasPistaDeporte()) {
+                if (duenho != null) puedePista = true;
+            }
+        }
+
+        // Mensajes finales: qué aún se puede edificar y qué no
+        List<String> permitidos = new ArrayList<>();
+        if (puedePista) permitidos.add("una pista de deporte");
+        if (puedePiscina) permitidos.add("una piscina");
+        if (puedeHotel) permitidos.add("un hotel");
+        if (puedeCasa) permitidos.add("una casa");
+
+        List<String> noPermitidos = new ArrayList<>();
+        if (!puedePista) noPermitidos.add("pistas de deporte");
+        if (!puedePiscina) noPermitidos.add("piscinas");
+        if (!puedeHotel) noPermitidos.add("hoteles");
+        if (!puedeCasa) noPermitidos.add("casas");
+
+        if (!permitidos.isEmpty()) {
+            // construir frase como en el ejemplo: "Aún se puede edificar una pista de deporte y una piscina."
+            StringBuilder sb = new StringBuilder("Aún se puede edificar ");
+            for (int i = 0; i < permitidos.size(); i++) {
+                if (i > 0 && i == permitidos.size() - 1) sb.append(" y ");
+                else if (i > 0) sb.append(", ");
+                sb.append(permitidos.get(i));
+            }
+            sb.append(".");
+            System.out.println(sb.toString());
+        } else {
+            System.out.println("Ya no se puede edificar ningún tipo de mejora en este grupo.");
+        }
+
+        // Frase sobre lo que ya no se puede construir (opcional, con el formato del ejemplo)
+        if (!noPermitidos.isEmpty()) {
+            // Si todos están prohibidos, mostrar frase tipo "Ya no se pueden construir ni hoteles ni casas."
+            // Construimos lista con formato "hoteles", "piscinas", etc. y la unimos con " ni "
+            StringBuilder sb2 = new StringBuilder("Ya no se pueden construir ");
+            for (int i = 0; i < noPermitidos.size(); i++) {
+                if (i > 0 && i == noPermitidos.size() - 1) sb2.append(" ni ");
+                else if (i > 0) sb2.append(", ");
+                sb2.append(noPermitidos.get(i));
+            }
+            sb2.append(".");
+            System.out.println(sb2.toString());
         }
     }
 
