@@ -149,7 +149,7 @@ public class Menu {
                 }
                 break;
                 
-            case "hipotecar":
+            /*case "hipotecar":
                 if (partes.length >= 2) {
                     hipotecar(partes[1]);
                 } else {
@@ -163,7 +163,7 @@ public class Menu {
                 } else {
                     System.out.println("Uso: deshipotecar <nombre_casilla>");
                 }
-                break;
+                break;*/
 
             default:
                 System.out.println("Comando no reconocido.");
