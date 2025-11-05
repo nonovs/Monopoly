@@ -150,7 +150,7 @@ public class Solar extends Casilla {
     }
 
     // ===============================
-    // Métodos para xestionar edificacions (engadidos)
+    // Métodos para xestionar edificacions
     // ===============================
     /**
      * Engade a edificacion ao rexistro do solar.

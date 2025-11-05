@@ -81,9 +81,13 @@ public class Grupo {
     public boolean esDuenhoGrupo(Jugador jugador) {
         if (jugador == null) return false;
 
-        for (Solar s : solares) {
-            if (s.getDuenho() != jugador){
-                return false;
+        for (Casilla c : miembros) {
+            if (c instanceof Solar) {
+                Solar s = (Solar) c;
+                // Como ya comprobamos que jugador != null, es seguro usar jugador.equals(...)
+                if (!jugador.equals(s.getDuenho())) {
+                    return false;
+                }
             }
         }
         return true;

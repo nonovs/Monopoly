@@ -40,7 +40,7 @@ public class GestorEdificaciones {
         String jugadorNombre = jugador.getNombre();
         tipo = tipo == null ? "" : tipo.trim().toLowerCase();
 
-        // Comprueba que el jugador sea dueño del solar
+        // Comprueba que el jugador sea dueño del solar y del grupo de solares
         if (solar.getDuenho() == null || solar.getDuenho() != jugador) {
             System.out.printf("%s no es el propietario de %s.%n", jugadorNombre, nombreSolar);
             return;
