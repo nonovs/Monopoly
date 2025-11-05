@@ -24,6 +24,8 @@ public class Solar extends Casilla {
     private float alquilerHotel;
     private float alquilerPiscina;
     private float alquilerPista;
+    private boolean hipotecado = false;
+    private float precioCompra;
 
     // Rexistro de edificacions construídas neste solar
     private final List<Edificio> edificaciones; // <-- novo
@@ -63,6 +65,12 @@ public class Solar extends Casilla {
     public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {
         if (getDuenho() == null || getDuenho() == actual || getDuenho() == banca)
             return true;
+
+        //Si está hipotecada, no se cobra alquiler
+        if (hipotecado) {
+            System.out.printf("La propiedad %s está hipotecada. No se cobra alquiler.%n", getNombre());
+            return true;
+        }
 
         float alquiler = calcularAlquiler();
         if (actual.getFortuna() >= alquiler) {
@@ -175,6 +183,56 @@ public class Solar extends Casilla {
         return hotel && piscina && pistaDeporte;
     }
 
+    public void hipotecar(Jugador jugador) {
+        if (getDuenho() != jugador) {
+            System.out.printf("%s no puede hipotecar %s. No es una propiedad que le pertenece.%n", jugador.getNombre(), getNombre());
+            return;
+        }
+
+        if (hipotecado) {
+            System.out.printf("%s no puede hipotecar %s. Ya está hipotecada.%n", jugador.getNombre(), getNombre());
+            return;
+        }
+
+        if (casas > 0 || hotel || piscina || pistaDeporte) {
+            System.out.printf("%s no puede hipotecar %s. Primero debe vender todos los edificios.%n", jugador.getNombre(), getNombre());
+            return;
+        }
+        //Calcular dinero recibido
+        float cantidad = getValor() / 2.0f;
+        jugador.recibir(cantidad);
+        hipotecado = true;
+
+        System.out.printf("%s recibe %.0f€ por la hipoteca de %s. No puede recibir alquileres ni edificar en el grupo %s.%n", jugador.getNombre(), cantidad, getNombre(), getGrupo().getColor());
+    }
+
+    public void deshipotecar(Jugador jugador) {
+        if (getDuenho() != jugador) {
+            System.out.printf("%s no puede deshipotecar %s. No es una propiedad que le pertenece.%n",
+                    jugador.getNombre(), getNombre());
+            return;
+        }
+
+        if (!hipotecado) {
+            System.out.printf("%s no puede deshipotecar %s. No está hipotecada.%n",
+                    jugador.getNombre(), getNombre());
+            return;
+        }
+
+        float cantidad = getValor() / 2.0f;
+        if (jugador.getFortuna() < cantidad) {
+            System.out.printf("La fortuna de %s no es suficiente para deshipotecar %s.%n",
+                    jugador.getNombre(), getNombre());
+            return;
+        }
+
+        jugador.pagar(cantidad);
+        hipotecado = false;
+
+        System.out.printf("%s paga %.0f€ por deshipotecar %s. Ahora puede recibir alquileres y edificar en el grupo %s.%n",
+                jugador.getNombre(), cantidad, getNombre(), getGrupo().getColor());
+    }
+
     @Override
     public String infoCasilla() {
         String color = (getGrupo() != null && getGrupo().getColor() != null) ? getGrupo().getColor() : "N/A";
@@ -228,6 +286,9 @@ public class Solar extends Casilla {
     public boolean hasHotel() { return hotel; }
     public boolean hasPiscina() { return piscina; }
     public boolean hasPistaDeporte() { return pistaDeporte; }
+    public boolean estaHipotecada() { return hipotecado; }
+
+    public float getPrecioCompra() { return precioCompra; }
 
     public void setPreciosMejoras(float precioCasa, float precioHotel, float precioPiscina, float precioPista) {
         this.precioCasa = precioCasa;

@@ -17,7 +17,7 @@ public class Grupo {
     private float alquilerPiscina;
     private float alquilerPista;
     private ArrayList<Solar> solares;
-    private ArrayList<Especial>especiales;//Rferencia directa a los solares del grupo
+    private ArrayList<Especial>especiales;//Referencia directa a los solares del grupo
 
     /// Valores para construir edificios
     private float valorCasa;

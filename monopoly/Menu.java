@@ -80,6 +80,7 @@ public class Menu {
                     if (partes[1].equalsIgnoreCase("jugadores")) listarJugadores();
                     else if (partes[1].equalsIgnoreCase("enventa")) listarVenta();
                     else if (partes[1].equalsIgnoreCase("avatares")) listarAvatares();
+                    else if (partes[1].equalsIgnoreCase("edificios")) listarEdificios();
                 }
                 break;
 
@@ -147,6 +148,22 @@ public class Menu {
                     System.out.println("Uso: edificar <casa|hotel|piscina|pista_deporte>");
                 }
                 break;
+                
+            case "hipotecar":
+                if (partes.length >= 2) {
+                    hipotecar(partes[1]);
+                } else {
+                    System.out.println("Uso: hipotecar <nombre_casilla>");
+                }
+                break;
+
+            case "deshipotecar":
+                if (partes.length >= 2){
+                    deshipotecar(partes[1]);
+                } else {
+                    System.out.println("Uso: deshipotecar <nombre_casilla>");
+                }
+                break;
 
             default:
                 System.out.println("Comando no reconocido.");
@@ -164,6 +181,8 @@ public class Menu {
                 System.out.println("  acabar turno");
                 System.out.println("  ver tablero");
                 System.out.println("  edificar <casa|hotel|piscina|pista_deporte>");
+                System.out.println("  hipotecar <nombre_casilla>");
+                System.out.println("  deshipotecar <nombre_casilla>");
         }
     }
 
@@ -621,6 +640,46 @@ public class Menu {
             System.out.println(a);
         }
     }
+    //listar Edificios
+
+    private void listarEdificios(){
+        // Recorremos todas las casillas, buscamos los Solar y listamos cada Edificio
+        boolean encontrado = false;
+        List<Casilla> casillas = tablero.getCasillas();
+        if (casillas == null || casillas.isEmpty()) {
+            System.out.println("No hay casillas en el tablero.");
+            return;
+        }
+
+        for (Casilla c : casillas) {
+            if (c instanceof Solar) {
+                Solar s = (Solar) c;
+                List<Edificio> edificaciones = s.getEdificaciones();
+                if (edificaciones == null || edificaciones.isEmpty()) continue;
+
+                for (Edificio e : edificaciones) {
+                    encontrado = true;
+                    String id = e.getId();
+                    String propietario = (s.getDuenho() != null) ? s.getDuenho().getNombre() : "sin propietario";
+                    String casilla = s.getNombre();
+                    String grupo = (s.getGrupo() != null && s.getGrupo().getColor() != null) ? s.getGrupo().getColor() : "-";
+                    float coste = e.getPrecio();
+
+                    System.out.println("{");
+                    System.out.println(" id: " + id + ",");
+                    System.out.println(" propietario: " + propietario + ",");
+                    System.out.println(" casilla: " + casilla + ",");
+                    System.out.println(" grupo: " + grupo + ",");
+                    System.out.println(" coste: " + String.format("%.0f", coste));
+                    System.out.println("},");
+                }
+            }
+        }
+
+        if (!encontrado) {
+            System.out.println("No hay edificios construidos.");
+        }
+    }
 
     // acabar turno
     private void acabarTurno() {
@@ -690,6 +749,78 @@ public class Menu {
             return false;
         }
     }
+    /*
+    private void hipotecar(String nombreCasilla) {
+        Jugador actual = jugadores.get(turno);
+        Casilla c = tablero.encontrar_casilla(nombreCasilla);
 
+        if (c == null) {
+            System.out.println("No existe la casilla " + nombreCasilla);
+            return;
+        }
 
+        if (c.getDuenho() != actual) {
+            System.out.println(actual.getNombre() + " no puede hipotecar " + nombreCasilla + ". No es una propiedad que le pertenece.");
+            return;
+        }
+
+        if (actual.getHipotecadas().contains(c)) {
+            System.out.println(actual.getNombre() + " no puede hipotecar " + nombreCasilla + ". Ya está hipotecada.");
+            return;
+        }
+
+        // Si es Solar y tiene edificios, no puede hipotecar
+        if (c instanceof Solar) {
+            Solar s = (Solar) c;
+            if (!s.getEdificaciones().isEmpty()) {
+                System.out.println("No puedes hipotecar " + nombreCasilla + ". Debes vender los edificios primero.");
+                return;
+            }
+        }
+
+        // Valor de hipoteca: mitad del precio de compra
+        float valorHipoteca = c.getPrecioCompra() / 2;
+
+        actual.sumarFortuna(valorHipoteca);
+        actual.getHipotecadas().add(c);
+
+        System.out.printf("%s recibe %.0f€ por la hipoteca de %s. No puede recibir alquileres ni edificar en el grupo %s.%n",
+                actual.getNombre(), valorHipoteca, c.getNombre(),
+                c.getGrupo() != null ? c.getGrupo().getColor() : "-");
+    }
+
+    private void deshipotecar(String nombreCasilla) {
+        Jugador actual = jugadores.get(turno);
+        Casilla c = tablero.encontrar_casilla(nombreCasilla);
+
+        if (c == null) {
+            System.out.println("No existe la casilla " + nombreCasilla);
+            return;
+        }
+
+        if (c.getDuenho() != actual) {
+            System.out.println(actual.getNombre() + " no puede deshipotecar " + nombreCasilla + ". No es una propiedad que le pertenece.");
+            return;
+        }
+
+        if (!actual.getHipotecadas().contains(c)) {
+            System.out.println(actual.getNombre() + " no puede deshipotecar " + nombreCasilla + ". No está hipotecada.");
+            return;
+        }
+
+        float valorHipoteca = c.getPrecioCompra() / 2;
+
+        if (actual.getFortuna() < valorHipoteca) {
+            System.out.println("No tienes suficiente dinero para deshipotecar esta propiedad.");
+            return;
+        }
+
+        actual.pagar(valorHipoteca);
+        actual.getHipotecadas().remove(c);
+
+        System.out.printf("%s paga %.0f€ por deshipotecar %s. Ahora puede recibir alquileres y edificar en el grupo %s.%n",
+                actual.getNombre(), valorHipoteca, c.getNombre(),
+                c.getGrupo() != null ? c.getGrupo().getColor() : "-");
+    }
+    */
 }
