@@ -251,6 +251,7 @@ public class Menu {
     }
 
     /**
+     * abjalskj
      * Nuevo método: edificar el tipo pedido para el jugador que tiene el turno.
      * Delegamos la lógica en GestorEdificaciones.
      */
