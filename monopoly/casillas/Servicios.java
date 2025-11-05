@@ -7,8 +7,9 @@ public class Servicios extends Casilla {
     private float factorServicio = 50000; // Según el guión del juego
 
     // Constructor
-    public Servicios(String nombre, int posicion, Jugador duenho) {
+    public Servicios(String nombre, int posicion,int precio ,Jugador duenho) {
         super(nombre, "Servicio", posicion, duenho);
+        this.setValor(precio);
     }
 
     @Override
