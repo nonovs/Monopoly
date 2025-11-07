@@ -26,4 +26,5 @@ public class Casa extends Edificio {
         // exemplo: 60% do valor do grupo
         return valorGrupo * 0.60f;
     }
+
 }

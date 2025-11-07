@@ -1,8 +1,9 @@
 package monopoly.casillas;
 
+import monopoly.Construccion.*;
 import monopoly.Grupo;
 import partida.Jugador;
-import monopoly.Construccion.Edificio; // <-- novo
+
 import java.util.ArrayList;          // <-- novo
 import java.util.List;               // <-- novo
 
@@ -269,6 +270,105 @@ public class Solar extends Casilla {
         }
         return String.format("{%n  tipo: solar,%n  grupo: %s,%n  valor: %.0f%n}", getGrupo(), getValor());
     }
+
+
+
+    //Aqui vou gestionar coossas de edificcacions
+    public boolean romperCasa(Casa casa) {
+        if (casa == null || !edificaciones.contains(casa)) {
+            return false;
+        }
+
+        // Devolver la mitad del precio al dueño
+        float devolucion = getPrecioCasa() / 2;
+        if (getDuenho() != null) {
+            getDuenho().recibir(devolucion);
+            System.out.printf("Se ha demolido la casa %s en %s. %s recibe %.0f€.%n",
+                    casa.getId(), getNombre(), getDuenho().getNombre(), devolucion);
+        }
+
+        // Decrementar el contador de casas (usa la variable existente)
+        if (casas > 0) {
+            casas--;
+        }
+
+        return true;
+    }
+
+    public boolean romperHotel(Hotel hotel) {
+        if (hotel == null || !edificaciones.contains(hotel)) {
+            return false;
+        }
+
+        // Devolver la mitad del precio al dueño
+        float devolucion = getPrecioHotel() / 2;
+        if (getDuenho() != null) {
+            getDuenho().recibir(devolucion);
+            System.out.printf("Se ha demolido el hotel %s en %s. %s recibe %.0f€.%n",
+                    hotel.getId(), getNombre(), getDuenho().getNombre(), devolucion);
+        }
+
+        // Marcar que ya no hay hotel
+        this.hotel = false;
+
+        // Volver a añadir 4 casas al demoler un hotel (regla del Monopoly)
+        if (casas + 4 <= 4) {
+            for (int i = 0; i < 4; i++) {
+                Casa casa = new Casa(this, getPrecioCasa());
+                edificaciones.add(casa);
+                casas++;
+            }
+            System.out.printf("Se han añadido 4 casas en %s tras demoler el hotel.%n", getNombre());
+        }
+
+        return true;
+    }
+
+    public boolean romperPiscina(Piscina piscina) {
+        if (piscina == null || !edificaciones.contains(piscina)) {
+            return false;
+        }
+
+        // Devolver la mitad del precio al dueño
+        float devolucion = getPrecioPiscina() / 2;
+        if (getDuenho() != null) {
+            getDuenho().recibir(devolucion);
+            System.out.printf("Se ha demolido la piscina %s en %s. %s recibe %.0f€.%n",
+                    piscina.getId(), getNombre(), getDuenho().getNombre(), devolucion);
+        }
+
+        // Marcar que ya no hay piscina
+        this.piscina = false;
+
+        return true;
+    }
+
+    public boolean romperPista(PistaDeporte pista) {
+        if (pista == null || !edificaciones.contains(pista)) {
+            return false;
+        }
+
+        // Devolver la mitad del precio al dueño
+        float devolucion = getPrecioPista() / 2;
+        if (getDuenho() != null) {
+            getDuenho().recibir(devolucion);
+            System.out.printf("Se ha demolido la pista de deporte %s en %s. %s recibe %.0f€.%n",
+                    pista.getId(), getNombre(), getDuenho().getNombre(), devolucion);
+        }
+
+        // Marcar que ya no hay pista
+        this.pistaDeporte = false;
+
+        return true;
+    }
+
+    public void eliminarEdificacion(Edificio edificio) {
+        if (edificio != null) {
+            edificaciones.remove(edificio);
+        }
+    }
+
+
 
     public float getAlquilerBase() { return alquilerBase; }
 

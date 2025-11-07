@@ -162,4 +162,62 @@ public class GestorEdificaciones {
                 System.out.println("Tipo de edificación no reconocido. Usa: casa, hotel, piscina o pista_deporte.");
         }
     }
+
+
+    public static boolean eliminarEdificio(Edificio edificio) {
+        if (edificio == null) {
+            System.out.println("No se puede eliminar un edificio nulo.");
+            return false;
+        }
+
+        Solar solar = edificio.getSolar();
+        if (solar == null) {
+            System.out.println("El edificio no está asociado a ningún solar.");
+            return false;
+        }
+
+        Jugador duenho = solar.getDuenho();
+        if (duenho == null) {
+            System.out.println("El solar no tiene dueño asignado.");
+            return false;
+        }
+
+        String tipoEdificio = "";
+
+        boolean resultado = false;
+
+        // Identificar el tipo de edificio y ejecutar la demolición correspondiente
+        if (edificio instanceof Casa) {
+            tipoEdificio = "casa";
+
+            resultado = solar.romperCasa((Casa) edificio);
+
+        } else if (edificio instanceof Hotel) {
+            tipoEdificio = "hotel";
+            resultado = solar.romperHotel((Hotel) edificio);
+
+        } else if (edificio instanceof Piscina) {
+            tipoEdificio = "piscina";
+            resultado = solar.romperPiscina((Piscina) edificio);
+
+        } else if (edificio instanceof PistaDeporte) {
+            tipoEdificio = "pista de deporte";
+            resultado = solar.romperPista((PistaDeporte) edificio);
+
+        } else {
+            System.out.println("Tipo de edificio no reconocido.");
+            return false;
+        }
+
+        if (!resultado) {
+            System.out.printf("No se pudo demoler el %s (%s) en %s.%n",
+                    tipoEdificio, edificio.getId(), solar.getNombre());
+            return false;
+        }
+
+
+        solar.eliminarEdificacion(edificio);
+
+        return true;
+    }
 }

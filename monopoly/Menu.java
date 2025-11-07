@@ -11,6 +11,8 @@ import monopoly.casillas.Solar;
 import monopoly.Construccion.Edificio;
 import java.text.Normalizer;
 
+import static partida.GestorEdificaciones.eliminarEdificio;
+
 
 public class Menu {
 
@@ -152,6 +154,13 @@ public class Menu {
                     System.out.println("Uso: edificar <casa|hotel|piscina|pista_deporte>");
                 }
                 break;
+
+            case "vender":
+                    if (partes.length >= 3) {
+                        venderEdificio(partes[1], partes[2]);
+
+
+                    }else System.out.println("Uso: vender <edificio> <solar>");
                 
             /*case "hipotecar":
                 if (partes.length >= 2) {
@@ -185,6 +194,7 @@ public class Menu {
                 System.out.println("  acabar turno");
                 System.out.println("  ver tablero");
                 System.out.println("  edificar <casa|hotel|piscina|pista_deporte>");
+                System.out.println("  vender <edificio> <solar>");
                 System.out.println("  hipotecar <nombre_casilla>");
                 System.out.println("  deshipotecar <nombre_casilla>");
         }
@@ -357,6 +367,8 @@ public class Menu {
         }
         System.out.println("Jugador no encontrado: " + nombre);
     }
+
+
 
     /* describir avatar <ID> */
     private void descAvatar(String ID) {
@@ -845,6 +857,57 @@ public class Menu {
         }
     }
 
+    private void venderEdificio(String nombreSolar, String idEdificio) {
+        if (jugadores == null || jugadores.isEmpty()) {
+            System.out.println("No hay jugadores en la partida.");
+            return;
+        }
+        Jugador actual = jugadores.get(turno);
+
+        // Buscar el solar por nombre
+        Casilla casilla = tablero.encontrar_casilla(nombreSolar);
+        if (casilla == null) {
+            System.out.printf("No se encontró la casilla '%s'.%n", nombreSolar);
+            return;
+        }
+        if (!(casilla instanceof Solar)) {
+            System.out.printf("La casilla '%s' no es un solar.%n", nombreSolar);
+            return;
+        }
+        Solar solar = (Solar) casilla;
+        // Verificar que el jugador actual sea el dueño
+        if (solar.getDuenho() == null || solar.getDuenho() != actual) {
+            System.out.printf("%s no es el propietario de %s.%n",
+                    actual.getNombre(), nombreSolar);
+            return;
+        }
+        // Buscar el edificio por ID en las edificaciones del solar
+        List<Edificio> edificaciones = solar.getEdificaciones();
+        Edificio edificioAVender = null;
+        for (Edificio e : edificaciones) {
+            if (e.getId().equalsIgnoreCase(idEdificio)) {
+                edificioAVender = e;
+                break;
+            }
+        }
+
+        if (edificioAVender == null) {
+            System.out.printf("No se encontró el edificio '%s' en %s.%n",
+                    idEdificio, nombreSolar);
+            return;
+        }
+
+        // Eliminar el edificio usando el método ya implementado
+        boolean eliminado = eliminarEdificio(edificioAVender);
+
+        if (eliminado) {
+            System.out.printf("El jugador %s ha vendido exitosamente el edificio %s de %s.%n",
+                    actual.getNombre(), idEdificio, nombreSolar);
+        } else {
+            System.out.printf("No se pudo vender el edificio %s de %s.%n",
+                    idEdificio, nombreSolar);
+        }
+    }
     // acabar turno
     private void acabarTurno() {
         if (!tirado) {
