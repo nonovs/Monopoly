@@ -9,6 +9,9 @@ import monopoly.Construccion.PistaDeporte;
 import monopoly.Construccion.Edificio;
 import monopoly.Grupo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Clase utilitaria para centralizar la lógica de edificar.
  *
@@ -96,6 +99,19 @@ public class GestorEdificaciones {
                     System.out.println("No se puede edificar un hotel: se requieren 4 casas y ser dueño del grupo o ya existe un hotel.");
                     return;
                 }
+                List<Edificio> casasAEliminar = new ArrayList<>();
+                for (Edificio e : solar.getEdificaciones()) {
+                    if (e instanceof Casa) {
+                        casasAEliminar.add(e);
+                    }
+                }
+                int eliminadas = 0;
+                for (Edificio casa : casasAEliminar) {
+                    if (eliminadas < 4) {
+                        solar.eliminarEdificacion(casa);
+                        eliminadas++;
+                    }
+                }
                 boolean ok = solar.construirHotel();
                 if (!ok) {
                     System.out.println("No se pudo edificar el hotel.");
@@ -105,6 +121,7 @@ public class GestorEdificaciones {
                 solar.anhadirEdificacion((Edificio) hotel);
                 System.out.printf("Se ha edificado un hotel (%s) en %s. La fortuna de %s se reduce en %.0f€.%n",
                         hotel.getId(), nombreSolar, jugadorNombre, precio);
+                System.out.printf("Las 4 casas en %s han sido reemplazadas por el hotel.%n", nombreSolar);
                 return;
             }
 

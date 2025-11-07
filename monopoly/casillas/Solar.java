@@ -135,12 +135,29 @@ public class Solar extends Casilla {
 
     public boolean construirHotel() {
         if (casas == 4 && !hotel) {
-            casas = 0;
-            hotel = true;
+            List<Edificio> casasAEliminar = new ArrayList<>();
+            for (Edificio e : edificaciones) {
+                if (e instanceof Casa) {
+                    casasAEliminar.add(e);
+                }
+            }
+
+            // Eliminar solo 4 casas puido fallar o codigo e crear mais de 4
+            int eliminadas = 0;
+            for (Edificio casa : casasAEliminar) {
+                if (eliminadas < 4) {
+                    edificaciones.remove(casa);
+                    eliminadas++;
+                }
+            }
+
+            casas = 0;      //casas a 0
+            hotel = true;   // hotel1
             return true;
         }
         return false;
     }
+
 
     public boolean construirPiscina() {
         if (hotel && !piscina) {
@@ -279,8 +296,8 @@ public class Solar extends Casilla {
             return false;
         }
 
-        // Devolver la mitad del precio al dueño
-        float devolucion = getPrecioCasa() / 2;
+
+        float devolucion = getPrecioCasa();
         if (getDuenho() != null) {
             getDuenho().recibir(devolucion);
             System.out.printf("Se ha demolido la casa %s en %s. %s recibe %.0f€.%n",
@@ -300,8 +317,8 @@ public class Solar extends Casilla {
             return false;
         }
 
-        // Devolver la mitad del precio al dueño
-        float devolucion = getPrecioHotel() / 2;
+
+        float devolucion = getPrecioHotel() ;
         if (getDuenho() != null) {
             getDuenho().recibir(devolucion);
             System.out.printf("Se ha demolido el hotel %s en %s. %s recibe %.0f€.%n",
@@ -311,7 +328,7 @@ public class Solar extends Casilla {
         // Marcar que ya no hay hotel
         this.hotel = false;
 
-        // Volver a añadir 4 casas al demoler un hotel (regla del Monopoly)
+        // Volver a añadir 4 casas al demoler un hotel
         if (casas + 4 <= 4) {
             for (int i = 0; i < 4; i++) {
                 Casa casa = new Casa(this, getPrecioCasa());
@@ -329,8 +346,8 @@ public class Solar extends Casilla {
             return false;
         }
 
-        // Devolver la mitad del precio al dueño
-        float devolucion = getPrecioPiscina() / 2;
+
+        float devolucion = getPrecioPiscina();
         if (getDuenho() != null) {
             getDuenho().recibir(devolucion);
             System.out.printf("Se ha demolido la piscina %s en %s. %s recibe %.0f€.%n",
@@ -348,8 +365,8 @@ public class Solar extends Casilla {
             return false;
         }
 
-        // Devolver la mitad del precio al dueño
-        float devolucion = getPrecioPista() / 2;
+
+        float devolucion = getPrecioPista();
         if (getDuenho() != null) {
             getDuenho().recibir(devolucion);
             System.out.printf("Se ha demolido la pista de deporte %s en %s. %s recibe %.0f€.%n",

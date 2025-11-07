@@ -156,12 +156,23 @@ public class Menu {
                 break;
 
             case "vender":
-                    if (partes.length >= 3) {
-                        venderEdificio(partes[1], partes[2]);
-
-
-                    }else System.out.println("Uso: vender <edificio> <solar>");
-                
+                if (partes.length >= 4) {
+                    // vender <tipo> <solar> <cantidad>
+                    try {
+                        String tipo = partes[1];
+                        String solar = partes[2];
+                        int cantidad = Integer.parseInt(partes[3]);
+                        venderEdificio(tipo, solar, cantidad);
+                    } catch (NumberFormatException e) {
+                        System.out.println("La cantidad debe ser un número.");
+                    }
+                } else if (partes.length >= 3) {
+                    // vender <tipo> <solar> (cantidad = 1 por defecto)
+                    venderEdificio(partes[1], partes[2], 1);
+                } else {
+                    System.out.println("Uso: vender <tipo> <solar> <cantidad>");
+                }
+                break;
             /*case "hipotecar":
                 if (partes.length >= 2) {
                     hipotecar(partes[1]);
@@ -194,7 +205,7 @@ public class Menu {
                 System.out.println("  acabar turno");
                 System.out.println("  ver tablero");
                 System.out.println("  edificar <casa|hotel|piscina|pista_deporte>");
-                System.out.println("  vender <edificio> <solar>");
+                System.out.println("  vender <edificio> <solar> (opcional <cantidad>)");
                 System.out.println("  hipotecar <nombre_casilla>");
                 System.out.println("  deshipotecar <nombre_casilla>");
         }
@@ -857,55 +868,137 @@ public class Menu {
         }
     }
 
-    private void venderEdificio(String nombreSolar, String idEdificio) {
+    private void venderEdificio(String tipoEdificio, String nombreSolar, int cantidad) {
         if (jugadores == null || jugadores.isEmpty()) {
             System.out.println("No hay jugadores en la partida.");
             return;
         }
+
         Jugador actual = jugadores.get(turno);
 
         // Buscar el solar por nombre
         Casilla casilla = tablero.encontrar_casilla(nombreSolar);
+
         if (casilla == null) {
             System.out.printf("No se encontró la casilla '%s'.%n", nombreSolar);
             return;
         }
+
         if (!(casilla instanceof Solar)) {
             System.out.printf("La casilla '%s' no es un solar.%n", nombreSolar);
             return;
         }
+
         Solar solar = (Solar) casilla;
+
         // Verificar que el jugador actual sea el dueño
         if (solar.getDuenho() == null || solar.getDuenho() != actual) {
-            System.out.printf("%s no es el propietario de %s.%n",
-                    actual.getNombre(), nombreSolar);
+            System.out.printf("No se pueden vender %s en %s. Esta propiedad no pertenece a %s.%n",
+                    tipoEdificio, nombreSolar, actual.getNombre());
             return;
         }
-        // Buscar el edificio por ID en las edificaciones del solar
+
+        // Normalizar tipo de edificio
+        tipoEdificio = tipoEdificio.toLowerCase().trim();
+
+        // Determinar el tipo singular para comparaciones
+        String tipoSingular;
+        if (tipoEdificio.equals("casas") || tipoEdificio.equals("casa")) {
+            tipoSingular = "casa";
+        } else if (tipoEdificio.equals("hoteles") || tipoEdificio.equals("hotel")) {
+            tipoSingular = "hotel";
+        } else if (tipoEdificio.equals("piscinas") || tipoEdificio.equals("piscina")) {
+            tipoSingular = "piscina";
+        } else if (tipoEdificio.equals("pistas") || tipoEdificio.equals("pista") ||
+                tipoEdificio.equals("pistas_deporte") || tipoEdificio.equals("pista_deporte")) {
+            tipoSingular = "pista";
+        } else {
+            System.out.printf("Tipo de edificio no reconocido: %s%n", tipoEdificio);
+            return;
+        }
+
+        // Restricciones especiales por tipo
+        if ((tipoSingular.equals("hotel") || tipoSingular.equals("piscina") || tipoSingular.equals("pista"))
+                && cantidad > 1) {
+            System.out.printf("Solamente se puede vender 1 %s, recibiendo %.0f€.%n",
+                    tipoSingular, getPrecioPorTipo(solar, tipoSingular));
+            cantidad = 1;
+        }
+
+        // Buscar edificios del tipo solicitado
         List<Edificio> edificaciones = solar.getEdificaciones();
-        Edificio edificioAVender = null;
+        List<Edificio> edificiosDelTipo = new ArrayList<>();
+
         for (Edificio e : edificaciones) {
-            if (e.getId().equalsIgnoreCase(idEdificio)) {
-                edificioAVender = e;
-                break;
+            String tipoEdif = e.getTipo() != null ? e.getTipo().toLowerCase() : "";
+            if (tipoEdif.equals(tipoSingular) ||
+                    (tipoSingular.equals("pista") && (tipoEdif.equals("pistadeporte") ||
+                            tipoEdif.equals("pista_deporte")))) {
+                edificiosDelTipo.add(e);
             }
         }
 
-        if (edificioAVender == null) {
-            System.out.printf("No se encontró el edificio '%s' en %s.%n",
-                    idEdificio, nombreSolar);
+        // Verificar que hay suficientes edificios
+        int disponibles = edificiosDelTipo.size();
+        if (disponibles == 0) {
+            System.out.printf("No hay %s en %s para vender.%n",
+                    cantidad > 1 ? tipoEdificio : tipoSingular, nombreSolar);
             return;
         }
 
-        // Eliminar el edificio usando el método ya implementado
-        boolean eliminado = eliminarEdificio(edificioAVender);
+        if (cantidad > disponibles) {
+            System.out.printf("Solo hay %d %s en %s. Se venderán todos.%n",
+                    disponibles, disponibles > 1 ? tipoEdificio : tipoSingular, nombreSolar);
+            cantidad = disponibles;
+        }
 
-        if (eliminado) {
-            System.out.printf("El jugador %s ha vendido exitosamente el edificio %s de %s.%n",
-                    actual.getNombre(), idEdificio, nombreSolar);
+        // Vender la cantidad solicitada
+        float precioUnitario = getPrecioPorTipo(solar, tipoSingular);
+        float totalRecibido = 0;
+        int vendidos = 0;
+
+        for (int i = 0; i < cantidad && i < edificiosDelTipo.size(); i++) {
+            Edificio e = edificiosDelTipo.get(i);
+            boolean eliminado = eliminarEdificio(e);
+            if (eliminado) {
+                totalRecibido += precioUnitario;
+                vendidos++;
+            }
+        }
+
+        // Mensaje de confirmación
+        int restantes = disponibles - vendidos;
+        String tipoMostrar = vendidos > 1 ? pluralizar(tipoSingular) : tipoSingular;
+
+        if (restantes > 0) {
+            String restanteTipo = restantes > 1 ? pluralizar(tipoSingular) : tipoSingular;
+            System.out.printf("%s ha vendido %d %s en %s, recibiendo %.0f€. En la propiedad quedan %d %s.%n",
+                    actual.getNombre(), vendidos, tipoMostrar, nombreSolar,
+                    totalRecibido, restantes, restanteTipo);
         } else {
-            System.out.printf("No se pudo vender el edificio %s de %s.%n",
-                    idEdificio, nombreSolar);
+            System.out.printf("%s ha vendido %d %s en %s, recibiendo %.0f€. No quedan más edificios de este tipo.%n",
+                    actual.getNombre(), vendidos, tipoMostrar, nombreSolar, totalRecibido);
+        }
+    }
+
+    // Métodos auxiliares
+    private float getPrecioPorTipo(Solar solar, String tipo) {
+        switch (tipo) {
+            case "casa": return solar.getPrecioCasa();
+            case "hotel": return solar.getPrecioHotel();
+            case "piscina": return solar.getPrecioPiscina();
+            case "pista": return solar.getPrecioPista();
+            default: return 0;
+        }
+    }
+
+    private String pluralizar(String tipo) {
+        switch (tipo) {
+            case "casa": return "casas";
+            case "hotel": return "hoteles";
+            case "piscina": return "piscinas";
+            case "pista": return "pistas";
+            default: return tipo + "s";
         }
     }
     // acabar turno
