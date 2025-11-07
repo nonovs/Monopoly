@@ -304,7 +304,7 @@ public class Solar extends Casilla {
                     casa.getId(), getNombre(), getDuenho().getNombre(), devolucion);
         }
 
-        // Decrementar el contador de casas (usa la variable existente)
+        // Decrementar el contador de casas
         if (casas > 0) {
             casas--;
         }

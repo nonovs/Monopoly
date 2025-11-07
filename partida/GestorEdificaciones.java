@@ -54,7 +54,7 @@ public class GestorEdificaciones {
 
         switch (tipo) {
             case "casa": {
-                // Regla típica: para construir casas en un grupo se requiere ser dueño de todo el grupo.
+                // Regla para construir casas en un grupo se requiere ser dueño de todo el grupo
                 if (grupo != null && !grupo.esDuenhoGrupo(jugador)) {
                     System.out.printf("No se puede edificar una casa en %s: %s no es dueño de todas las casillas del grupo %s.%n",
                             nombreSolar, jugadorNombre, grupo.getColor());
@@ -83,7 +83,7 @@ public class GestorEdificaciones {
             }
 
             case "hotel": {
-                // Para hotel normalmente se requieren 4 casas en esa casilla y ser dueño del grupo.
+                //Compruebo que es duanho del grupo y que tiene 4 casas
                 if (grupo != null && !grupo.esDuenhoGrupo(jugador)) {
                     System.out.printf("No se puede edificar un hotel en %s: %s no es dueño de todas las casillas del grupo %s.%n",
                             nombreSolar, jugadorNombre, grupo.getColor());
@@ -126,8 +126,8 @@ public class GestorEdificaciones {
             }
 
             case "piscina": {
-                // Piscina suele requerir hotel en la misma casilla; la propiedad del grupo no es necesaria
-                // salvo reglas especiales. Aquí comprobamos únicamente la presencia de hotel.
+                // Piscina suele requerir hotel en la misma casilla; la propiedad del grupo ya no tengo que comprobarla la compruebo en hotel
+
                 float precio = solar.getPrecioPiscina();
                 if (jugador.getFortuna() < precio) {
                     System.out.printf("La fortuna de %s no es suficiente para edificar una piscina en la casilla %s.%n", jugadorNombre, nombreSolar);

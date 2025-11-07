@@ -840,7 +840,7 @@ public class Menu {
         if (!puedeCasa) noPermitidos.add("casas");
 
         if (!permitidos.isEmpty()) {
-            // construir frase como en el ejemplo: "Aún se puede edificar una pista de deporte y una piscina."
+            // "Aún se puede edificar una pista de deporte y una piscina."
             StringBuilder sb = new StringBuilder("Aún se puede edificar ");
             for (int i = 0; i < permitidos.size(); i++) {
                 if (i > 0 && i == permitidos.size() - 1) sb.append(" y ");
@@ -853,10 +853,10 @@ public class Menu {
             System.out.println("Ya no se puede edificar ningún tipo de mejora en este grupo.");
         }
 
-        // Frase sobre lo que ya no se puede construir (opcional, con el formato del ejemplo)
+        //Frase sobre todas aquelas cousas que xa non se poden escribir
         if (!noPermitidos.isEmpty()) {
             // Si todos están prohibidos, mostrar frase tipo "Ya no se pueden construir ni hoteles ni casas."
-            // Construimos lista con formato "hoteles", "piscinas", etc. y la unimos con " ni "
+            // Construimos lista con formato "hoteles", "piscinas", etc. y la unimos con" ni "
             StringBuilder sb2 = new StringBuilder("Ya no se pueden construir ");
             for (int i = 0; i < noPermitidos.size(); i++) {
                 if (i > 0 && i == noPermitidos.size() - 1) sb2.append(" ni ");
