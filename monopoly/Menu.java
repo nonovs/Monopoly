@@ -14,6 +14,7 @@ import monopoly.casillas.Suerte;
 import monopoly.casillas.CajaComunidad;
 
 
+
 import static partida.GestorEdificaciones.eliminarEdificio;
 
 
@@ -31,6 +32,7 @@ public class Menu {
     private boolean tirado = false;       // Si el jugador actual ya tiró
     private boolean solvente = true;      // Si el jugador actual está solvente tras evaluar casilla
     private Dado dado = new Dado();       // Un solo Dado que gestiona 2 dados
+    private boolean puedeRepetirLanzamiento = false; // true solo cuando ha sacado dobles válidos
 
     // CONSTRUCTOR
     public Menu() {
@@ -412,6 +414,11 @@ public class Menu {
         }
         Jugador actual = jugadores.get(turno);
 
+        if (tirado && !puedeRepetirLanzamiento) {
+            System.out.println("Ya has lanzado los dados en este turno. Usa 'acabar turno' para pasar al siguiente jugador.");
+            return;
+        }
+
         // si es la primera tirada del turno resetea estado del dado
         if (lanzamientos == 0) {
             dado.iniciarTurno();
@@ -422,6 +429,7 @@ public class Menu {
         int d2 = dado.getD2();
         lanzamientos++;
         tirado = true;
+        puedeRepetirLanzamiento = false;
 
         // si esta en carcel se aplica la regla especial y salimos si ya resolvio
         if (actual.isEnCarcel()) {
@@ -462,6 +470,11 @@ public class Menu {
             return;
         }
         Jugador actual = jugadores.get(turno);
+
+        if (tirado && !puedeRepetirLanzamiento) {
+            System.out.println("Ya has lanzado los dados en este turno. Usa 'acabar turno' para pasar al siguiente jugador.");
+            return;
+        }
 
         if (lanzamientos == 0) {
             dado.iniciarTurno();
@@ -1026,6 +1039,7 @@ private void moverYEvaluar(Jugador j, int pasos) {
         turno = (turno + 1) % jugadores.size();
         tirado = false;
         lanzamientos = 0;   // resetea contador de dobles del turno
+        puedeRepetirLanzamiento = false; 
         solvente = true;
         System.out.println("Turno terminado. Ahora juega: " + jugadores.get(turno).getNombre());
     }
