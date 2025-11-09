@@ -60,6 +60,11 @@ public class Transporte extends Casilla {
         );
     }
 
+    
+    public float getAlquiler() {
+        return alquiler;
+    }
+
     @Override
     public String infoCasilla() {
         return String.format(

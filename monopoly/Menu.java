@@ -10,6 +10,9 @@ import monopoly.casillas.Casilla;
 import monopoly.casillas.Solar;
 import monopoly.Construccion.Edificio;
 import java.text.Normalizer;
+import monopoly.casillas.Suerte;
+import monopoly.casillas.CajaComunidad;
+
 
 import static partida.GestorEdificaciones.eliminarEdificio;
 
@@ -493,57 +496,70 @@ public class Menu {
         }
     }
 
-    // --- mover y evaluar la casilla destino ---
-    private void moverYEvaluar(Jugador j, int pasos) {
-        int posIni = j.getPosicion();
-        int posFin = (posIni + pasos) % 40;
+// --- mover y evaluar la casilla destino ---
+private void moverYEvaluar(Jugador j, int pasos) {
+    int posIni = j.getPosicion();
+    int posFin = (posIni + pasos) % 40;
 
-        // pasar por salida -> cobra SUMA_VUELTA
-        if (posIni + pasos >= 40) {
-            j.sumarFortuna((float) Valor.SUMA_VUELTA);
-            System.out.printf("%s pasa por Salida y cobra %.0f%n", j.getNombre(), Valor.SUMA_VUELTA);
-        }
-
-        // actualizar casillas: quitar avatar de la actual y poner en destino
-        Casilla origen = tablero.getCasilla(posIni);
-        Casilla destino = tablero.getCasilla(posFin);
-        if (origen != null && j.getAvatar() != null) {
-            origen.eliminarAvatar(j.getAvatar());
-        }
-        if (destino != null && j.getAvatar() != null) {
-            destino.anhadirAvatar(j.getAvatar());
-            // sincronizar lugar del avatar para mantener coherencia entre Avatar y Casilla
-            j.getAvatar().setLugar(destino);
-        }
-
-        // actualizar posicion en jugador
-        j.setPosicion(posFin);
-
-        // Detectar "Ir a la carcel" usando el método de Casilla (más robusto que comparar con 30).
-        if (destino != null && destino.esIrACarcel()) {
-            System.out.println("Vas a la carcel");
-            irACarcel(j);
-            mostrarTablero();
-            return; // no evaluar mas esta tirada
-        }
-
-        System.out.printf("%s avanza a %s (pos %d)%n", j.getNombre(),
-                destino != null ? destino.getNombre() : "desconocida", posFin);
-
-        // evaluar casilla segun su tipo, usando polimorfismo
-        if (destino != null) {
-            boolean ok = destino.evaluarCasilla(j, banca, pasos);
-            if (!ok) {
-                System.out.println("No has podido pagar tus deudas. Revisa hipotecas o declarate en bancarrota");
-                solvente = false;
-            } else {
-                solvente = true;
-            }
-        }
-
-        // repinta tablero tras movimiento
-        mostrarTablero();
+    // pasar por salida -> cobra SUMA_VUELTA
+    if (posIni + pasos >= 40) {
+        j.sumarFortuna((float) Valor.SUMA_VUELTA);
+        System.out.printf("%s pasa por Salida y cobra %.0f%n", j.getNombre(), Valor.SUMA_VUELTA);
     }
+
+    // actualizar casillas: quitar avatar de la actual y poner en destino
+    Casilla origen = tablero.getCasilla(posIni);
+    Casilla destino = tablero.getCasilla(posFin);
+    if (origen != null && j.getAvatar() != null) {
+        origen.eliminarAvatar(j.getAvatar());
+    }
+    if (destino != null && j.getAvatar() != null) {
+        destino.anhadirAvatar(j.getAvatar());
+        // sincronizar lugar del avatar para mantener coherencia entre Avatar y Casilla
+        j.getAvatar().setLugar(destino);
+    }
+
+    // actualizar posicion en jugador
+    j.setPosicion(posFin);
+
+    // Detectar "Ir a la carcel"
+    if (destino != null && destino.esIrACarcel()) {
+        System.out.println("Vas a la carcel");
+        irACarcel(j);
+        mostrarTablero();
+        return; // no evaluar mas esta tirada
+    }
+
+    System.out.printf("%s avanza a %s (pos %d)%n", j.getNombre(),
+            destino != null ? destino.getNombre() : "desconocida", posFin);
+
+    // evaluar casilla segun su tipo
+    if (destino != null) {
+        boolean ok;
+
+        if (destino instanceof Suerte) {
+            // delegamos en la lógica de cartas de Suerte
+            ok = ((Suerte) destino).aplicarCarta(tablero, j, banca, jugadores, pasos);
+        } else if (destino instanceof CajaComunidad) {
+            // delegamos en la lógica de cartas de Caja de Comunidad
+            ok = ((CajaComunidad) destino).aplicarCarta(tablero, j, banca, jugadores, pasos);
+        } else {
+            // resto de casillas como antes
+            ok = destino.evaluarCasilla(j, banca, pasos);
+        }
+
+        if (!ok) {
+            System.out.println("No has podido pagar tus deudas. Revisa hipotecas o declarate en bancarrota");
+            solvente = false;
+        } else {
+            solvente = true;
+        }
+    }
+
+    // repinta tablero tras movimiento
+    mostrarTablero();
+}
+
 
     // --- ir a carcel: lleva al jugador a la posicion 10 ---
     private void irACarcel(Jugador j) {
