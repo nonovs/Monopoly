@@ -26,7 +26,7 @@ public class Tablero {
         insertarLadoEste();
     }
 
-
+   
     // ---------------- LADO SUR ----------------
     private void insertarLadoSur() {
         ArrayList<Casilla> ladoSur = new ArrayList<>(11);
@@ -59,7 +59,7 @@ public class Tablero {
                 1000000, 500000, 60000,
                 500000, 500000, 100000, 200000,
                 1000000, 5500000, 1100000, 1100000,
-
+                
                 banca, null);
         ladoSur.add(casilla);
         banca.anhadirPropiedad(casilla);
@@ -212,7 +212,7 @@ public class Tablero {
                 2450000, 11500000, 2300000, 2300000,
                 banca, null));
 
-        ladoNorte.add(new Servicios(Valor.WHITE + "Serv2", 28,500000 ,banca));
+        ladoNorte.add(new Servicios(Valor.WHITE + "Serv2", 28, 500000, banca));
 
         ladoNorte.add(new Solar(Valor.BROWN + "Solar17", 29,
                 2800000, 1400000, 240000,

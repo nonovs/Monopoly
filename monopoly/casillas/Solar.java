@@ -26,7 +26,7 @@ public class Solar extends Casilla {
     private float alquilerPiscina;
     private float alquilerPista;
     private boolean hipotecado = false;
-    private float precioCompra;
+    private ArrayList<Edificio> edificio = new ArrayList<>();
 
     // Rexistro de edificacions construídas neste solar
     private final List<Edificio> edificaciones; // <-- novo
@@ -61,7 +61,11 @@ public class Solar extends Casilla {
         this.edificaciones = new ArrayList<>(); // <-- inicializar
     }
 
-
+    /** Se ejecuta cuando un jugador cae en la casilla
+     * -Si no tiene dueño o el dueño es la banca, no ocurre nada
+     * -si perteneces al mismo jugador, tampoco.
+     * -Si pertenece a otro jugador, se calcula y cobra el alquiler.
+     */
     @Override
     public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {
         if (getDuenho() == null || getDuenho() == actual || getDuenho() == banca)
@@ -83,21 +87,25 @@ public class Solar extends Casilla {
             return false;
         }
     }
-
+    //  Permite al jugador comprar la casilla si está libre y se encuentra en ella
     @Override
     public void comprarCasilla(Jugador solicitante, Jugador banca) {
+        //Verifica que la propiedad no esté ya vendida
         if (getDuenho() != banca) {
             System.out.println("Este solar ya tiene dueño.");
             return;
         }
+        // Solo se puede comprar si el jugador está sobre la casilla
         if (solicitante.getPosicion() != this.getPosicion()) {
             System.out.println("Solo puedes comprar la casilla en la que estás situado.");
             return;
         }
+        // verifica que el jugador tenga suficiente dinero
         if (solicitante.getFortuna() < getValor()) {
             System.out.println(solicitante.getNombre() + " no tiene suficiente dinero para comprar " + getNombre());
             return;
         }
+        //Efectua la compra
         solicitante.pagar(getValor());
         setDuenho(solicitante);
         solicitante.anhadirPropiedad(this);
@@ -107,7 +115,7 @@ public class Solar extends Casilla {
                 solicitante.getNombre(), getNombre(), getValor(), solicitante.getFortuna()
         );
     }
-
+    //Calcula el alquieler actual de la casilla, teniendo en cuenta edificaciones y grupos
     public float calcularAlquiler() {
         float total = alquilerBase;
 
@@ -199,56 +207,6 @@ public class Solar extends Casilla {
      */
     public boolean estaCompleto() {
         return hotel && piscina && pistaDeporte;
-    }
-
-    public void hipotecar(Jugador jugador) {
-        if (getDuenho() != jugador) {
-            System.out.printf("%s no puede hipotecar %s. No es una propiedad que le pertenece.%n", jugador.getNombre(), getNombre());
-            return;
-        }
-
-        if (hipotecado) {
-            System.out.printf("%s no puede hipotecar %s. Ya está hipotecada.%n", jugador.getNombre(), getNombre());
-            return;
-        }
-
-        if (casas > 0 || hotel || piscina || pistaDeporte) {
-            System.out.printf("%s no puede hipotecar %s. Primero debe vender todos los edificios.%n", jugador.getNombre(), getNombre());
-            return;
-        }
-        //Calcular dinero recibido
-        float cantidad = getValor() / 2.0f;
-        jugador.recibir(cantidad);
-        hipotecado = true;
-
-        System.out.printf("%s recibe %.0f€ por la hipoteca de %s. No puede recibir alquileres ni edificar en el grupo %s.%n", jugador.getNombre(), cantidad, getNombre(), getGrupo().getColor());
-    }
-
-    public void deshipotecar(Jugador jugador) {
-        if (getDuenho() != jugador) {
-            System.out.printf("%s no puede deshipotecar %s. No es una propiedad que le pertenece.%n",
-                    jugador.getNombre(), getNombre());
-            return;
-        }
-
-        if (!hipotecado) {
-            System.out.printf("%s no puede deshipotecar %s. No está hipotecada.%n",
-                    jugador.getNombre(), getNombre());
-            return;
-        }
-
-        float cantidad = getValor() / 2.0f;
-        if (jugador.getFortuna() < cantidad) {
-            System.out.printf("La fortuna de %s no es suficiente para deshipotecar %s.%n",
-                    jugador.getNombre(), getNombre());
-            return;
-        }
-
-        jugador.pagar(cantidad);
-        hipotecado = false;
-
-        System.out.printf("%s paga %.0f€ por deshipotecar %s. Ahora puede recibir alquileres y edificar en el grupo %s.%n",
-                jugador.getNombre(), cantidad, getNombre(), getGrupo().getColor());
     }
 
     @Override
@@ -403,9 +361,6 @@ public class Solar extends Casilla {
     public boolean hasHotel() { return hotel; }
     public boolean hasPiscina() { return piscina; }
     public boolean hasPistaDeporte() { return pistaDeporte; }
-    public boolean estaHipotecada() { return hipotecado; }
-
-    public float getPrecioCompra() { return precioCompra; }
 
     public void setPreciosMejoras(float precioCasa, float precioHotel, float precioPiscina, float precioPista) {
         this.precioCasa = precioCasa;
@@ -419,5 +374,9 @@ public class Solar extends Casilla {
         this.alquilerHotel = alquilerHotel;
         this.alquilerPiscina = alquilerPiscina;
         this.alquilerPista = alquilerPista;
+    }
+
+    public boolean tieneEdificios() {
+        return !edificio.isEmpty();
     }
 }

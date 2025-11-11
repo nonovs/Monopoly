@@ -1,12 +1,9 @@
-package monopoly; 
-
-import partida.Jugador;
-import monopoly.Menu;
-import java.util.jar.JarEntry;
+package monopoly;
 
 public class MonopolyETSE {
 
     public static void main(String[] args) {
+
         Menu menu = new Menu();
         if (args.length >= 1) {
             String fichero = args[0];

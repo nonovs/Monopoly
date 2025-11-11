@@ -2,8 +2,8 @@ package partida;
 
 import java.util.ArrayList;
 
-import monopoly.Menu;
 import monopoly.casillas.Casilla;
+import monopoly.casillas.Solar;
 
 
 public class Jugador {
@@ -54,8 +54,8 @@ public class Jugador {
         this.tiradasCarcel=0;
         this.enCarcel=false;
         this.vueltas=0;
-        this.propiedades=new ArrayList<Casilla>();
-        this.hipotecadas=new ArrayList<Casilla>();
+        this.propiedades=new ArrayList<>();
+        this.hipotecadas=new ArrayList<>();
         this.posicion= inicio != null ? inicio.getPosicion() : 0;
         this.turnosEnCarcel=0;
         this.avatar=new Avatar(tipoAvatar,this,inicio,avCreados);
@@ -131,7 +131,6 @@ public class Jugador {
         this.enCarcel = false;
         this.turnosEnCarcel = 0;
         this.tiradasCarcel=0;
-
         System.out.println(nombre + "  sale de la Carcel");
     }
     @Override//Esto método para que me funcione ben listar jugadores
@@ -143,23 +142,58 @@ public class Jugador {
         return nombre;
     }
 
-    public boolean tieneHipoteca(Casilla c){
-        return hipotecadas.contains(c);
-    }
     public void hipotecarPropiedad(Casilla c){
-        if(propiedades.contains(c)){
-            hipotecadas.add(c);
-            this.fortuna+=c.getHipoteca();
-            System.out.println(nombre + "  ha hipotecado " + c.getNombre() + "por " +c.getHipoteca());
+        if (!propiedades.contains(c)) {
+            System.out.println(nombre + " no puede hipotecar " + c.getNombre() + ". No es una propiedad que le pertenece.");
+            return;
         }
+        if (c.isHipotecada()) {
+            System.out.println(nombre + " no puede hipotecar " + c.getNombre() + ". Ya está hipotecada.");
+            return;
+        }
+        if (c instanceof Solar) {
+            Solar s = (Solar) c;
+            if (!s.getEdificaciones().isEmpty()) {
+                System.out.println(nombre + " no puede hipotecar " + s.getNombre() + ". Debe vender los edificios primero.");
+                return;
+            }
+        }
+        float cantidad = c.getPrecioHipoteca();
+        fortuna += cantidad;
+        c.setHipotecada(true);
+        hipotecadas.add(c);
+        propiedades.remove(c);
+
+        System.out.println(nombre + " recibe " + String.format("%.0f€", cantidad) + " por la hipoteca de " + c.getNombre() +
+                ". No puede recibir alquileres ni edificar en el grupo " + c.getGrupo().getColor() + ".");
     }
 
     public void deshipotecarPropiedad(Casilla c){
-        if(hipotecadas.contains(c)){
-            hipotecadas.remove(c);
-            this.fortuna-=c.getHipoteca();
-            System.out.println(nombre + "  deshipotecado " + c.getNombre() + "por " +c.getHipoteca());
+        if (!c.getDuenho().equals(this)) {
+            System.out.println(nombre + " no puede deshipotecar " + c.getNombre() + ". No es una propiedad que le pertenece.");
+            return;
         }
+        if (!(c instanceof Solar)) {
+            System.out.println(nombre + " no puede deshipotecar " + c.getNombre() + ". Solo los solares son hipotecables.");
+            return;
+        }
+        Solar s = (Solar) c;
+        if (!hipotecadas.contains(c)) {
+            System.out.println(nombre + " no puede deshipotecar " + s.getNombre() + ". No está hipotecada.");
+            return;
+        }
+        double cantidad = s.getPrecioHipoteca();
+        if (fortuna < cantidad) {
+            System.out.println(nombre + " no tiene suficiente dinero para deshipotecar " + s.getNombre() + ".");
+            return;
+        }
+        fortuna -= cantidad;
+        s.setHipotecada(false);
+        propiedades.add(c);
+        hipotecadas.remove(c);
+
+        System.out.println(nombre + " paga " + String.format("%.0f€", cantidad) + " por deshipotecar " + c.getNombre() +
+                ". Ahora puede recibir alquileres y edificar en el grupo " + c.getGrupo().getColor() + ".");
     }
    
     public void setAvatar(Avatar nuevoAvatar) {
@@ -238,9 +272,7 @@ public class Jugador {
         return hipotecadas;
     }
 
-    public void setHipotecadas(ArrayList<Casilla> hipotecadas) {
-        this.hipotecadas = hipotecadas;
-    }
+
 
 
 }

@@ -17,7 +17,7 @@ public class Grupo {
     private float alquilerPiscina;
     private float alquilerPista;
     private ArrayList<Solar> solares;
-    private ArrayList<Especial>especiales;//Referencia directa a los solares del grupo
+    private ArrayList<Especial>especiales;//Rferencia directa a los solares del grupo
 
     /// Valores para construir edificios
     private float valorCasa;
@@ -81,13 +81,9 @@ public class Grupo {
     public boolean esDuenhoGrupo(Jugador jugador) {
         if (jugador == null) return false;
 
-        for (Casilla c : miembros) {
-            if (c instanceof Solar) {
-                Solar s = (Solar) c;
-                // Como ya comprobamos que jugador != null, es seguro usar jugador.equals(...)
-                if (!jugador.equals(s.getDuenho())) {
-                    return false;
-                }
+        for (Solar s : solares) {
+            if (s.getDuenho() != jugador){
+                return false;
             }
         }
         return true;

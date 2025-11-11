@@ -1,6 +1,6 @@
 package partida;
 
-import java.util.concurrent.ThreadLocalRandom;
+
 import java.util.Random;
 
 /**
@@ -26,7 +26,7 @@ public class Dado {
     private int valor;
 
     // Contador de dobles consecutivos dentro del turno actual, debe reiniciarse al principio de cada turno
-    // por lo que se debe poner 0 con la funcion iniciar_turno
+    // por lo que se debe poner 0 con la función iniciar_turno
     private int doblesConsecutivos = 0;
 
     //Usaremos la clase Random de java para asignarle a la tirada de cada dado un valor aleatorio
@@ -54,6 +54,7 @@ public class Dado {
     public int tirar() {
         d1 = numeroRandom.nextInt(1, 7);
         d2 = numeroRandom.nextInt(1, 7);
+
         valor = d1 + d2;
 
         actualizarDobles();
@@ -71,6 +72,7 @@ public class Dado {
         }
         d1 = a;
         d2 = b;
+
         valor = d1 + d2;
 
         actualizarDobles();
@@ -90,6 +92,7 @@ public class Dado {
 
 
     public int getD2() { return d2; }
+
 
     public int getValor() {
         return valor;

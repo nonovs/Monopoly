@@ -178,7 +178,7 @@ public class Menu {
                     System.out.println("Uso: vender <tipo> <solar> <cantidad>");
                 }
                 break;
-            /*case "hipotecar":
+            case "hipotecar":
                 if (partes.length >= 2) {
                     hipotecar(partes[1]);
                 } else {
@@ -192,7 +192,7 @@ public class Menu {
                 } else {
                     System.out.println("Uso: deshipotecar <nombre_casilla>");
                 }
-                break;*/
+                break;
 
             default:
                 System.out.println("Comando no reconocido.");
@@ -201,6 +201,7 @@ public class Menu {
                 System.out.println("  listar jugadores");
                 System.out.println("  listar enventa");
                 System.out.println("  listar avatares");
+                System.out.println("  listar edificios");
                 System.out.println("  describir jugador <nombre>");
                 System.out.println("  describir avatar <id_avatar>");
                 System.out.println("  describir <nombre_casilla>");
@@ -300,7 +301,6 @@ public class Menu {
     }
 
     /**
-     * abjalskj
      * Nuevo método: edificar el tipo pedido para el jugador que tiene el turno.
      * Delegamos la lógica en GestorEdificaciones.
      */
@@ -419,6 +419,12 @@ public class Menu {
             return;
         }
 
+        //control de máximo 3 tiradas por turno
+        if (lanzamientos >= 3){
+            System.out.println("Ya has realizado el máximo de 3 lanzamientos en este turno. Usa 'acabar turno' para pasar al siguiente jugador.");
+            return;
+        }
+
         // si es la primera tirada del turno resetea estado del dado
         if (lanzamientos == 0) {
             dado.iniciarTurno();
@@ -447,14 +453,19 @@ public class Menu {
         moverYEvaluar(actual, suma);
 
         if (dado.esDoble()) {
-            if (lanzamientos >= 3) {
+            if (lanzamientos == 3) {
                 System.out.println("Tres dobles en el mismo turno. Vas a la carcel");
                 irACarcel(actual);
                 acabarTurno();
             } else {
                 System.out.println("Has sacado dobles, puedes volver a lanzar");
+                //Permitir un nuevo lanzamiento sin necesidad de 'acabar turno'
+                puedeRepetirLanzamiento = true;
+                tirado = false;
             }
         } else {
+            //Si no son dobles, el turno termina normalmente
+            puedeRepetirLanzamiento = false;
             System.out.println("Usa 'acabar turno' para pasar al siguiente jugador");
         }
     }
@@ -473,6 +484,12 @@ public class Menu {
 
         if (tirado && !puedeRepetirLanzamiento) {
             System.out.println("Ya has lanzado los dados en este turno. Usa 'acabar turno' para pasar al siguiente jugador.");
+            return;
+        }
+
+        //control de máximo 3 tiradas por turno
+        if (lanzamientos >= 3){
+            System.out.println("Ya has realizado el máximo de 3 lanzamientos en este turno. Usa 'acabar turno' para pasar al siguiente jugador.");
             return;
         }
 
@@ -496,15 +513,18 @@ public class Menu {
         moverYEvaluar(actual, suma);
 
         if (dado.esDoble()) {
-            if (lanzamientos >= 3) {
+            if (lanzamientos == 3) {
                 System.out.println("Tres dobles en el mismo turno. Vas a la carcel");
                 irACarcel(actual);
                 mostrarTablero();
                 acabarTurno();
             } else {
                 System.out.println("Has sacado dobles, puedes volver a lanzar");
+                puedeRepetirLanzamiento = true;
+                tirado = false;
             }
         } else {
+            puedeRepetirLanzamiento = false;
             System.out.println("Usa 'acabar turno' para pasar al siguiente jugador");
         }
     }
@@ -1099,44 +1119,16 @@ private void moverYEvaluar(Jugador j, int pasos) {
             return false;
         }
     }
-    /*
+
     private void hipotecar(String nombreCasilla) {
         Jugador actual = jugadores.get(turno);
         Casilla c = tablero.encontrar_casilla(nombreCasilla);
 
         if (c == null) {
-            System.out.println("No existe la casilla " + nombreCasilla);
+            System.out.println("No se encontró la casilla " + nombreCasilla);
             return;
         }
-
-        if (c.getDuenho() != actual) {
-            System.out.println(actual.getNombre() + " no puede hipotecar " + nombreCasilla + ". No es una propiedad que le pertenece.");
-            return;
-        }
-
-        if (actual.getHipotecadas().contains(c)) {
-            System.out.println(actual.getNombre() + " no puede hipotecar " + nombreCasilla + ". Ya está hipotecada.");
-            return;
-        }
-
-        // Si es Solar y tiene edificios, no puede hipotecar
-        if (c instanceof Solar) {
-            Solar s = (Solar) c;
-            if (!s.getEdificaciones().isEmpty()) {
-                System.out.println("No puedes hipotecar " + nombreCasilla + ". Debes vender los edificios primero.");
-                return;
-            }
-        }
-
-        // Valor de hipoteca: mitad del precio de compra
-        float valorHipoteca = c.getPrecioCompra() / 2;
-
-        actual.sumarFortuna(valorHipoteca);
-        actual.getHipotecadas().add(c);
-
-        System.out.printf("%s recibe %.0f€ por la hipoteca de %s. No puede recibir alquileres ni edificar en el grupo %s.%n",
-                actual.getNombre(), valorHipoteca, c.getNombre(),
-                c.getGrupo() != null ? c.getGrupo().getColor() : "-");
+        actual.hipotecarPropiedad(c);
     }
 
     private void deshipotecar(String nombreCasilla) {
@@ -1144,33 +1136,10 @@ private void moverYEvaluar(Jugador j, int pasos) {
         Casilla c = tablero.encontrar_casilla(nombreCasilla);
 
         if (c == null) {
-            System.out.println("No existe la casilla " + nombreCasilla);
+            System.out.println("No se encontró la casilla " + nombreCasilla);
             return;
         }
-
-        if (c.getDuenho() != actual) {
-            System.out.println(actual.getNombre() + " no puede deshipotecar " + nombreCasilla + ". No es una propiedad que le pertenece.");
-            return;
-        }
-
-        if (!actual.getHipotecadas().contains(c)) {
-            System.out.println(actual.getNombre() + " no puede deshipotecar " + nombreCasilla + ". No está hipotecada.");
-            return;
-        }
-
-        float valorHipoteca = c.getPrecioCompra() / 2;
-
-        if (actual.getFortuna() < valorHipoteca) {
-            System.out.println("No tienes suficiente dinero para deshipotecar esta propiedad.");
-            return;
-        }
-
-        actual.pagar(valorHipoteca);
-        actual.getHipotecadas().remove(c);
-
-        System.out.printf("%s paga %.0f€ por deshipotecar %s. Ahora puede recibir alquileres y edificar en el grupo %s.%n",
-                actual.getNombre(), valorHipoteca, c.getNombre(),
-                c.getGrupo() != null ? c.getGrupo().getColor() : "-");
+        actual.deshipotecarPropiedad(c);
     }
-    */
+
 }

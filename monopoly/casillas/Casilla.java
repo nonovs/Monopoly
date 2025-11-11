@@ -4,7 +4,10 @@ import partida.*;
 import monopoly.Grupo;
 import java.util.ArrayList;
 
-
+/** Representa una posición del tablero.
+ * Cada casilla puede tener distinto tipo (solar, servicio...) y este determina cómo se comporta cuando se cae en ella.
+ * Es la clase base de la jerarquía de casillas.
+ */
 public class Casilla {
 
     //Atributos:
@@ -18,8 +21,9 @@ public class Casilla {
     private float hipoteca; //Valor otorgado por hipotecar una casilla
     private ArrayList<Avatar> avatares; //Avatares que están situados en la casilla.
     private String colorGrupo;
+    private boolean hipotecada = false;
 
-    //Constructores:
+    //Constructor vacío: crea una casilla sin datos, inicializa una lista de avatares vacia
     public Casilla() {
         this.avatares = new ArrayList<>();
     }
@@ -134,7 +138,6 @@ public class Casilla {
     public void setGrupo(Grupo g) { this.grupo = g; }
     public float getImpuesto() { return impuesto; }
     public float getHipoteca() { return hipoteca; }
-    public void setHipoteca(float h) { this.hipoteca = h; }
     public ArrayList<Avatar> getAvatares() {  return avatares == null ? new ArrayList<>(): new ArrayList<>(avatares);}
 
 
@@ -155,4 +158,10 @@ public class Casilla {
 
         return false;
     }
+
+    public boolean isHipotecada() { return hipotecada; }
+    public void setHipotecada(boolean hipotecada) { this.hipotecada = hipotecada ; }
+
+    //Por defecto, la hipoteca vale la mitad del precio de compra
+    public float getPrecioHipoteca() { return getValor() / 2;}
 }
