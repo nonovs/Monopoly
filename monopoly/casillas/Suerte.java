@@ -94,6 +94,8 @@ public class Suerte extends Casilla {
                 // 3. Ganas la lotería: +1.000.000€
                 System.out.println("Carta Suerte 3: ¡Has ganado el bote de la lotería! Recibes 1.000.000€.");
                 actual.sumarFortuna(1_000_000f);
+                //añadido para estadisticas
+                actual.acumularPremiosInversionesOBote(1_000_000f);
                 return true;
 
             case 4:
@@ -115,6 +117,9 @@ public class Suerte extends Casilla {
                     if (j != null && j != actual) {
                         actual.pagar(250_000f);
                         j.recibir(250_000f);
+                        //añadido para estadisticas
+                        actual.acumularPagoTasasEImpuestos(250_000f);   // <<< AÑADIR
+                        j.acumularPremiosInversionesOBote(250_000f);  
                     }
                 }
                 return true;
@@ -132,6 +137,8 @@ public class Suerte extends Casilla {
                 if (actual.getFortuna() >= 150_000f) {
                     actual.pagar(150_000f);
                     banca.recibir(150_000f);
+                    //añadido para estadisticas
+                    actual.acumularPagoTasasEImpuestos(150_000f);
                     return true;
                 } else {
                     System.out.printf("%s no tiene dinero suficiente para pagar la multa de 150.000€.%n",
@@ -179,6 +186,10 @@ public class Suerte extends Casilla {
                     if (actual.getFortuna() >= alquilerDoble) {
                         actual.pagar(alquilerDoble);
                         du.recibir(alquilerDoble);
+
+                        //añadido para estadisticas
+                        actual.acumularPagoDeAlquileres(alquilerDoble);
+                        du.acumularCobroDeAlquileres(alquilerDoble);
                         System.out.printf("%s paga %.0f€ a %s (doble alquiler) por el transporte %s.%n",
                                 actual.getNombre(), alquilerDoble, du.getNombre(), tr.getNombre());
                         return true;

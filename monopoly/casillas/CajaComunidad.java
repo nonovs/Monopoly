@@ -44,6 +44,7 @@ public class CajaComunidad extends Casilla {
 
         if (considerarSalida && posFin < posIni) {
             jugador.sumarFortuna((float) Valor.SUMA_VUELTA);
+            jugador.acumularPasarPorSalida((float) Valor.SUMA_VUELTA);
             System.out.printf("%s pasa por Salida y cobra %.0f€.%n",
                     jugador.getNombre(), Valor.SUMA_VUELTA);
         }
@@ -75,6 +76,7 @@ public class CajaComunidad extends Casilla {
                 if (actual.getFortuna() >= 500_000f) {
                     actual.pagar(500_000f);
                     banca.recibir(500_000f);
+                    actual.acumularPagoTasasEImpuestos(500_000f);
                     return true;
                 } else {
                     System.out.printf("%s no puede pagar los 500.000€ del balneario.%n", actual.getNombre());
@@ -98,6 +100,7 @@ public class CajaComunidad extends Casilla {
                 System.out.println("Carta Comunidad 3: Te colocas en la casilla de Salida y cobras 2.000.000€.");
                 moverPorCarta(tablero, actual, banca, 0, false, tirada, false);
                 actual.sumarFortuna((float) Valor.SUMA_VUELTA); // 2.000.000€
+                actual.acumularPasarPorSalida((float) Valor.SUMA_VUELTA); //añadido para estadisticas
                 System.out.printf("%s cobra %.0f€ por situarse en Salida.%n", actual.getNombre(), Valor.SUMA_VUELTA);
                 return true;
 
@@ -105,6 +108,7 @@ public class CajaComunidad extends Casilla {
                 // 4. Devolución de Hacienda: cobras 500.000€
                 System.out.println("Carta Comunidad 4: Devolución de Hacienda. Cobras 500.000€.");
                 actual.sumarFortuna(500_000f);
+                actual.acumularPremiosInversionesOBote(500_000f); //añadido para estadisticas
                 return true;
 
             case 5:

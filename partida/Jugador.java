@@ -151,6 +151,7 @@ public class Jugador {
         this.posicion = casillaCarcel.getPosicion();
         this.turnosEnCarcel = 0;   // reiniciar turnos en carcel al entrar
         this.tiradasCarcel = 0;    // reiniciar contador de tiradas en carcel
+        this.incrementarVecesEnLaCarcel();
         System.out.println(nombre + " ha sido enviado a carcel");
     }
     public void salirDeCarcel(){

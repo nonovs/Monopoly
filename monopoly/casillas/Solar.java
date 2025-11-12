@@ -81,6 +81,11 @@ public class Solar extends Casilla {
         if (actual.getFortuna() >= alquiler) {
             actual.pagar(alquiler);
             getDuenho().recibir(alquiler);
+
+            //añadido para estadisticas
+            actual.acumularPagoDeAlquileres(alquiler);
+            getDuenho().acumularCobroDeAlquileres(alquiler);
+
             System.out.printf("%s paga %.0f€ de alquiler a %s por %s.%n",
                     actual.getNombre(), alquiler, getDuenho().getNombre(), getNombre());
 
@@ -110,6 +115,7 @@ public class Solar extends Casilla {
         }
         //Efectua la compra
         solicitante.pagar(getValor());
+        solicitante.acumularDineroInvertido(getValor());
         setDuenho(solicitante);
         solicitante.anhadirPropiedad(this);
 

@@ -28,6 +28,10 @@ public class Transporte extends Casilla {
         if (actual.getFortuna() >= alquilerTotal) {
             actual.pagar(alquilerTotal);
             getDuenho().recibir(alquilerTotal);
+
+            //añadido para estadisticas
+            actual.acumularPagoDeAlquileres(alquilerTotal);
+            getDuenho().acumularCobroDeAlquileres(alquilerTotal);
             System.out.printf("%s paga %.0f a %s por el transporte %s.%n",
                     actual.getNombre(), alquilerTotal, getDuenho().getNombre(), getNombre());
             return true;
@@ -57,6 +61,7 @@ public class Transporte extends Casilla {
         }
 
         solicitante.pagar(getValor());
+        solicitante.acumularDineroInvertido(getValor());
         setDuenho(solicitante);
         solicitante.anhadirPropiedad(this);
 

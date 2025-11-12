@@ -579,11 +579,21 @@ private void moverYEvaluar(Jugador j, int pasos) {
         boolean ok;
 
         if (destino instanceof Suerte) {
-            // delegamos en la lógica de cartas de Suerte
+            // delegamos en la lógica de cartas de Suerte y añadimos control de premios
+            float antes = j.getFortuna();
             ok = ((Suerte) destino).aplicarCarta(tablero, j, banca, jugadores, pasos);
+            float delta = j.getFortuna() - antes;
+            if (delta > 0f) j.acumularPremiosInversionesOBote(delta);
         } else if (destino instanceof CajaComunidad) {
-            // delegamos en la lógica de cartas de Caja de Comunidad
+            float antes = j.getFortuna();
             ok = ((CajaComunidad) destino).aplicarCarta(tablero, j, banca, jugadores, pasos);
+            float delta = j.getFortuna() - antes;
+
+            if (delta > 0f) {
+                j.acumularPremiosInversionesOBote(delta);
+            } else if (delta < 0f) {
+                j.acumularPagoTasasEImpuestos(-delta);
+            }
         } else {
             // resto de casillas como antes
             ok = destino.evaluarCasilla(j, banca, pasos);
