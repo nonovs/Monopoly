@@ -24,6 +24,11 @@ public class Servicios extends Casilla {
         if (actual.getFortuna() >= alquiler) {
             actual.pagar(alquiler);
             getDuenho().recibir(alquiler);
+
+            //añadido para estadisticas
+            actual.acumularPagoDeAlquileres(alquiler);  
+            getDuenho().acumularCobroDeAlquileres(alquiler); 
+            
             System.out.printf("%s paga %.0f a %s por caer en %s.%n",
                     actual.getNombre(), alquiler, getDuenho().getNombre(), getNombre());
             return true;
@@ -54,6 +59,10 @@ public class Servicios extends Casilla {
         solicitante.pagar(getValor());
         setDuenho(solicitante);
         solicitante.anhadirPropiedad(this);
+
+        //añadido para estadisticas
+        float precioCompra = getValor(); 
+        solicitante.acumularDineroInvertido(precioCompra);
 
         System.out.printf(
                 "El jugador %s compra el servicio %s por %.0f€. Su fortuna actual es %.0f€.\n",

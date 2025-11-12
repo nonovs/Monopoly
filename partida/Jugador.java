@@ -17,12 +17,29 @@ public class Jugador {
     private int tiradasCarcel; //Cuando está en la carcel, contará las tiradas sin éxito que ha hecho allí para intentar salir (se usa para limitar el numero de intentos).
     private int vueltas; //Cuenta las vueltas dadas al tablero.
     private ArrayList<Casilla> propiedades; //Propiedades que posee el jugador.
+    private float dineroInvertido;
+    private float pagoTasasEImpuestos;
+    private float pagoDeAlquileres;
+    private float cobroDeAlquileres;
+    private float pasarPorCasillaDeSalida;
+    private float premiosInversionesOBote;
+    private int vecesEnLaCarcel;
+
+
 
     //Atributos definidos por mi
     private int posicion;
     private int turnosEnCarcel;
     private ArrayList<Casilla> hipotecadas;
 
+
+    public void acumularDineroInvertido(float c) { sumarEstadistica("dineroInvertido", c); }
+    public void acumularPagoTasasEImpuestos(float c) { sumarEstadistica("pagoTasasEImpuestos", c); }
+    public void acumularPagoDeAlquileres(float c) { sumarEstadistica("pagoDeAlquileres", c); }
+    public void acumularCobroDeAlquileres(float c) { sumarEstadistica("cobroDeAlquileres", c); }
+    public void acumularPasarPorSalida(float c) { sumarEstadistica("pasarPorCasillaDeSalida", c); }
+    public void acumularPremiosInversionesOBote(float c) { sumarEstadistica("premiosInversionesOBote", c); }
+    public void incrementarVecesEnLaCarcel() { vecesEnLaCarcel++; }
 
 
     //Constructor vacío. Se usará para crear la banca.
@@ -107,6 +124,15 @@ public class Jugador {
     public float getFortuna(){
         return fortuna;
     }
+
+    //Nuevos getters de estadísticas
+    public float getDineroInvertido() { return dineroInvertido; }
+    public float getPagoTasasEImpuestos() { return pagoTasasEImpuestos; }
+    public float getPagoDeAlquileres() { return pagoDeAlquileres; }
+    public float getCobroDeAlquileres() { return cobroDeAlquileres; }
+    public float getPasarPorCasillaDeSalida() { return pasarPorCasillaDeSalida; }
+    public float getPremiosInversionesOBote() { return premiosInversionesOBote; }
+    public int getVecesEnLaCarcel() { return vecesEnLaCarcel; }
 
     public void recibir(float cantidad){
         sumarFortuna(cantidad);
@@ -270,6 +296,18 @@ public class Jugador {
 
     public ArrayList<Casilla> getHipotecadas() {
         return hipotecadas;
+    }
+
+    private void sumarEstadistica(String campo, float cantidad) {
+    if (cantidad <= 0) return;
+        switch (campo) {
+            case "dineroInvertido": dineroInvertido += cantidad; break;
+            case "pagoTasasEImpuestos": pagoTasasEImpuestos += cantidad; break;
+            case "pagoDeAlquileres": pagoDeAlquileres += cantidad; break;
+            case "cobroDeAlquileres": cobroDeAlquileres += cantidad; break;
+            case "pasarPorCasillaDeSalida": pasarPorCasillaDeSalida += cantidad; break;
+            case "premiosInversionesOBote": premiosInversionesOBote += cantidad; break;
+        }
     }
 
 

@@ -193,7 +193,13 @@ public class Menu {
                     System.out.println("Uso: deshipotecar <nombre_casilla>");
                 }
                 break;
-
+            
+            case "estadisticas":
+                if (partes.length >= 2)
+                    mostrarEstadisticas(partes[1]);
+                else
+                    System.out.println("Uso: comprar <nombre_jugador>");
+                break;
             default:
                 System.out.println("Comando no reconocido.");
                 System.out.println(" COMANDOS DISPONIBLES:");
@@ -214,6 +220,7 @@ public class Menu {
                 System.out.println("  vender <edificio> <solar> (opcional <cantidad>)");
                 System.out.println("  hipotecar <nombre_casilla>");
                 System.out.println("  deshipotecar <nombre_casilla>");
+                System.out.println("  estadisticas <nombre_jugador>");
         }
     }
 
@@ -537,6 +544,7 @@ private void moverYEvaluar(Jugador j, int pasos) {
     // pasar por salida -> cobra SUMA_VUELTA
     if (posIni + pasos >= 40) {
         j.sumarFortuna((float) Valor.SUMA_VUELTA);
+        j.acumularPasarPorSalida((float) Valor.SUMA_VUELTA); //añadido para comando de estadisticas
         System.out.printf("%s pasa por Salida y cobra %.0f%n", j.getNombre(), Valor.SUMA_VUELTA);
     }
 
@@ -613,6 +621,7 @@ private void moverYEvaluar(Jugador j, int pasos) {
         } else {
             System.out.println("Esa casilla no existe.");
         }
+
     }
 
     // salir carcel
@@ -1141,5 +1150,31 @@ private void moverYEvaluar(Jugador j, int pasos) {
         }
         actual.deshipotecarPropiedad(c);
     }
+
+    private Jugador buscarJugadorPorNombre(String nombre) {
+        for (Jugador ju : jugadores) {
+            if (ju.getNombre().equalsIgnoreCase(nombre)) return ju;
+        }
+        return null;
+    }
+
+private void mostrarEstadisticas(String nombre) {
+    Jugador j = buscarJugadorPorNombre(nombre);
+    if (j == null) {
+        System.out.println("Jugador no encontrado: " + nombre);
+        return;
+    }
+    System.out.println("$> estadisticas " + nombre);
+    System.out.println("{");
+    System.out.println("dineroInvertido: " + (int) j.getDineroInvertido() + ",");
+    System.out.println("pagoTasasEImpuestos: " + (int) j.getPagoTasasEImpuestos() + ",");
+    System.out.println("pagoDeAlquileres: " + (int) j.getPagoDeAlquileres() + ",");
+    System.out.println("cobroDeAlquileres: " + (int) j.getCobroDeAlquileres() + ",");
+    System.out.println("pasarPorCasillaDeSalida: " + (int) j.getPasarPorCasillaDeSalida() + ",");
+    System.out.println("premiosInversionesOBote: " + (int) j.getPremiosInversionesOBote() + ",");
+    System.out.println("vecesEnLaCarcel:" + j.getVecesEnLaCarcel());
+    System.out.println("}");
+}
+
 
 }
