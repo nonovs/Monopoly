@@ -698,7 +698,7 @@ private void moverYEvaluar(Jugador j, int pasos) {
                     for (Edificio e : s.getEdificaciones()) {
                         String casillaNombre = (e.getSolar() != null) ? e.getSolar().getNombre() : s.getNombre();
                         String tipo = (e.getTipo() != null) ? e.getTipo() : "-";
-                        String detalle = String.format("{id:%s, tipo:%s, casilla:%s, coste:%.0f } %n",
+                        String detalle = String.format("%s ",
                                 e.getId(), tipo, casillaNombre, e.getPrecio());
                         edifs.add(detalle);
                     }
