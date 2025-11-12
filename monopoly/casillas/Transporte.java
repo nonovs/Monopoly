@@ -18,16 +18,22 @@ public class Transporte extends Casilla {
     public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {
         if (getDuenho() == null || getDuenho() == actual || getDuenho() == banca)
             return true;
-
-        if (actual.getFortuna() >= alquiler) {
-            actual.pagar(alquiler);
-            getDuenho().recibir(alquiler);
+        int numTransportes = 0;
+        for (Casilla c : getDuenho().getPropiedades()) {
+            if (c instanceof Transporte) {
+                numTransportes++;
+            }
+        }
+        float alquilerTotal = alquiler * numTransportes;
+        if (actual.getFortuna() >= alquilerTotal) {
+            actual.pagar(alquilerTotal);
+            getDuenho().recibir(alquilerTotal);
             System.out.printf("%s paga %.0f a %s por el transporte %s.%n",
-                    actual.getNombre(), alquiler, getDuenho().getNombre(), getNombre());
+                    actual.getNombre(), alquilerTotal, getDuenho().getNombre(), getNombre());
             return true;
         } else {
             System.out.printf("%s no puede pagar el alquiler de %.0f por %s.%n",
-                    actual.getNombre(), alquiler, getNombre());
+                    actual.getNombre(), alquilerTotal, getNombre());
 
             return false;
         }

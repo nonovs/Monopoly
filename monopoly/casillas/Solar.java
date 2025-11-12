@@ -81,6 +81,9 @@ public class Solar extends Casilla {
         if (actual.getFortuna() >= alquiler) {
             actual.pagar(alquiler);
             getDuenho().recibir(alquiler);
+            System.out.printf("%s paga %.0f€ de alquiler a %s por %s.%n",
+                    actual.getNombre(), alquiler, getDuenho().getNombre(), getNombre());
+
             return true;
         } else {
             System.out.println(actual.getNombre() + " no puede pagar el alquiler de " + alquiler);
@@ -117,17 +120,25 @@ public class Solar extends Casilla {
     }
     //Calcula el alquieler actual de la casilla, teniendo en cuenta edificaciones y grupos
     public float calcularAlquiler() {
-        float total = alquilerBase;
+        float total = 0;
 
-        if (casas > 0) total += casas * alquilerCasa;
-        if (hotel)     total += alquilerHotel;
-        if (piscina)   total += alquilerPiscina;
-        if (pistaDeporte) total += alquilerPista;
+        // Si hay edificios, se cobra solo el alquiler de los edificios
+        if (casas > 0 || hotel || piscina || pistaDeporte) {
+            if (casas > 0) total += casas * alquilerCasa;
+            if (hotel)     total += alquilerHotel;
+            if (piscina)   total += alquilerPiscina;
+            if (pistaDeporte) total += alquilerPista;
+        } else {
+            // Si NO hay edificios, cobra el alquiler base
+            total = alquilerBase;
 
-        Grupo g = getGrupo();
-        if (g != null && g.esDuenhoGrupo(getDuenho()) && casas == 0 && !hotel && !piscina && !pistaDeporte) {
-            total *= 2;
+            // Si el dueño tiene todo el grupo, duplica el alquiler base
+            Grupo g = getGrupo();
+            if (g != null && g.esDuenhoGrupo(getDuenho())) {
+                total *= 2;
+            }
         }
+
         return total;
     }
 

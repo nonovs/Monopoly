@@ -45,6 +45,8 @@ public class Grupo {
         this.miembros.add(cas1);
         this.miembros.add(cas2);
         numCasillas = 2;
+        if (cas1 instanceof Solar) solares.add((Solar) cas1);
+        if (cas2 instanceof Solar) solares.add((Solar) cas2);
     }
 
     /*Constructor para cuando el grupo está formado por TRES CASILLAS:
@@ -59,6 +61,9 @@ public class Grupo {
         this.miembros.add(cas2);
         this.miembros.add(cas3);
         numCasillas = 3;
+        if (cas1 instanceof Solar) solares.add((Solar) cas1);
+        if (cas2 instanceof Solar) solares.add((Solar) cas2);
+        if (cas3 instanceof Solar) solares.add((Solar) cas3);
     }
 
     /* Método que añade una casilla al array de casillas miembro de un grupo.

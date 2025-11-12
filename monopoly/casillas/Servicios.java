@@ -17,9 +17,16 @@ public class Servicios extends Casilla {
         // Si la casilla no tiene dueño o es del mismo jugador/banca → no se paga nada
         if (getDuenho() == null || getDuenho() == actual || getDuenho() == banca)
             return true;
-
+        int numServicios = 0;
+        for (Casilla c : getDuenho().getPropiedades()) {
+            if (c instanceof Servicios) {
+                numServicios++;
+            }
+        }
         // Cálculo de alquiler: 4 × tirada × factorServicio
-        float alquiler = 4 * tirada * factorServicio;
+        // Multiplicador: 4 si tiene 1 servicio, 10 si tiene 2 o más
+        int multiplicador = (numServicios == 1) ? 4 : 10;
+        float alquiler = multiplicador * tirada * factorServicio;
 
         if (actual.getFortuna() >= alquiler) {
             actual.pagar(alquiler);
@@ -29,8 +36,9 @@ public class Servicios extends Casilla {
             actual.acumularPagoDeAlquileres(alquiler);  
             getDuenho().acumularCobroDeAlquileres(alquiler); 
             
-            System.out.printf("%s paga %.0f a %s por caer en %s.%n",
-                    actual.getNombre(), alquiler, getDuenho().getNombre(), getNombre());
+            System.out.printf("%s paga %.0f€ a %s por caer en %s (%d servicio(s), x%d).%n",
+                    actual.getNombre(), alquiler, getDuenho().getNombre(),
+                    getNombre(), numServicios, multiplicador);
             return true;
         } else {
             System.out.printf("%s no puede pagar el alquiler de %.0f en %s.%n",
@@ -58,6 +66,7 @@ public class Servicios extends Casilla {
 
         solicitante.pagar(getValor());
         setDuenho(solicitante);
+
         solicitante.anhadirPropiedad(this);
 
         //añadido para estadisticas
