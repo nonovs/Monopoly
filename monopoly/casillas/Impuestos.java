@@ -24,18 +24,28 @@ public class Impuestos extends Casilla {
     public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {
         if (actual.getFortuna() >= impuesto) {
             actual.pagar(impuesto);
-            setBote(impuesto);
-            System.out.println("El jugador paga "+ impuesto +"€ que se depositan en el Parking.");
-            banca.recibir(impuesto);
+
+            Impuestos.anhadirAlBote(impuesto);
+
+
+            actual.acumularPagoTasasEImpuestos(impuesto);
+
+            System.out.println("El jugador paga " + impuesto + "€ que se depositan en el Parking.");
             return true;
         } else {
-
             return false;
         }
     }
-    public static float setBote(float impuesto){
-        return bote+=impuesto;
+
+    public static void anhadirAlBote(float cantidad) {
+        bote += cantidad;
     }
+
+    public static void setBote(float nuevoValor){
+        bote = nuevoValor;
+    }
+
+    
     @Override
     public void comprarCasilla(Jugador solicitante, Jugador banca) {
         System.out.println("No puedes comprar una casilla de impuestos.");
