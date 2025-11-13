@@ -22,6 +22,9 @@ public class Casilla {
     private ArrayList<Avatar> avatares; //Avatares que están situados en la casilla.
     private String colorGrupo;
     private boolean hipotecada = false;
+    // Atributos para estadísticas del juego
+    private int vecesVisitada = 0;
+    private float alquileresGenerados = 0;
 
     //Constructor vacío: crea una casilla sin datos, inicializa una lista de avatares vacia
     public Casilla() {
@@ -164,4 +167,21 @@ public class Casilla {
 
     //Por defecto, la hipoteca vale la mitad del precio de compra
     public float getPrecioHipoteca() { return getValor() / 2;}
+
+    // Métodos para estadísticas del juego
+    public void incrementarVisitas() {
+        this.vecesVisitada++;
+    }
+
+    public int getVecesVisitada() {
+        return vecesVisitada;
+    }
+
+    public void sumarAlquilerGenerado(float cantidad) {
+        this.alquileresGenerados += cantidad;
+    }
+
+    public float getAlquileresGenerados() {
+        return alquileresGenerados;
+    }
 }

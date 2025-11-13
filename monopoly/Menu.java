@@ -193,12 +193,12 @@ public class Menu {
                     System.out.println("Uso: deshipotecar <nombre_casilla>");
                 }
                 break;
-            
+
             case "estadisticas":
                 if (partes.length >= 2)
                     mostrarEstadisticas(partes[1]);
                 else
-                    System.out.println("Uso: comprar <nombre_jugador>");
+                    mostrarEstadisticasJuego(); // ← CAMBIA ESTA LÍNEA
                 break;
             default:
                 System.out.println("Comando no reconocido.");
@@ -537,6 +537,7 @@ public class Menu {
     }
 
 // --- mover y evaluar la casilla destino ---
+// --- mover y evaluar la casilla destino ---
 private void moverYEvaluar(Jugador j, int pasos) {
     int posIni = j.getPosicion();
     int posFin = (posIni + pasos) % 40;
@@ -544,7 +545,8 @@ private void moverYEvaluar(Jugador j, int pasos) {
     // pasar por salida -> cobra SUMA_VUELTA
     if (posIni + pasos >= 40) {
         j.sumarFortuna((float) Valor.SUMA_VUELTA);
-        j.acumularPasarPorSalida((float) Valor.SUMA_VUELTA); //añadido para comando de estadisticas
+        j.acumularPasarPorSalida((float) Valor.SUMA_VUELTA);
+        j.incrementarVueltas(); // ← AÑADE ESTA LÍNEA AQUÍ
         System.out.printf("%s pasa por Salida y cobra %.0f%n", j.getNombre(), Valor.SUMA_VUELTA);
     }
 
@@ -599,12 +601,19 @@ private void moverYEvaluar(Jugador j, int pasos) {
             ok = destino.evaluarCasilla(j, banca, pasos);
         }
 
+
+
         if (!ok) {
             System.out.println("No has podido pagar tus deudas. Revisa hipotecas o declarate en bancarrota");
             solvente = false;
         } else {
             solvente = true;
         }
+    }
+
+    // ← AÑADE LA LÍNEA AQUÍ (DESPUÉS del if de destino != null)
+    if (destino != null) {
+        destino.incrementarVisitas();
     }
 
     // repinta tablero tras movimiento
@@ -708,7 +717,7 @@ private void moverYEvaluar(Jugador j, int pasos) {
                     for (Edificio e : s.getEdificaciones()) {
                         String casillaNombre = (e.getSolar() != null) ? e.getSolar().getNombre() : s.getNombre();
                         String tipo = (e.getTipo() != null) ? e.getTipo() : "-";
-                        String detalle = String.format("%s ",
+                        String detalle = String.format("%s",
                                 e.getId(), tipo, casillaNombre, e.getPrecio());
                         edifs.add(detalle);
                     }
@@ -1184,7 +1193,133 @@ private void mostrarEstadisticas(String nombre) {
     System.out.println("premiosInversionesOBote: " + (int) j.getPremiosInversionesOBote() + ",");
     System.out.println("vecesEnLaCarcel:" + j.getVecesEnLaCarcel());
     System.out.println("}");
+
+
 }
+
+    private void mostrarEstadisticasJuego() {
+        System.out.println("\n=== ESTADÍSTICAS DEL JUEGO ===\n");
+
+        // 1. Casilla más rentable
+        Casilla casillaMasRentable = null;
+        float maxAlquileres = 0;
+        for (Casilla c : tablero.getCasillas()) {
+            if (c.getAlquileresGenerados() > maxAlquileres) {
+                maxAlquileres = c.getAlquileresGenerados();
+                casillaMasRentable = c;
+            }
+        }
+
+        if (casillaMasRentable != null && maxAlquileres > 0) {
+            System.out.println("Casilla más rentable:");
+            System.out.println("  " + casillaMasRentable.getNombre() +
+                    " - Alquileres generados: " + String.format("%.0f€", maxAlquileres));
+        } else {
+            System.out.println("Casilla más rentable: Ninguna (aún no se han pagado alquileres)");
+        }
+
+        // 2. Grupo más rentable
+        HashMap<String, Float> alquileresPorGrupo = new HashMap<>();
+        for (Casilla c : tablero.getCasillas()) {
+            if (c.getGrupo() != null && c instanceof Solar) {
+                String color = c.getGrupo().getColor();
+                float actual = alquileresPorGrupo.getOrDefault(color, 0f);
+                alquileresPorGrupo.put(color, actual + c.getAlquileresGenerados());
+            }
+        }
+
+        String grupoMasRentable = null;
+        float maxGrupo = 0;
+        for (Map.Entry<String, Float> entry : alquileresPorGrupo.entrySet()) {
+            if (entry.getValue() > maxGrupo) {
+                maxGrupo = entry.getValue();
+                grupoMasRentable = entry.getKey();
+            }
+        }
+
+        if (grupoMasRentable != null && maxGrupo > 0) {
+            System.out.println("\nGrupo más rentable:");
+            System.out.println("  " + grupoMasRentable +
+                    " - Alquileres generados: " + String.format("%.0f€", maxGrupo));
+        } else {
+            System.out.println("\nGrupo más rentable: Ninguno");
+        }
+
+        // 3. Casilla más frecuentada
+        Casilla casillaMasFrecuentada = null;
+        int maxVisitas = 0;
+        for (Casilla c : tablero.getCasillas()) {
+            if (c.getVecesVisitada() > maxVisitas) {
+                maxVisitas = c.getVecesVisitada();
+                casillaMasFrecuentada = c;
+            }
+        }
+
+        if (casillaMasFrecuentada != null && maxVisitas > 0) {
+            System.out.println("\nCasilla más frecuentada:");
+            System.out.println("  " + casillaMasFrecuentada.getNombre() +
+                    " - Visitada " + maxVisitas + " veces");
+        } else {
+            System.out.println("\nCasilla más frecuentada: Ninguna");
+        }
+
+        // 4. Jugador con más vueltas
+        Jugador jugadorMasVueltas = null;
+        int maxVueltas = 0;
+        for (Jugador j : jugadores) {
+            if (j.getVueltas() > maxVueltas) {
+                maxVueltas = j.getVueltas();
+                jugadorMasVueltas = j;
+            }
+        }
+
+        if (jugadorMasVueltas != null && maxVueltas > 0) {
+            System.out.println("\nJugador con más vueltas:");
+            System.out.println("  " + jugadorMasVueltas.getNombre() +
+                    " - " + maxVueltas + " vueltas");
+        } else {
+            System.out.println("\nJugador con más vueltas: Ninguno");
+        }
+
+        // 5. Jugador con mayor fortuna total
+        Jugador jugadorMasRico = null;
+        float maxFortuna = 0;
+        for (Jugador j : jugadores) {
+            float fortunaTotal = j.getFortuna();
+
+            // Sumar valor de propiedades
+            for (Casilla c : j.getPropiedades()) {
+                fortunaTotal += c.getValor();
+            }
+
+            // Sumar valor de edificios
+            for (Casilla c : j.getPropiedades()) {
+                if (c instanceof Solar) {
+                    Solar s = (Solar) c;
+                    for (Edificio e : s.getEdificaciones()) {
+                        fortunaTotal += e.getPrecio();
+                    }
+                }
+            }
+
+            if (fortunaTotal > maxFortuna) {
+                maxFortuna = fortunaTotal;
+                jugadorMasRico = j;
+            }
+        }
+
+        if (jugadorMasRico != null) {
+            System.out.println("\nJugador con mayor fortuna:");
+            System.out.println("  " + jugadorMasRico.getNombre() +
+                    " - Fortuna total: " + String.format("%.0f€", maxFortuna));
+        } else {
+            System.out.println("\nJugador con mayor fortuna: Ninguno");
+        }
+
+        System.out.println(); // Línea en blanco al final
+    }
+
+
 
 
 }

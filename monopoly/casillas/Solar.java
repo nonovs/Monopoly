@@ -85,7 +85,7 @@ public class Solar extends Casilla {
             //añadido para estadisticas
             actual.acumularPagoDeAlquileres(alquiler);
             getDuenho().acumularCobroDeAlquileres(alquiler);
-
+            this.sumarAlquilerGenerado(alquiler);
             System.out.printf("%s paga %.0f€ de alquiler a %s por %s.%n",
                     actual.getNombre(), alquiler, getDuenho().getNombre(), getNombre());
 

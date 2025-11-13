@@ -32,6 +32,7 @@ public class Transporte extends Casilla {
             //añadido para estadisticas
             actual.acumularPagoDeAlquileres(alquilerTotal);
             getDuenho().acumularCobroDeAlquileres(alquilerTotal);
+            this.sumarAlquilerGenerado(alquiler);
             System.out.printf("%s paga %.0f a %s por el transporte %s.%n",
                     actual.getNombre(), alquilerTotal, getDuenho().getNombre(), getNombre());
             return true;

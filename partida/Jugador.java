@@ -41,7 +41,6 @@ public class Jugador {
     public void acumularPremiosInversionesOBote(float c) { sumarEstadistica("premiosInversionesOBote", c); }
     public void incrementarVecesEnLaCarcel() { vecesEnLaCarcel++; }
 
-
     //Constructor vacío. Se usará para crear la banca.
     public Jugador() {
         this.nombre="Banca";
@@ -311,7 +310,12 @@ public class Jugador {
         }
     }
 
+// El atributo 'vueltas' ya existe (línea 18), solo necesitas un método para incrementarlo
+// Añade este método después del método incrementarVecesEnLaCarcel() (línea ~42):
 
+    public void incrementarVueltas() {
+        this.vueltas++;
+    }
 
 
 }

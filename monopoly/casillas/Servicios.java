@@ -34,7 +34,8 @@ public class Servicios extends Casilla {
 
             //añadido para estadisticas
             actual.acumularPagoDeAlquileres(alquiler);  
-            getDuenho().acumularCobroDeAlquileres(alquiler); 
+            getDuenho().acumularCobroDeAlquileres(alquiler);
+            this.sumarAlquilerGenerado(alquiler);
             
             System.out.printf("%s paga %.0f€ a %s por caer en %s (%d servicio(s), x%d).%n",
                     actual.getNombre(), alquiler, getDuenho().getNombre(),
