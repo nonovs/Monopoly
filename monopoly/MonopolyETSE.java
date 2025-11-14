@@ -14,7 +14,7 @@ public class MonopolyETSE {
                 return;
             }
         }
-        new Menu().iniciarPartida();
+        menu.iniciarPartida();
     }
 
 }
