@@ -52,13 +52,6 @@ public class Edificio {
         return true;
     }
 
-    /**
-     * Método para calcular custo dependendo do grupo (se procede).
-     * Subclases poden sobrescribir.
-     */
-    protected float calcularCoste(float valorGrupo) {
-        return precio;
-    }
 
     @Override
     public String toString() {

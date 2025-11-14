@@ -18,7 +18,7 @@ public class Casilla {
     private Jugador duenho; //Dueño de la casilla (por defecto sería la banca).
     private Grupo grupo; //Grupo al que pertenece la casilla (si es solar).
     private float impuesto; //Cantidad a pagar por caer en la casilla: el alquiler en solares/servicios/transportes o impuestos.
-    private float hipoteca; //Valor otorgado por hipotecar una casilla
+    //private float hipoteca; //Valor otorgado por hipotecar una casilla
     private ArrayList<Avatar> avatares; //Avatares que están situados en la casilla.
     private String colorGrupo;
     private boolean hipotecada = false;
@@ -65,7 +65,40 @@ public class Casilla {
         this.duenho = duenho;
         this.avatares = new ArrayList<>();
     }
+    // Getters y setters necesarios para subclases
+    public String getNombre(){ return nombre;}
+    public String getTipo() { return tipo; }
+    public float getValor() { return valor; }
+    public void setValor(float valor){ this.valor = valor; }
+    public int getPosicion() { return posicion; }
+    public void setPosicion(int posicion) { this.posicion = posicion; }
+    public Jugador getDuenho() { return duenho; }
+    public void setDuenho(Jugador j) { this.duenho = j; }
+    public Grupo getGrupo() { return grupo; }
+    public void setGrupo(Grupo g) { this.grupo = g; }
+    public boolean isHipotecada() { return hipotecada; }
+    public void setHipotecada(boolean hipotecada) { this.hipotecada = hipotecada ; }
+    //Por defecto, la hipoteca vale la mitad del precio de compra
+    public float getPrecioHipoteca() { return getValor() / 2;}
+    public float getAlquileresGenerados() {
+        return alquileresGenerados;
+    }
+    public ArrayList<Avatar> getAvatares() {  return avatares == null ? new ArrayList<>(): new ArrayList<>(avatares);}
 
+    public int getVecesVisitada() {
+        return vecesVisitada;
+    }
+
+
+
+    // Métodos para estadísticas del juego
+    public void incrementarVisitas() {
+        this.vecesVisitada++;
+    }
+
+    public void sumarAlquilerGenerado(float cantidad) {
+        this.alquileresGenerados += cantidad;
+    }
     //Método utilizado para añadir un avatar al array de avatares en casilla.
     public void anhadirAvatar(Avatar av) {
         avatares.add(av);
@@ -128,26 +161,9 @@ public class Casilla {
         );
     }
 
-    // Getters y setters necesarios para subclases
-    public String getNombre(){ return nombre;}
-    public String getTipo() { return tipo; }
-    public float getValor() { return valor; }
-    public void setValor(float valor){ this.valor = valor; }
-    public int getPosicion() { return posicion; }
-    public void setPosicion(int posicion) { this.posicion = posicion; }
-    public Jugador getDuenho() { return duenho; }
-    public void setDuenho(Jugador j) { this.duenho = j; }
-    public Grupo getGrupo() { return grupo; }
-    public void setGrupo(Grupo g) { this.grupo = g; }
-    public float getImpuesto() { return impuesto; }
-    public float getHipoteca() { return hipoteca; }
-    public ArrayList<Avatar> getAvatares() {  return avatares == null ? new ArrayList<>(): new ArrayList<>(avatares);}
-
-
-    // Detectar robustamente la casilla "Ir a la carcel" por nombre, tolerando códigos ANSI y espacios
+    // Detectar  la casilla "Ir a la carcel" por nombre
     public boolean esIrACarcel() {
         if (this.nombre == null) return false;
-
         // quitar códigos ANSI y normalizar (minúsculas, sin espacios, sin acentos)
         String clean = this.nombre.replaceAll("\\u001B\\[[;\\d]*m", "").toLowerCase().trim();
         String compact = clean.replaceAll("\\s+", "");
@@ -162,26 +178,5 @@ public class Casilla {
         return false;
     }
 
-    public boolean isHipotecada() { return hipotecada; }
-    public void setHipotecada(boolean hipotecada) { this.hipotecada = hipotecada ; }
 
-    //Por defecto, la hipoteca vale la mitad del precio de compra
-    public float getPrecioHipoteca() { return getValor() / 2;}
-
-    // Métodos para estadísticas del juego
-    public void incrementarVisitas() {
-        this.vecesVisitada++;
-    }
-
-    public int getVecesVisitada() {
-        return vecesVisitada;
-    }
-
-    public void sumarAlquilerGenerado(float cantidad) {
-        this.alquileresGenerados += cantidad;
-    }
-
-    public float getAlquileresGenerados() {
-        return alquileresGenerados;
-    }
 }

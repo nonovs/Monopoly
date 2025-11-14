@@ -18,8 +18,5 @@ public class Hotel extends Edificio {
         return s.getCasas() == 4 && !s.hasHotel();
     }
 
-    @Override
-    protected float calcularCoste(float valorGrupo) {
-        return getPrecio();
-    }
+
 }

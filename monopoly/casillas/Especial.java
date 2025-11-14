@@ -42,7 +42,7 @@ public class Especial extends Casilla {
                 float bote = Impuestos.getBote();
                 if (bote > 0) {
                     actual.recibir(bote);
-                    actual.acumularPremiosInversionesOBote(bote); //añadido para estadisticas
+                    actual.acumularPremiosInversionesOBote(bote); //Para almacenar os datos en estadisticas
                     Impuestos.setBote(0);//Vaciamos o bote
                     System.out.printf("%s ha recibido %.0f del Parking gratuito.%n", actual.getNombre(), bote);
                 } else {

@@ -21,10 +21,5 @@ public class Casa extends Edificio {
         return s.getCasas() < 4;
     }
 
-    @Override
-    protected float calcularCoste(float valorGrupo) {
-        // exemplo: 60% do valor do grupo
-        return valorGrupo * 0.60f;
-    }
 
 }

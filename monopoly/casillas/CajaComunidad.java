@@ -19,32 +19,32 @@ public class CajaComunidad extends Casilla {
     }
 
     private static int siguienteCarta() {
-        indiceCarta = (indiceCarta % NUM_CARTAS) + 1;
+        indiceCarta = (indiceCarta % NUM_CARTAS) + 1;//Sirve para calcular el indice de la siguiente carta
         return indiceCarta;
     }
     
     private void moverPorCarta(Tablero tablero, Jugador jugador, Jugador banca, int nuevaPos, boolean considerarSalida, int tirada, boolean evaluarDestino) {
 
         int posIni = jugador.getPosicion();
-        int posFin = ((nuevaPos % 40) + 40) % 40;
+        int posFin = ((nuevaPos % 40) + 40) % 40;// Normaliza la posicion para que sea entre 0 y 39
 
-        Casilla origen = tablero.getCasilla(posIni);
-        Casilla destino = tablero.getCasilla(posFin);
+        Casilla origen = tablero.getCasilla(posIni);//tomamos datos de la casilla actual
+        Casilla destino = tablero.getCasilla(posFin);//tomamos datos de la casilla destino
 
-        Avatar av = jugador.getAvatar();
-        if (origen != null && av != null) {
+        Avatar av = jugador.getAvatar();//tomamos datos del avatar actual
+        if (origen != null && av != null) {//Sacamos el avatar de la casilla actual
             origen.eliminarAvatar(av);
         }
-        if (destino != null && av != null) {
+        if (destino != null && av != null) {//Pasamos el avatar a la casilla destino
             destino.anhadirAvatar(av);
             av.setLugar(destino);
         }
 
-        jugador.setPosicion(posFin);
+        jugador.setPosicion(posFin);//Actualizamos la posicion del jugador
 
-        if (considerarSalida && posFin < posIni) {
-            jugador.sumarFortuna((float) Valor.SUMA_VUELTA);
-            jugador.acumularPasarPorSalida((float) Valor.SUMA_VUELTA);
+        if (considerarSalida && posFin < posIni) {//En caso de que el jugador haya pasado por salida, sumamos
+            jugador.sumarFortuna((float) Valor.SUMA_VUELTA);//Le damos dinero
+            jugador.acumularPasarPorSalida((float) Valor.SUMA_VUELTA);//Actualizamos estadisticas
             System.out.printf("%s pasa por Salida y cobra %.0f€.%n",
                     jugador.getNombre(), Valor.SUMA_VUELTA);
         }
@@ -52,7 +52,7 @@ public class CajaComunidad extends Casilla {
         System.out.printf("%s se mueve a %s (pos %d) debido a la carta de Caja de Comunidad.%n",
                 jugador.getNombre(),
                 destino != null ? destino.getNombre() : "desconocida",
-                posFin);
+                posFin);//Informamos del movimiento
 
         if (evaluarDestino && destino != null && !destino.esIrACarcel()) {
             boolean ok = destino.evaluarCasilla(jugador, banca, tirada);
@@ -63,7 +63,7 @@ public class CajaComunidad extends Casilla {
     }
 
     public boolean aplicarCarta(Tablero tablero, Jugador actual, Jugador banca, List<Jugador> jugadores, int tirada) {
-
+    //Esta funcion lo que hace es robar una carta de Caja de Comunidad y realizar la accion correspondiente
         int carta = siguienteCarta();
         System.out.printf("%s roba carta de Caja de Comunidad nº %d.%n", actual.getNombre(), carta);
 

@@ -4,7 +4,7 @@ import partida.Jugador;
 
 public class Servicios extends Casilla {
 
-    private float factorServicio = 50000; // Según el guión del juego
+    private float factorServicio = 50000; // Coste dos servicios
 
     // Constructor
     public Servicios(String nombre, int posicion,int precio ,Jugador duenho) {
@@ -14,7 +14,7 @@ public class Servicios extends Casilla {
 
     @Override
     public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {
-        // Si la casilla no tiene dueño o es del mismo jugador/banca → no se paga nada
+        // Si la casilla no tiene dueño o es del mismo jugador/banca  no tiene que pagar nada
         if (getDuenho() == null || getDuenho() == actual || getDuenho() == banca)
             return true;
         int numServicios = 0;
@@ -32,7 +32,7 @@ public class Servicios extends Casilla {
             actual.pagar(alquiler);
             getDuenho().recibir(alquiler);
 
-            //añadido para estadisticas
+            //Para tener en cuenta en las estadisticas
             actual.acumularPagoDeAlquileres(alquiler);  
             getDuenho().acumularCobroDeAlquileres(alquiler);
             this.sumarAlquilerGenerado(alquiler);
@@ -65,14 +65,14 @@ public class Servicios extends Casilla {
             return;
         }
 
-        solicitante.pagar(getValor());
-        setDuenho(solicitante);
+        solicitante.pagar(getValor());//Hacemos que el que compre la casilla pague su valor
+        setDuenho(solicitante);//Le establecemos la casilla a su propiedad
 
         solicitante.anhadirPropiedad(this);
 
         //añadido para estadisticas
         float precioCompra = getValor(); 
-        solicitante.acumularDineroInvertido(precioCompra);
+        solicitante.acumularDineroInvertido(precioCompra);//Para sus estadisticas
 
         System.out.printf(
                 "El jugador %s compra el servicio %s por %.0f€. Su fortuna actual es %.0f€.\n",

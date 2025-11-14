@@ -17,6 +17,7 @@ public class Tablero {
         this.grupos = new HashMap<>();
         this.posiciones = new ArrayList<>();
         this.generarCasillas();
+
     }
 
     private void generarCasillas() {

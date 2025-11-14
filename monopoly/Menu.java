@@ -9,7 +9,6 @@ import partida.*;
 import monopoly.casillas.Casilla;
 import monopoly.casillas.Solar;
 import monopoly.Construccion.Edificio;
-import java.text.Normalizer;
 import monopoly.casillas.Suerte;
 import monopoly.casillas.CajaComunidad;
 
@@ -102,6 +101,7 @@ public class Menu {
                     descAvatar(partes[2]);
                 else if (partes.length >= 2)
                     descCasilla(partes[1]);
+                else System.out.println("Uso: describir <nombre_casilla> o describir jugador <nombre> o describir avatar <id_avatar>");
                 break;
 
             case "lanzar":
@@ -172,7 +172,7 @@ public class Menu {
                         System.out.println("La cantidad debe ser un número.");
                     }
                 } else if (partes.length >= 3) {
-                    // vender <tipo> <solar> (cantidad = 1 por defecto)
+
                     venderEdificio(partes[1], partes[2], 1);
                 } else {
                     System.out.println("Uso: vender <tipo> <solar> <cantidad>");
@@ -197,12 +197,27 @@ public class Menu {
             case "estadisticas":
                 if (partes.length >= 2)
                     mostrarEstadisticas(partes[1]);
-                else
-                    mostrarEstadisticasJuego(); // ← CAMBIA ESTA LÍNEA
+                else if (partes.length == 1)
+                    mostrarEstadisticasJuego();
+                else System.out.println("Uso: estadisticas <nombre_jugador> o estadisticas");
+                break;
+            case "mover":
+                // Comando secreto para testing: mover <numero_casilla>
+                if (partes.length >= 2) {
+                    try {
+                        moverChetada(partes[1]);
+
+                    } catch (NumberFormatException e) {
+                        System.out.println("Uso: mover <numero_casilla_0_a_39>");
+                    }
+                } else {
+                    System.out.println("Uso: mover <numero_casilla_0_a_39>");
+                }
                 break;
             default:
                 System.out.println("Comando no reconocido.");
                 System.out.println(" COMANDOS DISPONIBLES:");
+                System.out.println("  mover <numero_casilla> (para pruebas privadas");
                 System.out.println("  crear jugador <nombre> <tipo_avatar>");
                 System.out.println("  listar jugadores");
                 System.out.println("  listar enventa");
@@ -221,6 +236,7 @@ public class Menu {
                 System.out.println("  hipotecar <nombre_casilla>");
                 System.out.println("  deshipotecar <nombre_casilla>");
                 System.out.println("  estadisticas <nombre_jugador>");
+                System.out.println("  estadisticas");
         }
     }
 
@@ -413,7 +429,7 @@ public class Menu {
             System.out.println("Casilla no encontrada: " + nombre);
     }
 
-    // --- lanzar dados aleatoria ---
+    // lanzar dados aleatoria
     private void lanzarDados() {
         if (jugadores == null || jugadores.isEmpty()) {
             System.out.println("Primero crea jugadores con: crear jugador <nombre> <tipoAvatar>");
@@ -476,8 +492,59 @@ public class Menu {
             System.out.println("Usa 'acabar turno' para pasar al siguiente jugador");
         }
     }
+    /**
+     * Método permite mover al jugador actual a cualquier casilla
+     * sin restricciones ni necesidad de tirar dados.
+     */
+    private void moverChetada(String casilla) {
+        if (jugadores == null || jugadores.isEmpty()) {
+            System.out.println("No hay jugadores en la partida.");
+            return;
+        }
+        int posFin = tablero.encontrar_casilla(casilla).getPosicion();
 
-    // --- lanzar dados forzada X+Y ---
+
+
+        Jugador actual = jugadores.get(turno);
+        int posIni = actual.getPosicion();
+
+        System.out.println("Moviendo a " + actual.getNombre() + " de pos " + posIni + " a pos " + posFin);
+
+        // Quitar avatar de casilla actual
+        Casilla origen = tablero.getCasilla(posIni);
+        if (origen != null && actual.getAvatar() != null) {
+            origen.eliminarAvatar(actual.getAvatar());
+        }
+
+        // Añadir avatar a casilla destino
+        Casilla destino = tablero.getCasilla(posFin);
+        if (destino != null && actual.getAvatar() != null) {
+            destino.anhadirAvatar(actual.getAvatar());
+            actual.getAvatar().setLugar(destino);
+        }
+
+        // Actualizar posición del jugador
+        actual.setPosicion(posFin);
+
+        // Incrementar visitas (para estadísticas)
+        if (destino != null) {
+            destino.incrementarVisitas();
+        }
+
+        System.out.printf("%s ahora está en %s (pos %d)%n",
+                actual.getNombre(),
+                destino != null ? destino.getNombre() : "desconocida",
+                posFin);
+
+        // Mostrar tablero actualizado
+        mostrarTablero();
+
+        // Marcar que ya "tiró" para poder acabar turno
+        tirado = true;
+        System.out.println(" Puedes usar 'acabar turno' o seguir moviendo con 'mover <pos>'");
+    }
+
+    //  lanzar dados forzada X+Y
     private void lanzarDadosForzada(int a, int b) {
         if (jugadores == null || jugadores.isEmpty()) {
             System.out.println("Primero crea jugadores con: crear jugador <nombre> <tipoAvatar>");
@@ -537,7 +604,7 @@ public class Menu {
     }
 
 // --- mover y evaluar la casilla destino ---
-// --- mover y evaluar la casilla destino ---
+
 private void moverYEvaluar(Jugador j, int pasos) {
     int posIni = j.getPosicion();
     int posFin = (posIni + pasos) % 40;
@@ -546,7 +613,7 @@ private void moverYEvaluar(Jugador j, int pasos) {
     if (posIni + pasos >= 40) {
         j.sumarFortuna((float) Valor.SUMA_VUELTA);
         j.acumularPasarPorSalida((float) Valor.SUMA_VUELTA);
-        j.incrementarVueltas(); // ← AÑADE ESTA LÍNEA AQUÍ
+        j.setVueltas(); // ← AÑADE ESTA LÍNEA AQUÍ
         System.out.printf("%s pasa por Salida y cobra %.0f%n", j.getNombre(), Valor.SUMA_VUELTA);
     }
 
@@ -1198,7 +1265,7 @@ private void mostrarEstadisticas(String nombre) {
 }
 
     private void mostrarEstadisticasJuego() {
-        System.out.println("\n=== ESTADÍSTICAS DEL JUEGO ===\n");
+        System.out.println("\n ESTADÍSTICAS DEL JUEGO \n");
 
         // 1. Casilla más rentable
         Casilla casillaMasRentable = null;

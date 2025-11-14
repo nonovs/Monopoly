@@ -99,44 +99,7 @@ public class Grupo {
         return colorGrupo;
     }
 
-    public float getAlquilerCasa(){
-        return alquilerCasa;
-    }
-    public float getAlquilerHotel(){
-        return alquilerHotel;
-    }
-    public float getAlquilerPiscina(){
-        return alquilerPiscina;
-    }
-    public float getAlquilerPista(){
-        return alquilerPista;
-    }
-
-    public ArrayList<Solar> getSolares(){
-        return solares;
-    }
-
-    public int getNumCasillas(){
-        return numCasillas;
-    }
-
-    //Permite ajustar las tarifas de alquiler por tipo
-    public void setTarifas(float casa, float hotel, float piscina, float pista){
-        this.alquilerCasa = casa;
-        this.alquilerHotel = hotel;
-        this.alquilerPiscina = piscina;
-        this.alquilerPista = pista;
-    }
-    public Float getValorCasa(){ return valorCasa;}
-    public Float getValorHotel(){ return valorHotel;}
-    public Float getValorPiscina(){ return valorPiscina;}
-    public Float getValorPista(){ return valorPista;}
-    public void setValorConstruccion(float casa, float hotel, float piscina, float pista){
-        this.valorCasa = casa;
-        this.valorHotel = hotel;
-        this.valorPiscina = piscina;
-        this.valorPista = pista;
-    }
+    @Override
     public String toString(){
         return String.format("Grupo %s (%d solares)", colorGrupo, miembros.size());
     }

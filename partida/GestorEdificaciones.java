@@ -126,7 +126,7 @@ public class GestorEdificaciones {
             }
 
             case "piscina": {
-                // Piscina suele requerir hotel en la misma casilla; la propiedad del grupo ya no tengo que comprobarla la compruebo en hotel
+                // Piscina  requerir hotel en la misma casilla; la propiedad del grupo ya no tengo que comprobarla la compruebo en hotel
 
                 float precio = solar.getPrecioPiscina();
                 if (jugador.getFortuna() < precio) {

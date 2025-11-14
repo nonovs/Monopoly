@@ -4,8 +4,8 @@ import monopoly.Construccion.*;
 import monopoly.Grupo;
 import partida.Jugador;
 
-import java.util.ArrayList;          // <-- novo
-import java.util.List;               // <-- novo
+import java.util.ArrayList;
+import java.util.List;
 
 public class Solar extends Casilla {
 
@@ -29,7 +29,7 @@ public class Solar extends Casilla {
     private ArrayList<Edificio> edificio = new ArrayList<>();
 
     // Rexistro de edificacions construídas neste solar
-    private final List<Edificio> edificaciones; // <-- novo
+    private final List<Edificio> edificaciones;
 
     public Solar(
             String nombre, int posicion,
@@ -39,7 +39,6 @@ public class Solar extends Casilla {
             Jugador duenho, Grupo grupo
     ) {
         super(nombre, "Solar", posicion, valor, duenho);// Llama al constructor de Casilla,
-        // this.setHipoteca(hipoteca);
         this.alquilerBase = alquilerBase;
         this.setGrupo(grupo);
 
@@ -58,7 +57,7 @@ public class Solar extends Casilla {
         this.piscina = false;
         this.pistaDeporte = false;
 
-        this.edificaciones = new ArrayList<>(); // <-- inicializar
+        this.edificaciones = new ArrayList<>();
     }
 
     /** Se ejecuta cuando un jugador cae en la casilla
@@ -82,7 +81,7 @@ public class Solar extends Casilla {
             actual.pagar(alquiler);
             getDuenho().recibir(alquiler);
 
-            //añadido para estadisticas
+            //FUncions para ter en conta para as estadísticas
             actual.acumularPagoDeAlquileres(alquiler);
             getDuenho().acumularCobroDeAlquileres(alquiler);
             this.sumarAlquilerGenerado(alquiler);
@@ -148,7 +147,7 @@ public class Solar extends Casilla {
         return total;
     }
 
-
+    // Métodos para xestionar edificacions
     public boolean construirCasa() {
         Grupo g = getGrupo();
         if (g != null && casas < 4 && !hotel && g.esDuenhoGrupo(getDuenho())) {
@@ -200,9 +199,9 @@ public class Solar extends Casilla {
         return false;
     }
 
-    // ===============================
-    // Métodos para xestionar edificacions
-    // ===============================
+
+
+
     /**
      * Engade a edificacion ao rexistro do solar.
      */
@@ -219,12 +218,6 @@ public class Solar extends Casilla {
         return new ArrayList<>(edificaciones);
     }
 
-    /**
-     * Conveniencia: saber se o solar está "completo" (criterio: hotel+piscina+pista).
-     */
-    public boolean estaCompleto() {
-        return hotel && piscina && pistaDeporte;
-    }
 
     @Override
     public String infoCasilla() {
@@ -249,7 +242,7 @@ public class Solar extends Casilla {
                         " alquiler pista: %.0f%n" +
                         "}",
                 color, duenhoStr,
-                getValor(), getHipoteca(), alquilerBase,
+                getValor(), getPrecioHipoteca(), alquilerBase,
                 precioCasa, precioHotel, precioPiscina, precioPista,
                 alquilerCasa, alquilerHotel, alquilerPiscina, alquilerPista
         );
@@ -362,38 +355,20 @@ public class Solar extends Casilla {
 
 
 
-    public float getAlquilerBase() { return alquilerBase; }
-
     public float getPrecioCasa() { return precioCasa; }
     public float getPrecioHotel() { return precioHotel; }
     public float getPrecioPiscina() { return precioPiscina; }
     public float getPrecioPista() { return precioPista; }
 
-    public float getAlquilerCasa() { return alquilerCasa; }
-    public float getAlquilerHotel() { return alquilerHotel; }
-    public float getAlquilerPiscina() { return alquilerPiscina; }
-    public float getAlquilerPista() { return alquilerPista; }
 
     public int getCasas() { return casas; }
     public boolean hasHotel() { return hotel; }
     public boolean hasPiscina() { return piscina; }
     public boolean hasPistaDeporte() { return pistaDeporte; }
 
-    public void setPreciosMejoras(float precioCasa, float precioHotel, float precioPiscina, float precioPista) {
-        this.precioCasa = precioCasa;
-        this.precioHotel = precioHotel;
-        this.precioPiscina = precioPiscina;
-        this.precioPista = precioPista;
-    }
 
-    public void setAlquileresMejoras(float alquilerCasa, float alquilerHotel, float alquilerPiscina, float alquilerPista) {
-        this.alquilerCasa = alquilerCasa;
-        this.alquilerHotel = alquilerHotel;
-        this.alquilerPiscina = alquilerPiscina;
-        this.alquilerPista = alquilerPista;
-    }
 
-    public boolean tieneEdificios() {
-        return !edificio.isEmpty();
-    }
+
+
+
 }

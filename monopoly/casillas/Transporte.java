@@ -14,6 +14,7 @@ public class Transporte extends Casilla {
         this.alquiler = alquiler;
     }
 
+
     @Override
     public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {
         if (getDuenho() == null || getDuenho() == actual || getDuenho() == banca)
@@ -29,7 +30,7 @@ public class Transporte extends Casilla {
             actual.pagar(alquilerTotal);
             getDuenho().recibir(alquilerTotal);
 
-            //añadido para estadisticas
+            //Como siempre guardamos datos para estadísticas del juego
             actual.acumularPagoDeAlquileres(alquilerTotal);
             getDuenho().acumularCobroDeAlquileres(alquilerTotal);
             this.sumarAlquilerGenerado(alquiler);

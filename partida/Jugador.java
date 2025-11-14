@@ -105,15 +105,7 @@ public class Jugador {
         this.gastos+=valor;
     }
 
-    /*Método para establecer al jugador en la cárcel. 
-    * Se requiere disponer de las casillas del tablero para ello (por eso se pasan como parámetro).*/
-    public void encarcelar(ArrayList<ArrayList<Casilla>> pos) {
-        this.enCarcel=true;
-        this.tiradasCarcel=0;
-        this.turnosEnCarcel=0;
-        this.posicion=10;//Posicion da carcel
 
-    }
 
     public void pagar(float cantidad){
         fortuna -= cantidad;
@@ -265,17 +257,11 @@ public class Jugador {
     public int getVueltas() {
         return vueltas;
     }
-
-    public void setVueltas(int vueltas) {
-        this.vueltas = vueltas;
+    public void setVueltas() {
+        this.vueltas++;
     }
-
     public ArrayList<Casilla> getPropiedades() {
         return propiedades;
-    }
-
-    public void setPropiedades(ArrayList<Casilla> propiedades) {
-        this.propiedades = propiedades;
     }
 
     public int getPosicion() {
@@ -288,10 +274,6 @@ public class Jugador {
 
     public int getTurnosEnCarcel() {
         return turnosEnCarcel;
-    }
-
-    public void setTurnosEnCarcel(int turnosEnCarcel) {
-        this.turnosEnCarcel = turnosEnCarcel;
     }
 
     public ArrayList<Casilla> getHipotecadas() {
@@ -310,12 +292,7 @@ public class Jugador {
         }
     }
 
-// El atributo 'vueltas' ya existe (línea 18), solo necesitas un método para incrementarlo
-// Añade este método después del método incrementarVecesEnLaCarcel() (línea ~42):
 
-    public void incrementarVueltas() {
-        this.vueltas++;
-    }
 
 
 }
