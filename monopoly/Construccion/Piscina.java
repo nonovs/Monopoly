@@ -15,7 +15,7 @@ public class Piscina extends Edificio {
     public boolean esEdificable() {
         Solar s = getSolar();
         if (s == null) return false;
-        return s.hasHotel() && !s.hasPiscina();
+        return s.hasHotel() &&  !s.hasPiscina();
 
     }
 }

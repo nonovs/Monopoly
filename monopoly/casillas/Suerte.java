@@ -163,7 +163,7 @@ public class Suerte extends Casilla {
                     }
                 }
 
-                // Nos movemos SIN considerar Salida (la carta no dice que cobres por pasar))
+                // Nos movemos SIN considerar Salida (la carta no dice que cobres por  pasar))
                 moverPorCarta(tablero, actual, banca, mejorPos, false, tirada, false);
 
                 Casilla dest = tablero.getCasilla(mejorPos);

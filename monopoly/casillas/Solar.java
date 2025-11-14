@@ -334,7 +334,7 @@ public class Solar extends Casilla {
         }
 
 
-        float devolucion = getPrecioPista();
+        float devolucion =  getPrecioPista();
         if (getDuenho() != null) {
             getDuenho().recibir(devolucion);
             System.out.printf("Se ha demolido la pista de deporte %s en %s. %s recibe %.0f€.%n",

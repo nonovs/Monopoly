@@ -126,6 +126,7 @@ public class CajaComunidad extends Casilla {
             default:
                 return true;
         }
+
     }
 
 

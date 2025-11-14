@@ -46,7 +46,7 @@ public class Edificio {
     }
 
     /**
-     * Método que pode ser sobrescrito pola subclase se hai regras específicas.
+     * Método que pode ser sobrescrito pola  subclase se hai regras específicas.
      */
     public boolean esEdificable() {
         return true;

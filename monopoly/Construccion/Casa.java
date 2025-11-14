@@ -15,7 +15,7 @@ public class Casa extends Edificio {
     public boolean esEdificable() {
         Solar s = getSolar();
         if (s == null) return false;
-        // non se permiten casas se xa hai hotel
+        // non se permiten casas se xa hai  hotel
         if (s.hasHotel()) return false;
         // máximo 4 casas
         return s.getCasas() < 4;

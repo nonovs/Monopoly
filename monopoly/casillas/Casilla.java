@@ -176,6 +176,7 @@ public class Casilla {
         if (compact.contains("ir") && compact.contains("carcel")) return true;
 
         return false;
+
     }
 
 

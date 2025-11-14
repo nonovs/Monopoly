@@ -76,7 +76,7 @@ public class Servicios extends Casilla {
 
         System.out.printf(
                 "El jugador %s compra el servicio %s por %.0f€. Su fortuna actual es %.0f€.\n",
-                solicitante.getNombre(), getNombre(), getValor(), solicitante.getFortuna()
+                solicitante.getNombre(), getNombre(), getValor(),  solicitante.getFortuna()
         );
     }
 

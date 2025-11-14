@@ -52,7 +52,7 @@ public class Impuestos extends Casilla {
 
     @Override
     public String casEnVenta() {
-        return ""; // No está en venta
+        return ""; // No  está en venta
     }
 
     public static float getBote() {

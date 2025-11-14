@@ -30,7 +30,7 @@ public class Transporte extends Casilla {
             actual.pagar(alquilerTotal);
             getDuenho().recibir(alquilerTotal);
 
-            //Como siempre guardamos datos para estadísticas del juego
+            //Como siempre guardamos datos para estadísticas  del juego
             actual.acumularPagoDeAlquileres(alquilerTotal);
             getDuenho().acumularCobroDeAlquileres(alquilerTotal);
             this.sumarAlquilerGenerado(alquiler);

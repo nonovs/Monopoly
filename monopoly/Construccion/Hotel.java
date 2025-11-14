@@ -15,7 +15,7 @@ public class Hotel extends Edificio {
     public boolean esEdificable() {
         Solar s = getSolar();
         if (s == null) return false;
-        return s.getCasas() == 4 && !s.hasHotel();
+        return s.getCasas() == 4 &&  !s.hasHotel();
     }
 
 

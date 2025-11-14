@@ -15,7 +15,7 @@ public class PistaDeporte extends Edificio {
     public boolean esEdificable() {
         Solar s = getSolar();
         if (s == null) return false;
-        return s.hasHotel() && s.hasPiscina() && !s.hasPistaDeporte();
+        return  s.hasHotel() && s.hasPiscina() && !s.hasPistaDeporte();
 
     }
 }

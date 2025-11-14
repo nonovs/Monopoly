@@ -37,7 +37,7 @@ public class Especial extends Casilla {
                 System.out.println(actual.getNombre() + " está en la casilla de la cárcel (visita).");
                 return true;
 
-            case 20: // Parking (bote)
+            case 20: // Parking  (bote)
                 // Si quieres usar la casilla Parking como depósito, usa getValor()/setValor.
                 float bote = Impuestos.getBote();
                 if (bote > 0) {
