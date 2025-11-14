@@ -18,18 +18,8 @@ public class Impuestos extends Casilla {
 
     public Impuestos() {
         super();
-    }//Constructor vacio
-
-    //Getters y setters
-    public static float getBote() {
-        return bote;
-    }
-    public static float setBote(float impuesto){
-        return bote+=impuesto;
     }
 
-
-    //Metodos de la interfaz Casilla
     @Override
     public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {
         if (actual.getFortuna() >= impuesto) {
@@ -43,7 +33,9 @@ public class Impuestos extends Casilla {
             return false;
         }
     }
-
+    public static float setBote(float impuesto){
+        return bote+=impuesto;
+    }
     @Override
     public void comprarCasilla(Jugador solicitante, Jugador banca) {
         System.out.println("No puedes comprar una casilla de impuestos.");
@@ -63,7 +55,9 @@ public class Impuestos extends Casilla {
         return ""; // No está en venta
     }
 
-
+    public static float getBote() {
+        return bote;
+}
 
 
 
