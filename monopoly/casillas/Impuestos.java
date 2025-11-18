@@ -9,7 +9,7 @@ import partida.Jugador;
 public class Impuestos extends Casilla {
 
     private float impuesto;
-    private static float bote=0;//Static para que todas as instancias o compartan
+    private static int bote=0;//Static para que todas as instancias o compartan
     // Constructor
     public Impuestos(String nombre, int posicion, float impuesto, Jugador duenho) {
         super(nombre, posicion, impuesto, duenho); // usa el constructor específico de impuestos
@@ -23,6 +23,9 @@ public class Impuestos extends Casilla {
     @Override
     public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {
         if (actual.getFortuna() >= impuesto) {
+
+            actual.acumularPagoTasasEImpuestos(impuesto); //añadido para estadisticas
+
             actual.pagar(impuesto);
             setBote(impuesto);
             System.out.println("El jugador paga "+ impuesto +"€ que se depositan en el Parking.");
@@ -55,7 +58,7 @@ public class Impuestos extends Casilla {
         return ""; // No  está en venta
     }
 
-    public static float getBote() {
+    public static int getBote() {
         return bote;
 }
 

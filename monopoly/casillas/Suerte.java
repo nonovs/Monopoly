@@ -118,7 +118,7 @@ public class Suerte extends Casilla {
                         actual.pagar(250_000f);
                         j.recibir(250_000f);
                         //añadido para estadisticas
-                        actual.acumularPagoTasasEImpuestos(250_000f);   // <<< AÑADIR
+                        actual.acumularPagoTasasEImpuestos(250_000f); 
                         j.acumularPremiosInversionesOBote(250_000f);  
                     }
                 }

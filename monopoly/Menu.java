@@ -648,21 +648,12 @@ private void moverYEvaluar(Jugador j, int pasos) {
         boolean ok;
 
         if (destino instanceof Suerte) {
-            // delegamos en la lógica de cartas de Suerte y añadimos control de premios
-            float antes = j.getFortuna();
+            // Las cartas de Suerte ya actualizan las estadísticas internas
             ok = ((Suerte) destino).aplicarCarta(tablero, j, banca, jugadores, pasos);
-            float delta = j.getFortuna() - antes;
-            if (delta > 0f) j.acumularPremiosInversionesOBote(delta);
-        } else if (destino instanceof CajaComunidad) {
-            float antes = j.getFortuna();
-            ok = ((CajaComunidad) destino).aplicarCarta(tablero, j, banca, jugadores, pasos);
-            float delta = j.getFortuna() - antes;
 
-            if (delta > 0f) {
-                j.acumularPremiosInversionesOBote(delta);
-            } else if (delta < 0f) {
-                j.acumularPagoTasasEImpuestos(-delta);
-            }
+        } else if (destino instanceof CajaComunidad) {
+            // Igual: CajaComunidad ya se encarga de las estadísticas
+            ok = ((CajaComunidad) destino).aplicarCarta(tablero, j, banca, jugadores, pasos);   
         } else {
             // resto de casillas como antes
             ok = destino.evaluarCasilla(j, banca, pasos);
@@ -1166,6 +1157,7 @@ private void moverYEvaluar(Jugador j, int pasos) {
             System.out.println(j.getNombre() + " esta en la carcel y debe pagar 500000 para salir");
             if (j.getFortuna() >= 500000) {
                 j.pagar(500000);
+                j.acumularPagoTasasEImpuestos(500000);
                 j.salirDeCarcel();
                 System.out.println(j.getNombre() + " paga 500000 y sale de la carcel tras pagar la fianza de 500000");
                 return true; // ya puede jugar
