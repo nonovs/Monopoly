@@ -1,0 +1,27 @@
+crear jugador Alice Coche
+crear jugador Bob Sombrero
+
+lanzar dados 2+2
+acabar turno
+
+lanzar dados 1+3
+acabar turno
+
+lanzar dados 6+5
+acabar turno
+
+lanzar dados 2+3
+acabar turno
+
+lanzar dados 2+3
+acabar turno
+
+lanzar dados 1+2
+acabar turno
+
+lanzar dados 2+2
+
+estadisticas Alice
+estadisticas Bob
+salir
+
