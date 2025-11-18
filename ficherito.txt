@@ -1,0 +1,46 @@
+crear jugador Ana pelota
+crear jugador Bob coche
+lanzar dados 2+3
+comprar Solar2
+acabar turno
+lanzar dados 3+2
+acabar turno
+lanzar dados 1+2
+acabar turno
+lanzar dados 6+6
+comprar Solar3
+lanzar dados 1+2
+acabar turno
+lanzar dados 3+3
+comprar Solar1
+lanzar dados 2+2
+comprar Solar2
+lanzar dados 1+1
+acabar turno
+lanzar dados 5+5
+Trans1
+acabar turno
+lanzar dados 3+4
+acabar turno
+lanzar dados 2+4
+acabar turno
+lanzar dados 1+3
+acabar turno
+lanzar dados 2+2
+acabar turno
+lanzar dados 5+4
+comprar Solar5
+edificar casa
+edificar casa
+edificar casa
+edificar casa
+acabar turno
+lanzar dados 3+3
+acabar turno
+lanzar dados 1+5
+acabar turno
+lanzar dados 2+3
+acabar turno
+estadisticas
+estadisticas Ana
+estadisticas Bob
