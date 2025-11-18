@@ -39,6 +39,9 @@ public class Impuestos extends Casilla {
     public static float setBote(float impuesto){
         return bote+=impuesto;
     }
+    public static float resetBote(){
+        return bote=0;
+    }
     @Override
     public void comprarCasilla(Jugador solicitante, Jugador banca) {
         System.out.println("No puedes comprar una casilla de impuestos.");

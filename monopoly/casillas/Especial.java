@@ -40,7 +40,7 @@ public class Especial extends Casilla {
                 if (bote > 0) {
                     actual.recibir(bote);
                     actual.acumularPremiosInversionesOBote(bote);
-                    Impuestos.setBote(0);
+                    Impuestos.resetBote();
 
                     System.out.printf("%s ha recibido %d del Parking gratuito.%n",
                             actual.getNombre(), bote);
