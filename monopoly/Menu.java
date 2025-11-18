@@ -1186,6 +1186,9 @@ private void moverYEvaluar(Jugador j, int pasos) {
             System.out.println("Has sacado dobles y sales de la carcel");
             moverYEvaluar(actual, suma);
             System.out.println("Usa 'acabar turno' para pasar al siguiente jugador");
+            System.out.println("Has sacado dobles, puedes volver a lanzar");
+            puedeRepetirLanzamiento = true;
+            tirado = false;
             return true;
         }
 

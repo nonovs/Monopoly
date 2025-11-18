@@ -76,6 +76,7 @@ public class GestorEdificaciones {
                     return;
                 }
                 jugador.pagar(precio);
+                jugador.acumularDineroInvertido(precio);
                 solar.anhadirEdificacion((Edificio) casa);
                 System.out.printf("Se ha edificado una casa (%s) en %s. La fortuna de %s se reduce en %.0f€.%n",
                         casa.getId(), nombreSolar, jugadorNombre, precio);
@@ -118,6 +119,7 @@ public class GestorEdificaciones {
                     return;
                 }
                 jugador.pagar(precio);
+                jugador.acumularDineroInvertido(precio);
                 solar.anhadirEdificacion((Edificio) hotel);
                 System.out.printf("Se ha edificado un hotel (%s) en %s. La fortuna de %s se reduce en %.0f€.%n",
                         hotel.getId(), nombreSolar, jugadorNombre, precio);
@@ -144,6 +146,7 @@ public class GestorEdificaciones {
                     return;
                 }
                 jugador.pagar(precio);
+                jugador.acumularDineroInvertido(precio);
                 solar.anhadirEdificacion((Edificio) piscina);
                 System.out.printf("Se ha edificado una piscina (%s) en %s. La fortuna de %s se reduce en %.0f€.%n",
                         piscina.getId(), nombreSolar, jugadorNombre, precio);
@@ -169,6 +172,7 @@ public class GestorEdificaciones {
                     return;
                 }
                 jugador.pagar(precio);
+                jugador.acumularDineroInvertido(precio);
                 solar.anhadirEdificacion((Edificio) pista);
                 System.out.printf("Se ha edificado una pista de deporte (%s) en %s. La fortuna de %s se reduce en %.0f€.%n",
                         pista.getId(), nombreSolar, jugadorNombre, precio);

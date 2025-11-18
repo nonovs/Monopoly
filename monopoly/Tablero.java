@@ -69,7 +69,7 @@ public class Tablero {
         ladoSur.add(casilla);
         banca.anhadirPropiedad(casilla);
 
-        casilla = new Impuestos(Valor.WHITE + "Imp1" + Valor.RESET, 4, 1000000, banca);
+        casilla = new Impuestos(Valor.WHITE + "Imp1" + Valor.RESET, 4, 2000000, banca);
         ladoSur.add(casilla);
         banca.anhadirPropiedad(casilla);
 

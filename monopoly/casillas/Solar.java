@@ -268,6 +268,7 @@ public class Solar extends Casilla {
         float devolucion = getPrecioCasa();
         if (getDuenho() != null) {
             getDuenho().recibir(devolucion);
+
             System.out.printf("Se ha demolido la casa %s en %s. %s recibe %.0f€.%n",
                     casa.getId(), getNombre(), getDuenho().getNombre(), devolucion);
         }
