@@ -1208,7 +1208,7 @@ private void moverYEvaluar(Jugador j, int pasos) {
             actual.pagar(500000);
             actual.salirDeCarcel();
             moverYEvaluar(actual, suma);
-            System.out.println("Usa 'acabar turno' para pasar al siguiente jugador");f
+            System.out.println("Usa 'acabar turno' para pasar al siguiente jugador");
             return true;
         } else {
             System.out.println("No tienes suficiente dinero para pagar la fianza. Sigues en la carcel");
