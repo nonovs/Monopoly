@@ -47,6 +47,7 @@ public class Suerte extends Casilla {
         // Cobrar por pasar por Salida si la carta lo indica
         if (considerarSalida && posFin < posIni) {
             jugador.sumarFortuna((float) Valor.SUMA_VUELTA);
+            jugador.acumularPasarPorSalida((float) Valor.SUMA_VUELTA);
             System.out.printf("%s pasa por Salida y cobra %.0f€.%n",
                     jugador.getNombre(), Valor.SUMA_VUELTA);
         }
