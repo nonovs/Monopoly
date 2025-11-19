@@ -849,14 +849,14 @@ private void moverYEvaluar(Jugador j, int pasos) {
 
 
     private void listarEdificiosGrupo(String colorGrupo) {
-        if (colorGrupo == null || colorGrupo.trim().isEmpty()) {
+        if (colorGrupo == null || colorGrupo.trim().isEmpty()) {//Comprobacion para tomar el color del grupo
             System.out.println("Uso: listar edificios <color_grupo>");
             return;
         }
-        colorGrupo = colorGrupo.trim();
+        colorGrupo = colorGrupo.trim();//ELimino espacios
 
-        List<Casilla> casillas = tablero.getCasillas();
-        if (casillas == null || casillas.isEmpty()) {
+        List<Casilla> casillas = tablero.getCasillas();//Tomo una lista de casillas
+        if (casillas == null || casillas.isEmpty()) {//Comprobacion de casillas, no haria falta pero por seguridad
             System.out.println("No hay casillas en el tablero.");
             return;
         }
@@ -873,12 +873,12 @@ private void moverYEvaluar(Jugador j, int pasos) {
         List<Solar> solaresGrupo = new ArrayList<>();
 
         for (Casilla c : casillas) {
-            if (c instanceof Solar) {
+            if (c instanceof Solar) {//todas las casillas que sean solares
                 Solar s = (Solar) c;
                 if (s.getGrupo() != null && s.getGrupo().getColor() != null
                         && s.getGrupo().getColor().equalsIgnoreCase(colorGrupo)) {
                     tienealgo = true;
-                    solaresGrupo.add(s);
+                    solaresGrupo.add(s);//Solo me quedo con los solares cuyo color de grupo coincide
                 }
             }
         }
@@ -961,7 +961,7 @@ private void moverYEvaluar(Jugador j, int pasos) {
             }
         }
 
-        // Mensajes finales: qué aún se puede edificar y qué no
+        // Mensajes finales qué aún se puede edificar y qué no
         List<String> permitidos = new ArrayList<>();
         if (puedePista) permitidos.add("una pista de deporte");
         if (puedePiscina) permitidos.add("una piscina");
@@ -992,6 +992,13 @@ private void moverYEvaluar(Jugador j, int pasos) {
         if (!noPermitidos.isEmpty()) {
             // Si todos están prohibidos, mostrar frase tipo "Ya no se pueden construir ni hoteles ni casas."
             // Construimos lista con formato "hoteles", "piscinas", etc. y la unimos con" ni "
+
+            /*Exemplo de como funciona StringBUlder, e como un array de palabras
+            * StringBuilder sb = new StringBuilder();
+            sb.append("Hola");
+            sb.append(" mundo");
+            String resultado = sb.toString();
+            */
             StringBuilder sb2 = new StringBuilder("Ya no se pueden construir ");
             for (int i = 0; i < noPermitidos.size(); i++) {
                 if (i > 0 && i == noPermitidos.size() - 1) sb2.append(" ni ");
@@ -1201,7 +1208,7 @@ private void moverYEvaluar(Jugador j, int pasos) {
             actual.pagar(500000);
             actual.salirDeCarcel();
             moverYEvaluar(actual, suma);
-            System.out.println("Usa 'acabar turno' para pasar al siguiente jugador");
+            System.out.println("Usa 'acabar turno' para pasar al siguiente jugador");f
             return true;
         } else {
             System.out.println("No tienes suficiente dinero para pagar la fianza. Sigues en la carcel");
