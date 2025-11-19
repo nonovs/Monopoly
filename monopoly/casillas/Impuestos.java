@@ -28,7 +28,7 @@ public class Impuestos extends Casilla {
 
             actual.pagar(impuesto);
             setBote(impuesto);
-            System.out.println("El jugador paga "+ (int)impuesto +" € que se depositan en el Parking.");//O cast solo o fixen pa que imprima bonito todo en ints
+            System.out.println("El jugador paga "+ (int)impuesto +" € que se depositan en el Parking.");//O cast solo o fixen pa que imprima bonito todo en int's
             banca.recibir(impuesto);
             return true;
         } else {
