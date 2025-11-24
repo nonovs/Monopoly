@@ -7,9 +7,12 @@ import java.io.IOException;
 
 public class Menu {
 
-    private Juego juego;
+    // CAMBIO 1: El tipo del atributo ahora es la Interfaz 'Comando'
+    private Comando juego;
 
     public Menu() {
+        // CAMBIO 2: Instanciamos Juego, pero lo guardamos en la variable de tipo Comando
+        // Esto es polimorfismo.
         this.juego = new Juego();
     }
 
@@ -22,7 +25,6 @@ public class Menu {
 
     private void procesarComandos() {
         while (true) {
-            // Usamos nuestro método corto 'leer'
             String comando = leer("> ");
 
             if (comando.equalsIgnoreCase("salir")) {
@@ -38,6 +40,8 @@ public class Menu {
         String[] partes = comando.split(" ");
         String cmd = partes[0].toLowerCase();
 
+        // El resto del switch NO cambia, porque todos los métodos que llamas
+        // (juego.crearJugador, juego.lanzarDados, etc.) están definidos en la interfaz Comando.
         switch (cmd) {
             case "crear":
                 if (partes.length == 4 && partes[1].equalsIgnoreCase("jugador")) {
@@ -148,7 +152,6 @@ public class Menu {
                 break;
 
             case "listargrupo":
-                // Usamos nuestro método corto 'leer'
                 String grupo = leer("Grupo: ");
                 juego.listarCasillasGrupo(grupo);
                 break;
@@ -178,11 +181,11 @@ public class Menu {
         return false;
     }
 
-    // ================================================================
-    //   MÉTODOS AUXILIARES (WRAPPERS) PARA ACORTAR LLAMADAS
-    // ================================================================
-
+    // MÉTODOS AUXILIARES (WRAPPERS)
     private void imprimir(String mensaje) {
+        // Aquí seguimos accediendo a Juego.consola estáticamente.
+        // Esto es válido porque consola es estático en la CLASE Juego,
+        // independientemente de la interfaz Comando.
         Juego.consola.imprimir(mensaje);
     }
 
