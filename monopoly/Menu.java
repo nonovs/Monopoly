@@ -1,41 +1,35 @@
 package monopoly;
-
+import  monopoly.Juego;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Scanner;
 
 public class Menu {
 
-    // Único atributo: La instancia del juego
-    private monopoly.Juego juego;
+    private Juego juego;
 
     public Menu() {
-        this.juego = new monopoly.Juego();
+        this.juego = new Juego();
     }
 
     public void iniciarPartida() {
-        System.out.println("Bienvenido al Monopoly");
+        imprimir("Bienvenido al Monopoly");
         juego.mostrarTablero();
-        System.out.println("Introduce comandos. Escribe 'salir' para terminar.\n");
+        imprimir("Introduce comandos. Escribe 'salir' para terminar.\n");
         procesarComandos();
     }
 
     private void procesarComandos() {
-        Scanner sc = new Scanner(System.in);
         while (true) {
-            System.out.print("> ");
-            if (sc.hasNextLine()) {
-                String comando = sc.nextLine().trim();
-                if (comando.equalsIgnoreCase("salir")) {
-                    System.out.println("Fin de la partida.");
-                    break;
-                }
-                analizarComando(comando);
-            } else {
+            // Usamos nuestro método corto 'leer'
+            String comando = leer("> ");
+
+            if (comando.equalsIgnoreCase("salir")) {
+                imprimir("Fin de la partida.");
                 break;
             }
+            analizarComando(comando);
         }
     }
 
@@ -49,7 +43,7 @@ public class Menu {
                 if (partes.length == 4 && partes[1].equalsIgnoreCase("jugador")) {
                     juego.crearJugador(partes[2], partes[3]);
                 } else {
-                    System.out.println("Uso: crear jugador <nombre> <tipo_avatar>");
+                    imprimir("Uso: crear jugador <nombre> <tipo_avatar>");
                 }
                 break;
 
@@ -76,7 +70,7 @@ public class Menu {
                 } else if (partes.length >= 2) {
                     juego.descCasilla(partes[1]);
                 } else {
-                    System.out.println("Uso: describir <casilla> | jugador <nombre> | avatar <id>");
+                    imprimir("Uso: describir <casilla> | jugador <nombre> | avatar <id>");
                 }
                 break;
 
@@ -85,7 +79,6 @@ public class Menu {
                     if (partes.length == 2) {
                         juego.lanzarDados();
                     } else {
-                        // lanzar dados 2+3
                         String[] d = partes[2].split("\\+");
                         if (d.length == 2) {
                             try {
@@ -93,12 +86,12 @@ public class Menu {
                                 int b = Integer.parseInt(d[1]);
                                 juego.lanzarDadosForzada(a, b);
                             } catch (NumberFormatException e) {
-                                System.out.println("Números inválidos.");
+                                imprimir("Números inválidos.");
                             }
                         }
                     }
                 } else {
-                    System.out.println("Uso: lanzar dados");
+                    imprimir("Uso: lanzar dados");
                 }
                 break;
 
@@ -120,21 +113,20 @@ public class Menu {
 
             case "edificar":
                 if (partes.length >= 2) juego.edificar(partes[1]);
-                else System.out.println("Uso: edificar <tipo>");
+                else imprimir("Uso: edificar <tipo>");
                 break;
 
             case "vender":
-                // Parsing de argumentos sigue aquí, pero la lógica va a Juego
                 if (partes.length >= 4) {
                     try {
                         juego.venderEdificio(partes[1], partes[2], Integer.parseInt(partes[3]));
                     } catch (NumberFormatException e) {
-                        System.out.println("Cantidad debe ser número.");
+                        imprimir("Cantidad debe ser número.");
                     }
                 } else if (partes.length >= 3) {
                     juego.venderEdificio(partes[1], partes[2], 1);
                 } else {
-                    System.out.println("Uso: vender <tipo> <solar> [cantidad]");
+                    imprimir("Uso: vender <tipo> <solar> [cantidad]");
                 }
                 break;
 
@@ -156,13 +148,13 @@ public class Menu {
                 break;
 
             case "listargrupo":
-                Scanner sc = new Scanner(System.in);
-                System.out.print("Grupo: ");
-                juego.listarCasillasGrupo(sc.nextLine().trim());
+                // Usamos nuestro método corto 'leer'
+                String grupo = leer("Grupo: ");
+                juego.listarCasillasGrupo(grupo);
                 break;
 
             default:
-                System.out.println("Comando no reconocido.");
+                imprimir("Comando no reconocido.");
         }
     }
 
@@ -172,15 +164,29 @@ public class Menu {
             while ((linea = buffer.readLine()) != null) {
                 linea = linea.trim();
                 if (linea.isEmpty()) continue;
-                System.out.println("> " + linea);
+
+                imprimir("> " + linea);
+
                 if (linea.equalsIgnoreCase("salir")) return true;
                 analizarComando(linea);
             }
         } catch (FileNotFoundException e) {
-            System.out.println("Archivo no encontrado.");
+            imprimir("Archivo no encontrado.");
         } catch (IOException e) {
-            System.out.println("Error de lectura.");
+            imprimir("Error de lectura.");
         }
         return false;
+    }
+
+    // ================================================================
+    //   MÉTODOS AUXILIARES (WRAPPERS) PARA ACORTAR LLAMADAS
+    // ================================================================
+
+    private void imprimir(String mensaje) {
+        Juego.consola.imprimir(mensaje);
+    }
+
+    private String leer(String descripcion) {
+        return Juego.consola.leer(descripcion);
     }
 }

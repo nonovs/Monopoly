@@ -1,5 +1,5 @@
 package partida;
-
+import monopoly.Juego;
 import monopoly.casillas.Casilla;
 import monopoly.casillas.Solar;
 import monopoly.Construccion.Casa;
@@ -28,13 +28,13 @@ public class GestorEdificaciones {
      */
     public static void edificar(Jugador jugador, String tipo) {
         if (jugador == null || jugador.getAvatar() == null || jugador.getAvatar().getLugar() == null) {
-            System.out.println("No se ha localizado la casilla actual del jugador.");
+            Juego.consola.imprimir("No se ha localizado la casilla actual del jugador.");
             return;
         }
 
         Casilla lugar = jugador.getAvatar().getLugar();
         if (!(lugar instanceof Solar)) {
-            System.out.println("No se puede edificar en esta casilla (no es un solar).");
+            Juego.consola.imprimir("No se puede edificar en esta casilla (no es un solar).");
             return;
         }
 
@@ -45,7 +45,7 @@ public class GestorEdificaciones {
 
         // Comprueba que el jugador sea dueño del solar y del grupo de solares
         if (solar.getDuenho() == null || solar.getDuenho() != jugador) {
-            System.out.printf("%s no es el propietario de %s.%n", jugadorNombre, nombreSolar);
+            Juego.consola.imprimir(String.format("%s no es el propietario de %s.%n", jugadorNombre, nombreSolar));
             return;
         }
 
@@ -56,48 +56,47 @@ public class GestorEdificaciones {
             case "casa": {
                 // Regla para construir casas en un grupo se requiere ser dueño de todo el grupo
                 if (grupo != null && !grupo.esDuenhoGrupo(jugador)) {
-                    System.out.printf("No se puede edificar una casa en %s: %s no es dueño de todas las casillas del grupo %s.%n",
-                            nombreSolar, jugadorNombre, grupo.getColor());
+                    Juego.consola.imprimir(String.format("No se puede edificar una casa en %s: %s no es dueño de todas las casillas del grupo %s.%n",nombreSolar, jugadorNombre, grupo.getColor()));
                     return;
                 }
                 float precio = solar.getPrecioCasa();
                 if (jugador.getFortuna() < precio) {
-                    System.out.printf("La fortuna de %s no es suficiente para edificar una casa en la casilla %s.%n", jugadorNombre, nombreSolar);
+                    Juego.consola.imprimir(String.format("La fortuna de %s no es suficiente para edificar una casa en la casilla %s.%n", jugadorNombre, nombreSolar));
                     return;
                 }
                 Casa casa = new Casa(solar, precio);
                 if (!casa.esEdificable()) {
-                    System.out.println("No se puede edificar ningún edificio más en esta casilla ni en el grupo al que la casilla pertenece.");
+                    Juego.consola.imprimir("No se puede edificar ningún edificio más en esta casilla ni en el grupo al que la casilla pertenece.");
                     return;
                 }
                 boolean okCasa = solar.construirCasa();
                 if (!okCasa) {
-                    System.out.println("No se ha podido edificar la casa (condiciones no cumplidas).");
+                    Juego.consola.imprimir("No se ha podido edificar la casa (condiciones no cumplidas).");
                     return;
                 }
                 jugador.pagar(precio);
                 jugador.acumularDineroInvertido(precio);
                 solar.anhadirEdificacion((Edificio) casa);
-                System.out.printf("Se ha edificado una casa (%s) en %s. La fortuna de %s se reduce en %.0f€.%n",
-                        casa.getId(), nombreSolar, jugadorNombre, precio);
+                Juego.consola.imprimir(String.format("Se ha edificado una casa (%s) en %s. La fortuna de %s se reduce en %.0f€.%n",
+                        casa.getId(), nombreSolar, jugadorNombre, precio));
                 return;
             }
 
             case "hotel": {
                 //Compruebo que es duanho del grupo y que tiene 4 casas
                 if (grupo != null && !grupo.esDuenhoGrupo(jugador)) {
-                    System.out.printf("No se puede edificar un hotel en %s: %s no es dueño de todas las casillas del grupo %s.%n",
-                            nombreSolar, jugadorNombre, grupo.getColor());
+                    Juego.consola.imprimir(String.format("No se puede edificar un hotel en %s: %s no es dueño de todas las casillas del grupo %s.%n",
+                            nombreSolar, jugadorNombre, grupo.getColor()));
                     return;
                 }
                 float precio = solar.getPrecioHotel();
                 if (jugador.getFortuna() < precio) {
-                    System.out.printf("La fortuna de %s no es suficiente para edificar un hotel en la casilla %s.%n", jugadorNombre, nombreSolar);
+                    Juego.consola.imprimir(String.format("La fortuna de %s no es suficiente para edificar un hotel en la casilla %s.%n", jugadorNombre, nombreSolar));
                     return;
                 }
                 Hotel hotel = new Hotel(solar, precio);
                 if (!hotel.esEdificable()) {
-                    System.out.println("No se puede edificar un hotel: se requieren 4 casas y ser dueño del grupo o ya existe un hotel.");
+                    Juego.consola.imprimir("No se puede edificar un hotel: se requieren 4 casas y ser dueño del grupo o ya existe un hotel.");
                     return;
                 }
                 List<Edificio> casasAEliminar = new ArrayList<>();
@@ -115,15 +114,15 @@ public class GestorEdificaciones {
                 }
                 boolean ok = solar.construirHotel();
                 if (!ok) {
-                    System.out.println("No se pudo edificar el hotel.");
+                    Juego.consola.imprimir("No se pudo edificar el hotel.");
                     return;
                 }
                 jugador.pagar(precio);
                 jugador.acumularDineroInvertido(precio);
                 solar.anhadirEdificacion((Edificio) hotel);
-                System.out.printf("Se ha edificado un hotel (%s) en %s. La fortuna de %s se reduce en %.0f€.%n",
-                        hotel.getId(), nombreSolar, jugadorNombre, precio);
-                System.out.printf("Las 4 casas en %s han sido reemplazadas por el hotel.%n", nombreSolar);
+                Juego.consola.imprimir(String.format("Se ha edificado un hotel (%s) en %s. La fortuna de %s se reduce en %.0f€.%n",
+                        hotel.getId(), nombreSolar, jugadorNombre, precio));
+                Juego.consola.imprimir(String.format("Las 4 casas en %s han sido reemplazadas por el hotel.%n", nombreSolar));
                 return;
             }
 
@@ -132,24 +131,24 @@ public class GestorEdificaciones {
 
                 float precio = solar.getPrecioPiscina();
                 if (jugador.getFortuna() < precio) {
-                    System.out.printf("La fortuna de %s no es suficiente para edificar una piscina en la casilla %s.%n", jugadorNombre, nombreSolar);
+                    Juego.consola.imprimir(String.format("La fortuna de %s no es suficiente para edificar una piscina en la casilla %s.%n", jugadorNombre, nombreSolar));
                     return;
                 }
                 Piscina piscina = new Piscina(solar, precio);
                 if (!piscina.esEdificable()) {
-                    System.out.println("No se puede edificar una piscina, ya que no se dispone de un hotel.");
+                    Juego.consola.imprimir("No se puede edificar una piscina, ya que no se dispone de un hotel.");
                     return;
                 }
                 boolean okPisc = solar.construirPiscina();
                 if (!okPisc) {
-                    System.out.println("No se pudo edificar la piscina.");
+                    Juego.consola.imprimir("No se pudo edificar la piscina.");
                     return;
                 }
                 jugador.pagar(precio);
                 jugador.acumularDineroInvertido(precio);
                 solar.anhadirEdificacion((Edificio) piscina);
-                System.out.printf("Se ha edificado una piscina (%s) en %s. La fortuna de %s se reduce en %.0f€.%n",
-                        piscina.getId(), nombreSolar, jugadorNombre, precio);
+                Juego.consola.imprimir(String.format("Se ha edificado una piscina (%s) en %s. La fortuna de %s se reduce en %.0f€.%n",
+                        piscina.getId(), nombreSolar, jugadorNombre, precio));
                 return;
             }
 
@@ -158,48 +157,48 @@ public class GestorEdificaciones {
 
                 float precio = solar.getPrecioPista();
                 if (jugador.getFortuna() < precio) {
-                    System.out.printf("La fortuna de %s no es suficiente para edificar una pista de deporte en la casilla %s.%n", jugadorNombre, nombreSolar);
+                    Juego.consola.imprimir(String.format("La fortuna de %s no es suficiente para edificar una pista de deporte en la casilla %s.%n", jugadorNombre, nombreSolar));
                     return;
                 }
                 PistaDeporte pista = new PistaDeporte(solar, precio);
                 if (!pista.esEdificable()) {
-                    System.out.println("No se puede edificar una pista, ya que falta hotel o piscina.");
+                    Juego.consola.imprimir("No se puede edificar una pista, ya que falta hotel o piscina.");
                     return;
                 }
                 boolean okPista = solar.construirPista();
                 if (!okPista) {
-                    System.out.println("No se pudo edificar la pista.");
+                    Juego.consola.imprimir("No se pudo edificar la pista.");
                     return;
                 }
                 jugador.pagar(precio);
                 jugador.acumularDineroInvertido(precio);
                 solar.anhadirEdificacion((Edificio) pista);
-                System.out.printf("Se ha edificado una pista de deporte (%s) en %s. La fortuna de %s se reduce en %.0f€.%n",
-                        pista.getId(), nombreSolar, jugadorNombre, precio);
+                Juego.consola.imprimir(String.format("Se ha edificado una pista de deporte (%s) en %s. La fortuna de %s se reduce en %.0f€.%n",
+                        pista.getId(), nombreSolar, jugadorNombre, precio));
                 return;
             }
 
             default:
-                System.out.println("Tipo de edificación no reconocido. Usa: casa, hotel, piscina o pista_deporte.");
+                Juego.consola.imprimir("Tipo de edificación no reconocido. Usa: casa, hotel, piscina o pista_deporte.");
         }
     }
 
 
     public static boolean eliminarEdificio(Edificio edificio) {
         if (edificio == null) {
-            System.out.println("No se puede eliminar un edificio nulo.");
+            Juego.consola.imprimir("No se puede eliminar un edificio nulo.");
             return false;
         }
 
         Solar solar = edificio.getSolar();
         if (solar == null) {
-            System.out.println("El edificio no está asociado a ningún solar.");
+            Juego.consola.imprimir("El edificio no está asociado a ningún solar.");
             return false;
         }
 
         Jugador duenho = solar.getDuenho();
         if (duenho == null) {
-            System.out.println("El solar no tiene dueño asignado.");
+            Juego.consola.imprimir("El solar no tiene dueño asignado.");
             return false;
         }
 
@@ -226,13 +225,13 @@ public class GestorEdificaciones {
             resultado = solar.romperPista((PistaDeporte) edificio);
 
         } else {
-            System.out.println("Tipo de edificio no reconocido.");
+            Juego.consola.imprimir("Tipo de edificio no reconocido.");
             return false;
         }
 
         if (!resultado) {
-            System.out.printf("No se pudo demoler el %s (%s) en %s.%n",
-                    tipoEdificio, edificio.getId(), solar.getNombre());
+            Juego.consola.imprimir(String.format("No se pudo demoler el %s (%s) en %s.%n",
+                    tipoEdificio, edificio.getId(), solar.getNombre()));
             return false;
         }
 

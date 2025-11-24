@@ -1,5 +1,6 @@
 package monopoly;
 
+import monopoly.Juego;
 import monopoly.casillas.*;
 import partida.*;
 import java.util.ArrayList;
@@ -429,6 +430,6 @@ public class Tablero {
 
 
     public void mostrarTablero() {
-        System.out.println(this.toString());
+        Juego.consola.imprimir(this.toString());
     }
 }
