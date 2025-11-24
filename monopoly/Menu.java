@@ -4,337 +4,166 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
-import partida.*;
-import monopoly.casillas.Casilla;
-import monopoly.casillas.Solar;
-import monopoly.Construccion.Edificio;
-import monopoly.casillas.Suerte;
-import monopoly.casillas.CajaComunidad;
-
-
-
-import static partida.GestorEdificaciones.eliminarEdificio;
-
+import java.util.Scanner;
 
 public class Menu {
 
-    // Atributos
-    private ArrayList<Jugador> jugadores; // Jugadores de la partida
-    private ArrayList<Avatar> avatares;   // Avatares en la partida
-    private int turno = 0;                // Indice del jugador que tiene el turno
-    private int lanzamientos = 0;         // Lanzamientos en el turno actual
-    private Tablero tablero;              // Tablero en el que se juega
-    private Dado dado1;                   // Si los usas en otras partes, los dejo inicializados
-    private Dado dado2;
-    private Jugador banca;                // La banca
-    private boolean tirado = false;       // Si el jugador actual ya tiró
-    private boolean solvente = true;      // Si el jugador actual está solvente tras evaluar casilla
-    private Dado dado = new Dado();       // Un solo Dado que gestiona 2 dados
-    private boolean puedeRepetirLanzamiento = false; // true solo cuando ha sacado dobles válidos
+    // Único atributo: La instancia del juego
+    private monopoly.Juego juego;
 
-    // CONSTRUCTOR
     public Menu() {
-        this.banca = new Jugador();
-        this.tablero = new Tablero(banca);
-        this.dado1 = new Dado();
-        this.dado2 = new Dado();
-        this.jugadores = new ArrayList<>();
-        this.avatares  = new ArrayList<>();
+        this.juego = new monopoly.Juego();
     }
 
-    // Método para inciar una partida
     public void iniciarPartida() {
         System.out.println("Bienvenido al Monopoly");
-        mostrarTablero();
-        System.out.println("Introduce comandos. Escribe 'salir' para temrinar \n");
+        juego.mostrarTablero();
+        System.out.println("Introduce comandos. Escribe 'salir' para terminar.\n");
         procesarComandos();
     }
 
-    /** Bucle principal de lectura de comandos **/
     private void procesarComandos() {
+        Scanner sc = new Scanner(System.in);
         while (true) {
             System.out.print("> ");
-            Scanner sc = new Scanner(System.in);
-            String comando = sc.nextLine().trim();
-            if (comando.equalsIgnoreCase("salir")) {
-                System.out.println("Fin de la partida.");
+            if (sc.hasNextLine()) {
+                String comando = sc.nextLine().trim();
+                if (comando.equalsIgnoreCase("salir")) {
+                    System.out.println("Fin de la partida.");
+                    break;
+                }
+                analizarComando(comando);
+            } else {
                 break;
             }
-            analizarComando(comando);
         }
     }
 
-    /* Interpreta el comando introducido y toma la accion correspondiente */
     private void analizarComando(String comando) {
         if (comando.isEmpty()) return;
         String[] partes = comando.split(" ");
+        String cmd = partes[0].toLowerCase();
 
-        switch (partes[0].toLowerCase()) {
+        switch (cmd) {
             case "crear":
                 if (partes.length == 4 && partes[1].equalsIgnoreCase("jugador")) {
-                    crearJugador(partes[2], partes[3]);
+                    juego.crearJugador(partes[2], partes[3]);
                 } else {
                     System.out.println("Uso: crear jugador <nombre> <tipo_avatar>");
                 }
                 break;
+
             case "jugador":
-                mostrarJugadorEnTurno();
+                juego.mostrarJugadorEnTurno();
                 break;
+
             case "listar":
                 if (partes.length >= 2) {
-                    if (partes[1].equalsIgnoreCase("jugadores")) listarJugadores();
-                    else if (partes[1].equalsIgnoreCase("enventa")) listarVenta();
-                    else if (partes[1].equalsIgnoreCase("avatares")) listarAvatares();
+                    if (partes[1].equalsIgnoreCase("jugadores")) juego.listarJugadores();
+                    else if (partes[1].equalsIgnoreCase("enventa")) juego.listarVenta();
+                    else if (partes[1].equalsIgnoreCase("avatares")) juego.listarAvatares();
                     else if (partes[1].equalsIgnoreCase("edificios")) {
-                        if (partes.length >= 3){
-                            listarEdificiosGrupo(partes[2]);
-                        }else listarEdificios();
+                        if (partes.length >= 3) juego.listarEdificiosGrupo(partes[2]);
+                        else juego.listarEdificios();
                     }
                 }
                 break;
 
             case "describir":
-                if (partes.length >= 3 && partes[1].equalsIgnoreCase("jugador"))
-                    descJugador(partes);
-                else if (partes.length >= 3 && partes[1].equalsIgnoreCase("avatar"))
-                    descAvatar(partes[2]);
-                else if (partes.length >= 2)
-                    descCasilla(partes[1]);
-                else System.out.println("Uso: describir <nombre_casilla> o describir jugador <nombre> o describir avatar <id_avatar>");
+                if (partes.length >= 3) {
+                    if (partes[1].equalsIgnoreCase("jugador")) juego.descJugador(partes[2]);
+                    else if (partes[1].equalsIgnoreCase("avatar")) juego.descAvatar(partes[2]);
+                } else if (partes.length >= 2) {
+                    juego.descCasilla(partes[1]);
+                } else {
+                    System.out.println("Uso: describir <casilla> | jugador <nombre> | avatar <id>");
+                }
                 break;
 
             case "lanzar":
-                // lanzar dados          -> tirada aleatoria
-                // lanzar dados 2+4      -> tirada forzada
                 if (partes.length >= 2 && partes[1].equalsIgnoreCase("dados")) {
                     if (partes.length == 2) {
-                        lanzarDados(); // aleatoria
+                        juego.lanzarDados();
                     } else {
+                        // lanzar dados 2+3
                         String[] d = partes[2].split("\\+");
                         if (d.length == 2) {
-                            int a = Integer.parseInt(d[0]);
-                            int b = Integer.parseInt(d[1]);
-                            lanzarDadosForzada(a, b); // forzada
-                        } else {
-                            System.out.println("Uso: lanzar dados | lanzar dados X+Y");
+                            try {
+                                int a = Integer.parseInt(d[0]);
+                                int b = Integer.parseInt(d[1]);
+                                juego.lanzarDadosForzada(a, b);
+                            } catch (NumberFormatException e) {
+                                System.out.println("Números inválidos.");
+                            }
                         }
                     }
                 } else {
                     System.out.println("Uso: lanzar dados");
                 }
                 break;
-            case "listargrupo":
-                Scanner sc = new Scanner(System.in);
-                System.out.print("Ingrese el nombre del grupo: ");
-                String grupo = sc.nextLine().trim();
-                listarCasillasGrupo(grupo);
-                break;
+
             case "comprar":
-                if (partes.length >= 2)
-                    comprar(partes[1]);
-                else
-                    System.out.println("Uso: comprar <nombre_casilla>");
+                if (partes.length >= 2) juego.comprar(partes[1]);
                 break;
 
             case "salir":
-                if (partes.length >= 2 && partes[1].equalsIgnoreCase("cárcel"))
-                    salirCarcel();
+                if (partes.length >= 2 && partes[1].equalsIgnoreCase("cárcel")) juego.salirCarcel();
                 break;
 
             case "acabar":
-                if (partes.length >= 2 && partes[1].equalsIgnoreCase("turno"))
-                    acabarTurno();
+                if (partes.length >= 2 && partes[1].equalsIgnoreCase("turno")) juego.acabarTurno();
                 break;
+
             case "ver":
-                if (partes.length >= 2 && partes[1].equalsIgnoreCase("tablero"))
-                    mostrarTablero();
+                if (partes.length >= 2 && partes[1].equalsIgnoreCase("tablero")) juego.mostrarTablero();
                 break;
 
             case "edificar":
-                // nuevo comando: edificar <tipo>
-                if (partes.length >= 2) {
-                    edificar(partes[1]);
-                } else {
-                    System.out.println("Uso: edificar <casa|hotel|piscina|pista_deporte>");
-                }
+                if (partes.length >= 2) juego.edificar(partes[1]);
+                else System.out.println("Uso: edificar <tipo>");
                 break;
 
             case "vender":
+                // Parsing de argumentos sigue aquí, pero la lógica va a Juego
                 if (partes.length >= 4) {
-                    // vender <tipo> <solar> <cantidad>
                     try {
-                        String tipo = partes[1];
-                        String solar = partes[2];
-                        int cantidad = Integer.parseInt(partes[3]);
-                        venderEdificio(tipo, solar, cantidad);
+                        juego.venderEdificio(partes[1], partes[2], Integer.parseInt(partes[3]));
                     } catch (NumberFormatException e) {
-                        System.out.println("La cantidad debe ser un número.");
+                        System.out.println("Cantidad debe ser número.");
                     }
                 } else if (partes.length >= 3) {
-
-                    venderEdificio(partes[1], partes[2], 1);
+                    juego.venderEdificio(partes[1], partes[2], 1);
                 } else {
-                    System.out.println("Uso: vender <tipo> <solar> <cantidad>");
+                    System.out.println("Uso: vender <tipo> <solar> [cantidad]");
                 }
                 break;
+
             case "hipotecar":
-                if (partes.length >= 2) {
-                    hipotecar(partes[1]);
-                } else {
-                    System.out.println("Uso: hipotecar <nombre_casilla>");
-                }
+                if (partes.length >= 2) juego.hipotecar(partes[1]);
                 break;
 
             case "deshipotecar":
-                if (partes.length >= 2){
-                    deshipotecar(partes[1]);
-                } else {
-                    System.out.println("Uso: deshipotecar <nombre_casilla>");
-                }
+                if (partes.length >= 2) juego.deshipotecar(partes[1]);
                 break;
 
             case "estadisticas":
-                if (partes.length >= 2)
-                    mostrarEstadisticas(partes[1]);
-                else if (partes.length == 1)
-                    mostrarEstadisticasJuego();
-                else System.out.println("Uso: estadisticas <nombre_jugador> o estadisticas");
+                if (partes.length >= 2) juego.mostrarEstadisticas(partes[1]);
+                else juego.mostrarEstadisticasJuego();
                 break;
-            case "mover":
-                // Comando secreto para testing: mover <numero_casilla>
-                if (partes.length >= 2) {
-                    try {
-                        moverChetada(partes[1]);
 
-                    } catch (NumberFormatException e) {
-                        System.out.println("Uso: mover <numero_casilla_0_a_39>");
-                    }
-                } else {
-                    System.out.println("Uso: mover <numero_casilla_0_a_39>");
-                }
+            case "mover":
+                if (partes.length >= 2) juego.moverChetada(partes[1]);
                 break;
+
+            case "listargrupo":
+                Scanner sc = new Scanner(System.in);
+                System.out.print("Grupo: ");
+                juego.listarCasillasGrupo(sc.nextLine().trim());
+                break;
+
             default:
                 System.out.println("Comando no reconocido.");
-                System.out.println(" COMANDOS DISPONIBLES:");
-                System.out.println("  mover <numero_casilla> (para pruebas privadas");
-                System.out.println("  crear jugador <nombre> <tipo_avatar>");
-                System.out.println("  listar jugadores");
-                System.out.println("  listar enventa");
-                System.out.println("  listar avatares");
-                System.out.println("  listar edificios");
-                System.out.println("  describir jugador <nombre>");
-                System.out.println("  describir avatar <id_avatar>");
-                System.out.println("  describir <nombre_casilla>");
-                System.out.println("  lanzar dados");
-                System.out.println("  comprar <nombre_casilla>");
-                System.out.println("  salir carcel");
-                System.out.println("  acabar turno");
-                System.out.println("  ver tablero");
-                System.out.println("  edificar <casa|hotel|piscina|pista_deporte>");
-                System.out.println("  vender <edificio> <solar> (opcional <cantidad>)");
-                System.out.println("  hipotecar <nombre_casilla>");
-                System.out.println("  deshipotecar <nombre_casilla>");
-                System.out.println("  estadisticas <nombre_jugador>");
-                System.out.println("  estadisticas");
         }
-    }
-
-    private void mostrarTablero() {
-        tablero.mostrarTablero();
-    }
-
-    private void crearJugador(String nombre, String tipoAvatar) {
-        // evitar duplicados en nombre
-        for (Jugador j : jugadores) {
-            if (j.getNombre().equalsIgnoreCase(nombre)) {
-                System.out.println("Ya existe un jugador con ese nombre.");
-                return;
-            }
-        }
-        if (jugadores.size() >= 4) {
-            System.out.println("No se pueden crear más de 4 jugadores.");
-            return;
-        }
-        if (!tipoAvatar.equalsIgnoreCase("Coche") && !tipoAvatar.equalsIgnoreCase("Esfinge") && !tipoAvatar.equalsIgnoreCase("Sombrero") && !tipoAvatar.equalsIgnoreCase("Pelota")) {
-            System.out.println("No se puede crear un jugador con ese tipo de avatar.");
-
-            return;
-
-        }
-
-        Casilla salida = tablero.encontrar_casilla("Salida");
-        if (salida == null) {
-            System.out.println("No se encontró la casilla Salida.");
-            return;
-        }
-
-        // crear jugador (si tu constructor ya crea avatar, lo devolverá en getAvatar)
-        Jugador nuevo = new Jugador(nombre, tipoAvatar, salida, avatares);
-        Avatar avatar = nuevo.getAvatar();
-
-        // Si el constructor del Jugador NO creó el avatar, créalo aquí
-        if (avatar == null) {
-            avatar = new Avatar(tipoAvatar, nuevo, salida, avatares);
-            nuevo.setAvatar(avatar);
-        }
-
-        // registrar jugador sin duplicar avatar en la lista de avatares
-        jugadores.add(nuevo);
-        boolean ya = false;
-        for (Avatar a : avatares) {
-            if (a.getId().equalsIgnoreCase(avatar.getId())) { ya = true; break; }
-        }
-        if (!ya) avatares.add(avatar);
-
-        // añadir avatar a la casilla Salida solo si no está ya
-        boolean presente = false;
-        for (Avatar a : salida.getAvatares()) {
-            if (a.getId().equalsIgnoreCase(avatar.getId())) { presente = true; break; }
-        }
-        if (!presente) {
-            salida.anhadirAvatar(avatar);
-            // sincronizar lugar del avatar (muy importante para que enviarACarcel elimine correctamente)
-            avatar.setLugar(salida);
-        }
-
-        // sincronizar posicion del jugador
-        nuevo.setPosicion(salida.getPosicion());
-
-        System.out.printf("{nombre: %s, avatar: %s}%n", nombre, avatar.getId());
-        tablero.mostrarTablero();
-    }
-    // --- muestra el jugador que tiene el turno actual ---
-    private void mostrarJugadorEnTurno() {
-        if (jugadores == null || jugadores.isEmpty()) {
-            System.out.println("No hay jugadores en la partida");
-            return;
-        }
-
-        Jugador actual = jugadores.get(turno);
-        String avatarId = (actual.getAvatar() != null) ? actual.getAvatar().getId() : "-";
-        System.out.printf("Turno de: %s (avatar %s) - posicion %d%n",
-                actual.getNombre(), avatarId, actual.getPosicion());
-
-        // si esta en carcel, solo informar
-        if (actual.isEnCarcel()) {
-            System.out.println(actual.getNombre() + " esta en la carcel y debe pagar 500000 para salir");
-            System.out.println("Usa 'salir carcel' para pagar y poder lanzar");
-        }
-    }
-
-    /**
-     * Nuevo método: edificar el tipo pedido para el jugador que tiene el turno.
-     * Delegamos la lógica en GestorEdificaciones.
-     */
-    private void edificar(String tipo) {
-        if (jugadores == null || jugadores.isEmpty()) {
-            System.out.println("No hay jugadores en la partida.");
-            return;
-        }
-        Jugador actual = jugadores.get(turno);
-        // Delegar en GestorEdificaciones
-        GestorEdificaciones.edificar(actual, tipo);
     }
 
     public boolean procesarFichero(String fichero) {
@@ -343,1052 +172,15 @@ public class Menu {
             while ((linea = buffer.readLine()) != null) {
                 linea = linea.trim();
                 if (linea.isEmpty()) continue;
-
-                // eco opcional para seguir la ejecución del fichero
                 System.out.println("> " + linea);
-
-                // Si la línea es exactamente "salir" (sin argumentos), solicitamos terminar la ejecución
-                if (linea.equalsIgnoreCase("salir")) {
-                    System.out.println("Se encontró 'salir' en el fichero. Terminando ejecución según especificación.");
-                    return true;
-                }
-
-                // ejecutar la línea como comando normal
+                if (linea.equalsIgnoreCase("salir")) return true;
                 analizarComando(linea);
             }
         } catch (FileNotFoundException e) {
-            System.out.println("Archivo no encontrado: " + fichero);
+            System.out.println("Archivo no encontrado.");
         } catch (IOException e) {
-            System.out.println("Error leyendo el archivo: " + fichero);
+            System.out.println("Error de lectura.");
         }
         return false;
     }
-
-    /* describir jugador <nombre> */
-    private void descJugador(String[] partes) {
-        String nombre = partes[2];
-        for (Jugador j : jugadores) {
-            if (j.getNombre().equalsIgnoreCase(nombre)) {
-
-                String avatarId = (j.getAvatar() != null) ? j.getAvatar().getId() : "-";
-
-                //Propiedades
-                ArrayList<String> props = new ArrayList<>();
-                for (Casilla c : j.getPropiedades())
-                    props.add((c.getNombre()));
-
-                // Hipotecas
-                ArrayList<String> hips = new ArrayList<>();
-                for (Casilla c : j.getHipotecadas())
-                    hips.add(c.getNombre());
-
-                // Edificios: extraemos desde las propiedades tipo Solar
-                ArrayList<String> edifs = new ArrayList<>();
-                for (Casilla c : j.getPropiedades()) {
-                    if (c instanceof Solar) {
-                        Solar s = (Solar) c;
-                        for (Edificio e : s.getEdificaciones()) {
-                            edifs.add(e.getId());
-                        }
-                    }
-                }
-
-                System.out.println("{");
-                System.out.println("  nombre: " + j.getNombre() + ",");
-                System.out.println("  avatar: " + avatarId + ",");
-                System.out.println("  fortuna: " + String.format("%.0f", j.getFortuna()) + ",");
-                System.out.println("  propiedades: " + (props.isEmpty() ? "-" : props) + ",");
-                System.out.println("  hipotecas: " + (hips.isEmpty() ? "-" : hips) + ",");
-                System.out.println("  edificios: " + (edifs.isEmpty() ? "-" : edifs));
-                System.out.println("}");
-                return;
-            }
-        }
-        System.out.println("Jugador no encontrado: " + nombre);
-    }
-
-
-
-    /* describir avatar <ID> */
-    private void descAvatar(String ID) {
-        for (Avatar a : avatares) {
-            if (a.getId().equalsIgnoreCase(ID)) {
-                System.out.println(a);
-                return;
-            }
-        }
-        System.out.println("No existe un avatar con ID: " + ID);
-    }
-
-    /* describir <nombre_casilla> */
-    private void descCasilla(String nombre) {
-        Casilla c = tablero.encontrar_casilla(nombre);
-        if (c != null)
-            System.out.println(c.infoCasilla());
-        else
-            System.out.println("Casilla no encontrada: " + nombre);
-    }
-
-    // lanzar dados aleatoria
-    private void lanzarDados() {
-        if (jugadores == null || jugadores.isEmpty()) {
-            System.out.println("Primero crea jugadores con: crear jugador <nombre> <tipoAvatar>");
-            return;
-        }
-        Jugador actual = jugadores.get(turno);
-
-        if (tirado && !puedeRepetirLanzamiento) {
-            System.out.println("Ya has lanzado los dados en este turno. Usa 'acabar turno' para pasar al siguiente jugador.");
-            return;
-        }
-
-        //control de máximo 3 tiradas por turno
-        if (lanzamientos >= 3){
-            System.out.println("Ya has realizado el máximo de 3 lanzamientos en este turno. Usa 'acabar turno' para pasar al siguiente jugador.");
-            return;
-        }
-
-        // si es la primera tirada del turno resetea estado del dado
-        if (lanzamientos == 0) {
-            dado.iniciarTurno();
-        }
-
-        int suma = dado.tirar();
-        int d1 = dado.getD1();
-        int d2 = dado.getD2();
-        lanzamientos++;
-        tirado = true;
-        puedeRepetirLanzamiento = false;
-
-        // si esta en carcel se aplica la regla especial y salimos si ya resolvio
-        if (actual.isEnCarcel()) {
-            boolean resuelto = procesarTiradaEnCarcel(actual, d1, d2, suma);
-            if (!resuelto) {
-                // sigue preso y no se mueve
-                return;
-            }
-            // si se resolvio (salio y quiza se movio) no se aplica logica de dobles normal
-            return;
-        }
-
-        // flujo normal fuera de carcel
-        System.out.printf("%s tira los dados -> %d + %d = %d%n", actual.getNombre(), d1, d2, suma);
-        moverYEvaluar(actual, suma);
-
-        if (dado.esDoble()) {
-            if (lanzamientos == 3) {
-                System.out.println("Tres dobles en el mismo turno. Vas a la carcel");
-                irACarcel(actual);
-                acabarTurno();
-            } else {
-                System.out.println("Has sacado dobles, puedes volver a lanzar");
-                //Permitir un nuevo lanzamiento sin necesidad de 'acabar turno'
-                puedeRepetirLanzamiento = true;
-                tirado = false;
-            }
-        } else {
-            //Si no son dobles, el turno termina normalmente
-            puedeRepetirLanzamiento = false;
-            System.out.println("Usa 'acabar turno' para pasar al siguiente jugador");
-        }
-    }
-    /**
-     * Método permite mover al jugador actual a cualquier casilla
-     * sin restricciones ni necesidad de tirar dados.
-     */
-    private void moverChetada(String casilla) {
-        if (jugadores == null || jugadores.isEmpty()) {
-            System.out.println("No hay jugadores en la partida.");
-            return;
-        }
-        int posFin = tablero.encontrar_casilla(casilla).getPosicion();
-
-
-
-        Jugador actual = jugadores.get(turno);
-        int posIni = actual.getPosicion();
-
-        System.out.println("Moviendo a " + actual.getNombre() + " de pos " + posIni + " a pos " + posFin);
-
-        // Quitar avatar de casilla actual
-        Casilla origen = tablero.getCasilla(posIni);
-        if (origen != null && actual.getAvatar() != null) {
-            origen.eliminarAvatar(actual.getAvatar());
-        }
-
-        // Añadir avatar a casilla destino
-        Casilla destino = tablero.getCasilla(posFin);
-        if (destino != null && actual.getAvatar() != null) {
-            destino.anhadirAvatar(actual.getAvatar());
-            actual.getAvatar().setLugar(destino);
-        }
-
-        // Actualizar posición del jugador
-        actual.setPosicion(posFin);
-
-        // Incrementar visitas (para estadísticas)
-        if (destino != null) {
-            destino.incrementarVisitas();
-        }
-
-        System.out.printf("%s ahora está en %s (pos %d)%n",
-                actual.getNombre(),
-                destino != null ? destino.getNombre() : "desconocida",
-                posFin);
-
-        // Mostrar tablero actualizado
-        mostrarTablero();
-
-        // Marcar que ya "tiró" para poder acabar turno
-        tirado = true;
-        System.out.println(" Puedes usar 'acabar turno' o seguir moviendo con 'mover <pos>'");
-    }
-
-    //  lanzar dados forzada X+Y
-    private void lanzarDadosForzada(int a, int b) {
-        if (jugadores == null || jugadores.isEmpty()) {
-            System.out.println("Primero crea jugadores con: crear jugador <nombre> <tipoAvatar>");
-            return;
-        }
-        if (a < 1 || a > 6 || b < 1 || b > 6) {
-            System.out.println("Valores invalidos. Deben ser 1..6");
-            return;
-        }
-        Jugador actual = jugadores.get(turno);
-
-        if (tirado && !puedeRepetirLanzamiento) {
-            System.out.println("Ya has lanzado los dados en este turno. Usa 'acabar turno' para pasar al siguiente jugador.");
-            return;
-        }
-
-        //control de máximo 3 tiradas por turno
-        if (lanzamientos >= 3){
-            System.out.println("Ya has realizado el máximo de 3 lanzamientos en este turno. Usa 'acabar turno' para pasar al siguiente jugador.");
-            return;
-        }
-
-        if (lanzamientos == 0) {
-            dado.iniciarTurno();
-        }
-
-        int suma = dado.tirarForzado(a, b);
-        int d1 = dado.getD1();
-        int d2 = dado.getD2();
-        lanzamientos++;
-        tirado = true;
-
-        if (actual.isEnCarcel()) {
-            boolean resuelto = procesarTiradaEnCarcel(actual, d1, d2, suma);
-            if (!resuelto) return;
-            return;
-        }
-
-        System.out.printf("%s tira dados forzados -> %d + %d = %d%n", actual.getNombre(), d1, d2, suma);
-        moverYEvaluar(actual, suma);
-
-        if (dado.esDoble()) {
-            if (lanzamientos == 3) {
-                System.out.println("Tres dobles en el mismo turno. Vas a la carcel");
-                irACarcel(actual);
-                mostrarTablero();
-                acabarTurno();
-            } else {
-                System.out.println("Has sacado dobles, puedes volver a lanzar");
-                puedeRepetirLanzamiento = true;
-                tirado = false;
-            }
-        } else {
-            puedeRepetirLanzamiento = false;
-            System.out.println("Usa 'acabar turno' para pasar al siguiente jugador");
-        }
-    }
-
-// --- mover y evaluar la casilla destino ---
-
-private void moverYEvaluar(Jugador j, int pasos) {
-    int posIni = j.getPosicion();
-    int posFin = (posIni + pasos) % 40;
-
-    // pasar por salida -> cobra SUMA_VUELTA
-    if (posIni + pasos >= 40) {
-        j.sumarFortuna((float) Valor.SUMA_VUELTA);
-        j.acumularPasarPorSalida((float) Valor.SUMA_VUELTA);
-        j.setVueltas(); // ← AÑADE ESTA LÍNEA AQUÍ
-        System.out.printf("%s pasa por Salida y cobra %.0f%n", j.getNombre(), Valor.SUMA_VUELTA);
-    }
-
-    // actualizar casillas: quitar avatar de la actual y poner en destino
-    Casilla origen = tablero.getCasilla(posIni);
-    Casilla destino = tablero.getCasilla(posFin);
-    if (origen != null && j.getAvatar() != null) {
-        origen.eliminarAvatar(j.getAvatar());
-    }
-    if (destino != null && j.getAvatar() != null) {
-        destino.anhadirAvatar(j.getAvatar());
-        // sincronizar lugar del avatar para mantener coherencia entre Avatar y Casilla
-        j.getAvatar().setLugar(destino);
-    }
-
-    // actualizar posicion en jugador
-    j.setPosicion(posFin);
-
-    // Detectar "Ir a la carcel"
-    if (destino != null && destino.esIrACarcel()) {
-        System.out.println("Vas a la carcel");
-        irACarcel(j);
-        mostrarTablero();
-        return; // no evaluar mas esta tirada
-    }
-
-    System.out.printf("%s avanza a %s (pos %d)%n", j.getNombre(),
-            destino != null ? destino.getNombre() : "desconocida", posFin);
-
-    // evaluar casilla segun su tipo
-    if (destino != null) {
-        boolean ok;
-
-        if (destino instanceof Suerte) {
-            // Las cartas de Suerte ya actualizan las estadísticas internas
-            ok = ((Suerte) destino).aplicarCarta(tablero, j, banca, jugadores, pasos);
-
-        } else if (destino instanceof CajaComunidad) {
-            // Igual: CajaComunidad ya se encarga de las estadísticas
-            ok = ((CajaComunidad) destino).aplicarCarta(tablero, j, banca, jugadores, pasos);   
-        } else {
-            // resto de casillas como antes
-            ok = destino.evaluarCasilla(j, banca, pasos);
-        }
-
-
-
-        if (!ok) {
-            System.out.println("No has podido pagar tus deudas. Revisa hipotecas o declarate en bancarrota");
-            solvente = false;
-        } else {
-            solvente = true;
-        }
-    }
-
-    // ← AÑADE LA LÍNEA AQUÍ (DESPUÉS del if de destino != null)
-    if (destino != null) {
-        destino.incrementarVisitas();
-    }
-
-    // repinta tablero tras movimiento
-    mostrarTablero();
-}
-
-
-    // --- ir a carcel: lleva al jugador a la posicion 10 ---
-    private void irACarcel(Jugador j) {
-        Casilla carcel = tablero.getCasilla(10); // tu carcel es la pos 10
-        /*if (carcel == null) {
-            System.out.println("No se encontro la casilla de carcel");
-            return;
-        }*/
-        j.enviarACarcel(carcel); // marca flag, posiciona, mueve avatar y reinicia contadores
-    }
-
-    /* comprar <nombre_casilla> */
-    private void comprar(String nombre) {
-        Jugador actual = jugadores.get(turno);
-        Casilla cas = tablero.encontrar_casilla(nombre);
-        if (cas != null) {
-            cas.comprarCasilla(actual, banca);
-        } else {
-            System.out.println("Esa casilla no existe.");
-        }
-
-    }
-
-    // salir carcel
-    private void salirCarcel() {
-        Jugador actual = jugadores.get(turno);
-        if (!actual.isEnCarcel()) {
-            System.out.println("No estas en la carcel.");
-            return;
-        }
-
-        // comprobar saldo
-        if (actual.getFortuna() < 500000) {
-            System.out.println("No tienes suficiente dinero para pagar la fianza (500000).");
-            return;
-        }
-
-        // pagar y salir
-
-        comprobarCarcel(actual.getAvatar().getJugador());// este metodo ya imprime el mensaje de salida
-    }
-
-
-    // listar en venta
-    private void listarVenta() {
-        for (Casilla c : tablero.getCasillas()) {
-            if (c.getDuenho() == banca) {
-                String info = c.casEnVenta();
-                if (!info.isEmpty()) {
-                    System.out.println(info + ",");
-                }
-            }
-        }
-    }
-    /*Listar en venta pero que eu lle mande a cor do grupo(cales do grupoo azul estan en venta)*/
-    private void listarCasillasGrupo(String colorgrupo){
-
-        for (Casilla c : tablero.getCasillas()){
-            if (c.getGrupo()!= null && c.getGrupo().getColor().equalsIgnoreCase(colorgrupo) && c.getDuenho() == banca){
-                String info = c.casEnVenta();
-                if (!info.isEmpty()) {
-                    System.out.println(info + ",");
-                }
-            }
-        }
-
-
-    }
-    // listar jugadores
-    private void listarJugadores() {
-        if (jugadores.isEmpty()){
-            System.out.println("No hay jugadores en la partida.");
-            return;
-        }
-        for (int i = 0; i < jugadores.size(); i++) {
-            Jugador j = jugadores.get(i);
-
-            String avatarId = (j.getAvatar() != null) ? j.getAvatar().getId() : "-";
-
-            // Propiedades
-            ArrayList<String> props = new ArrayList<>();
-            for (Casilla c : j.getPropiedades())
-                props.add(c.getNombre());
-
-            // Hipotecas
-            ArrayList<String> hips = new ArrayList<>();
-            for (Casilla c : j.getHipotecadas())
-                hips.add(c.getNombre());
-
-            // Edificios: extraer ids desde las propiedades tipo Solar
-            ArrayList<String> edifs = new ArrayList<>();
-            for (Casilla c : j.getPropiedades()) {
-                if (c instanceof Solar) {
-                    Solar s = (Solar) c;
-                    for (Edificio e : s.getEdificaciones()) {
-                        String casillaNombre = (e.getSolar() != null) ? e.getSolar().getNombre() : s.getNombre();
-                        String tipo = (e.getTipo() != null) ? e.getTipo() : "-";
-                        String detalle = String.format("%s",
-                                e.getId(), tipo, casillaNombre, e.getPrecio());
-                        edifs.add(detalle);
-                    }
-                }
-            }
-
-            System.out.println("{");
-            System.out.println("  nombre: " + j.getNombre() + ",");
-            System.out.println("  avatar: " + avatarId + ",");
-            System.out.println("  fortuna: " + String.format("%.0f", j.getFortuna()) + ",");
-            System.out.println("  propiedades: " + (props.isEmpty() ? "-" : props) + ",");
-            System.out.println("  hipotecas: " + (hips.isEmpty() ? "-" : hips) + ",");
-            System.out.println("  edificios: " + (edifs.isEmpty() ? "-" : edifs));
-            System.out.print("}");
-
-            // Si no es el último jugador, añadir coma
-            if (i < jugadores.size() - 1) {
-                System.out.println(",");
-            } else {
-                System.out.println();
-            }
-        }
-    }
-
-    // listar avatares
-    private void listarAvatares() {
-        for (Avatar a : avatares) {
-            System.out.println(a);
-        }
-    }
-    //listar Edificios
-
-    private void listarEdificios(){
-        // Recorremos todas las casillas, buscamos los Solar y listamos cada Edificio
-        boolean encontrado = false;
-        List<Casilla> casillas = tablero.getCasillas();
-        if (casillas == null || casillas.isEmpty()) {
-            System.out.println("No hay casillas en el tablero.");
-            return;
-        }
-
-        for (Casilla c : casillas) {
-            if (c instanceof Solar) {
-                Solar s = (Solar) c;
-                List<Edificio> edificaciones = s.getEdificaciones();
-                if (edificaciones == null || edificaciones.isEmpty()) continue;
-
-                for (Edificio e : edificaciones) {
-                    encontrado = true;
-                    String id = e.getId();
-                    String propietario = (s.getDuenho() != null) ? s.getDuenho().getNombre() : "sin propietario";
-                    String casilla = s.getNombre();
-                    String grupo = (s.getGrupo() != null && s.getGrupo().getColor() != null) ? s.getGrupo().getColor() : "-";
-                    float coste = e.getPrecio();
-
-                    System.out.println("{");
-                    System.out.println(" id: " + id + ",");
-                    System.out.println(" propietario: " + propietario + ",");
-                    System.out.println(" casilla: " + casilla + ",");
-                    System.out.println(" grupo: " + grupo + ",");
-                    System.out.println(" coste: " + String.format("%.0f", coste));
-                    System.out.println("},");
-                }
-            }
-        }
-
-        if (!encontrado) {
-            System.out.println("No hay edificios construidos.");
-        }
-    }
-
-
-    private void listarEdificiosGrupo(String colorGrupo) {
-        if (colorGrupo == null || colorGrupo.trim().isEmpty()) {//Comprobacion para tomar el color del grupo
-            System.out.println("Uso: listar edificios <color_grupo>");
-            return;
-        }
-        colorGrupo = colorGrupo.trim();//ELimino espacios
-
-        List<Casilla> casillas = tablero.getCasillas();//Tomo una lista de casillas
-        if (casillas == null || casillas.isEmpty()) {//Comprobacion de casillas, no haria falta pero por seguridad
-            System.out.println("No hay casillas en el tablero.");
-            return;
-        }
-
-        boolean tienealgo = false;
-
-        // Flags para saber si a nivel de grupo queda posibilidad de construir cada tipo
-        boolean puedeCasa = false;
-        boolean puedeHotel = false;
-        boolean puedePiscina = false;
-        boolean puedePista = false;
-
-        // Lista de solares del grupo para imprimir en el mismo orden del tablero
-        List<Solar> solaresGrupo = new ArrayList<>();
-
-        for (Casilla c : casillas) {
-            if (c instanceof Solar) {//todas las casillas que sean solares
-                Solar s = (Solar) c;
-                if (s.getGrupo() != null && s.getGrupo().getColor() != null
-                        && s.getGrupo().getColor().equalsIgnoreCase(colorGrupo)) {
-                    tienealgo = true;
-                    solaresGrupo.add(s);//Solo me quedo con los solares cuyo color de grupo coincide
-                }
-            }
-        }
-
-        if (!tienealgo || solaresGrupo.isEmpty()) {
-            System.out.println("No se encontraron solares del grupo: " + colorGrupo);
-            return;
-        }
-
-        // Imprimir por cada solar sus edificaciones y calcular posibilidades
-        for (Solar s : solaresGrupo) {
-            List<Edificio> eds = s.getEdificaciones();
-            List<String> casasIds = new ArrayList<>();
-            List<String> hotelesIds = new ArrayList<>();
-            List<String> piscinasIds = new ArrayList<>();
-            List<String> pistasIds = new ArrayList<>();
-
-            if (eds != null) {
-                for (Edificio e : eds) {
-                    String tipo = e.getTipo() != null ? e.getTipo().toLowerCase() : "";
-                    switch (tipo) {
-                        case "casa":
-                            casasIds.add(e.getId());
-                            break;
-                        case "hotel":
-                            hotelesIds.add(e.getId());
-                            break;
-                        case "piscina":
-                            piscinasIds.add(e.getId());
-                            break;
-                        case "pista":
-                        case "pistadeporte":
-                        case "pista_deporte":
-                        case "pista_deportes":
-                        case "pistadeportes":
-                            pistasIds.add(e.getId());
-                            break;
-                        default:
-                            // si hay otros tipos, ignorar o añadir según necesites
-                    }
-                }
-            }
-
-            // Imprimir bloque del solar
-            System.out.println("{");
-            System.out.println(" propiedad: " + s.getNombre() + ",");
-            System.out.println(" hoteles: " + (hotelesIds.isEmpty() ? "-" : hotelesIds.toString()) + ",");
-            System.out.println(" casas: " + (casasIds.isEmpty() ? "-" : casasIds.toString()) + ",");
-            System.out.println(" piscinas: " + (piscinasIds.isEmpty() ? "-" : piscinasIds.toString()) + ",");
-            System.out.println(" pistasDeDeporte: " + (pistasIds.isEmpty() ? "-" : pistasIds.toString()) + ",");
-            // alquiler actual calculado por Solar
-            float alquiler = s.calcularAlquiler();
-            System.out.println(" alquiler: " + String.format("%.0f", alquiler));
-            System.out.println("},");
-
-            // Determinar posibilidades para este solar (según reglas ya implementadas en GestorEdificaciones/Solar)
-            Jugador duenho = s.getDuenho();
-            Grupo grupo = s.getGrupo();
-
-            // Casas: necesita ser dueño del grupo, no tener hotel y tener <4 casas
-            if (duenho != null && grupo != null && grupo.esDuenhoGrupo(duenho) && s.getCasas() < 4 && !s.hasHotel()) {
-                puedeCasa = true;
-            }
-
-            // Hotel: necesita 4 casas y no tener hotel y ser dueño del grupo
-            if (duenho != null && grupo != null && grupo.esDuenhoGrupo(duenho) && s.getCasas() == 4 && !s.hasHotel()) {
-                puedeHotel = true;
-            }
-
-            // Piscina: necesita hotel y no tener piscina (propietario no se requiere que tenga todo el grupo)
-            if (s.hasHotel() && !s.hasPiscina()) {
-                // además, normalmente debe pertenecer al dueño que construyó el hotel;
-                // comprobamos que exista dueño (si no hay dueño no se puede edificar)
-                if (duenho != null) puedePiscina = true;
-            }
-
-            // Pista: necesita hotel y piscina y no tener pista
-            if (s.hasHotel() && s.hasPiscina() && !s.hasPistaDeporte()) {
-                if (duenho != null) puedePista = true;
-            }
-        }
-
-        // Mensajes finales qué aún se puede edificar y qué no
-        List<String> permitidos = new ArrayList<>();
-        if (puedePista) permitidos.add("una pista de deporte");
-        if (puedePiscina) permitidos.add("una piscina");
-        if (puedeHotel) permitidos.add("un hotel");
-        if (puedeCasa) permitidos.add("una casa");
-
-        List<String> noPermitidos = new ArrayList<>();
-        if (!puedePista) noPermitidos.add("pistas de deporte");
-        if (!puedePiscina) noPermitidos.add("piscinas");
-        if (!puedeHotel) noPermitidos.add("hoteles");
-        if (!puedeCasa) noPermitidos.add("casas");
-
-        if (!permitidos.isEmpty()) {
-            // "Aún se puede edificar una pista de deporte y una piscina."
-            StringBuilder sb = new StringBuilder("Aún se puede edificar ");
-            for (int i = 0; i < permitidos.size(); i++) {
-                if (i > 0 && i == permitidos.size() - 1) sb.append(" y ");
-                else if (i > 0) sb.append(", ");
-                sb.append(permitidos.get(i));
-            }
-            sb.append(".");
-            System.out.println(sb.toString());
-        } else {
-            System.out.println("Ya no se puede edificar ningún tipo de mejora en este grupo.");
-        }
-
-        //Frase sobre todas aquelas cousas que xa non se poden escribir
-        if (!noPermitidos.isEmpty()) {
-            // Si todos están prohibidos, mostrar frase tipo "Ya no se pueden construir ni hoteles ni casas."
-            // Construimos lista con formato "hoteles", "piscinas", etc. y la unimos con" ni "
-
-            /*Exemplo de como funciona StringBUlder, e como un array de palabras
-            * StringBuilder sb = new StringBuilder();
-            sb.append("Hola");
-            sb.append(" mundo");
-            String resultado = sb.toString();
-            */
-            StringBuilder sb2 = new StringBuilder("Ya no se pueden construir ");
-            for (int i = 0; i < noPermitidos.size(); i++) {
-                if (i > 0 && i == noPermitidos.size() - 1) sb2.append(" ni ");
-                else if (i > 0) sb2.append(", ");
-                sb2.append(noPermitidos.get(i));
-            }
-            sb2.append(".");
-            System.out.println(sb2.toString());
-        }
-    }
-
-    private void venderEdificio(String tipoEdificio, String nombreSolar, int cantidad) {
-        if (jugadores == null || jugadores.isEmpty()) {
-            System.out.println("No hay jugadores en la partida.");
-            return;
-        }
-
-        Jugador actual = jugadores.get(turno);
-
-        // Buscar el solar por nombre
-        Casilla casilla = tablero.encontrar_casilla(nombreSolar);
-
-        if (casilla == null) {
-            System.out.printf("No se encontró la casilla '%s'.%n", nombreSolar);
-            return;
-        }
-
-        if (!(casilla instanceof Solar)) {
-            System.out.printf("La casilla '%s' no es un solar.%n", nombreSolar);
-            return;
-        }
-
-        Solar solar = (Solar) casilla;
-
-        // Verificar que el jugador actual sea el dueño
-        if (solar.getDuenho() == null || solar.getDuenho() != actual) {
-            System.out.printf("No se pueden vender %s en %s. Esta propiedad no pertenece a %s.%n",
-                    tipoEdificio, nombreSolar, actual.getNombre());
-            return;
-        }
-
-        // Normalizar tipo de edificio
-        tipoEdificio = tipoEdificio.toLowerCase().trim();
-
-        // Determinar el tipo singular para comparaciones
-        String tipoSingular;
-        if (tipoEdificio.equals("casas") || tipoEdificio.equals("casa")) {
-            tipoSingular = "casa";
-        } else if (tipoEdificio.equals("hoteles") || tipoEdificio.equals("hotel")) {
-            tipoSingular = "hotel";
-        } else if (tipoEdificio.equals("piscinas") || tipoEdificio.equals("piscina")) {
-            tipoSingular = "piscina";
-        } else if (tipoEdificio.equals("pistas") || tipoEdificio.equals("pista") ||
-                tipoEdificio.equals("pistas_deporte") || tipoEdificio.equals("pista_deporte")) {
-            tipoSingular = "pista";
-        } else {
-            System.out.printf("Tipo de edificio no reconocido: %s%n", tipoEdificio);
-            return;
-        }
-
-        // Restricciones especiales por tipo
-        if ((tipoSingular.equals("hotel") || tipoSingular.equals("piscina") || tipoSingular.equals("pista"))
-                && cantidad > 1) {
-            System.out.printf("Solamente se puede vender 1 %s, recibiendo %.0f€.%n",
-                    tipoSingular, getPrecioPorTipo(solar, tipoSingular));
-            cantidad = 1;
-        }
-
-        // Buscar edificios del tipo solicitado
-        List<Edificio> edificaciones = solar.getEdificaciones();
-        List<Edificio> edificiosDelTipo = new ArrayList<>();
-
-        for (Edificio e : edificaciones) {
-            String tipoEdif = e.getTipo() != null ? e.getTipo().toLowerCase() : "";
-            if (tipoEdif.equals(tipoSingular) ||
-                    (tipoSingular.equals("pista") && (tipoEdif.equals("pistadeporte") ||
-                            tipoEdif.equals("pista_deporte")))) {
-                edificiosDelTipo.add(e);
-            }
-        }
-
-        // Verificar que hay suficientes edificios
-        int disponibles = edificiosDelTipo.size();
-        if (disponibles == 0) {
-            System.out.printf("No hay %s en %s para vender.%n",
-                    cantidad > 1 ? tipoEdificio : tipoSingular, nombreSolar);
-            return;
-        }
-
-        if (cantidad > disponibles) {
-            System.out.printf("Solo hay %d %s en %s. Se venderán todos.%n",
-                    disponibles, disponibles > 1 ? tipoEdificio : tipoSingular, nombreSolar);
-            cantidad = disponibles;
-        }
-
-        // Vender la cantidad solicitada
-        float precioUnitario = getPrecioPorTipo(solar, tipoSingular);
-        float totalRecibido = 0;
-        int vendidos = 0;
-
-        for (int i = 0; i < cantidad && i < edificiosDelTipo.size(); i++) {
-            Edificio e = edificiosDelTipo.get(i);
-            boolean eliminado = eliminarEdificio(e);
-            if (eliminado) {
-                totalRecibido += precioUnitario;
-                vendidos++;
-            }
-        }
-
-        // Mensaje de confirmación
-        int restantes = disponibles - vendidos;
-        String tipoMostrar = vendidos > 1 ? pluralizar(tipoSingular) : tipoSingular;
-
-        if (restantes > 0) {
-            String restanteTipo = restantes > 1 ? pluralizar(tipoSingular) : tipoSingular;
-            System.out.printf("%s ha vendido %d %s en %s, recibiendo %.0f€. En la propiedad quedan %d %s.%n",
-                    actual.getNombre(), vendidos, tipoMostrar, nombreSolar,
-                    totalRecibido, restantes, restanteTipo);
-        } else {
-            System.out.printf("%s ha vendido %d %s en %s, recibiendo %.0f€. No quedan más edificios de este tipo.%n",
-                    actual.getNombre(), vendidos, tipoMostrar, nombreSolar, totalRecibido);
-        }
-    }
-
-    // Métodos auxiliares
-    private float getPrecioPorTipo(Solar solar, String tipo) {
-        switch (tipo) {
-            case "casa": return solar.getPrecioCasa();
-            case "hotel": return solar.getPrecioHotel();
-            case "piscina": return solar.getPrecioPiscina();
-            case "pista": return solar.getPrecioPista();
-            default: return 0;
-        }
-    }
-
-    private String pluralizar(String tipo) {
-        switch (tipo) {
-            case "casa": return "casas";
-            case "hotel": return "hoteles";
-            case "piscina": return "piscinas";
-            case "pista": return "pistas";
-            default: return tipo + "s";
-        }
-    }
-    // acabar turno
-    private void acabarTurno() {
-        if (!tirado) {
-            System.out.println("Debes lanzar los dados antes de acabar el turno.");
-            return;
-        }
-        turno = (turno + 1) % jugadores.size();
-        tirado = false;
-        lanzamientos = 0;   // resetea contador de dobles del turno
-        puedeRepetirLanzamiento = false; 
-        solvente = true;
-        System.out.println("Turno terminado. Ahora juega: " + jugadores.get(turno).getNombre());
-    }
-
-    // comprobar si el jugador puede jugar (no en carcel o paga fianza)
-
-    private boolean comprobarCarcel(Jugador j) {
-        if (j.isEnCarcel()) {
-            System.out.println(j.getNombre() + " esta en la carcel y debe pagar 500000 para salir");
-            if (j.getFortuna() >= 500000) {
-                j.pagar(500000);
-                j.acumularPagoTasasEImpuestos(500000);
-                j.salirDeCarcel();
-                System.out.println(j.getNombre() + " paga 500000 y sale de la carcel tras pagar la fianza de 500000");
-                return true; // ya puede jugar
-            } else {
-                System.out.println("No tienes suficiente dinero para pagar la fianza. No puedes lanzar los dados");
-                return false; // no puede jugar
-            }
-        }
-        return true; // no estaba en carcel
-    }
-
-    private boolean procesarTiradaEnCarcel(Jugador actual, int d1, int d2, int suma) {
-        System.out.printf("%s esta en la carcel y ha tirado %d + %d%n", actual.getNombre(), d1, d2);
-
-        if (d1 == d2) {
-            // dobles -> sale sin pagar y avanza la suma
-            actual.salirDeCarcel();
-            System.out.println("Has sacado dobles y sales de la carcel");
-            moverYEvaluar(actual, suma);
-            System.out.println("Usa 'acabar turno' para pasar al siguiente jugador");
-            System.out.println("Has sacado dobles, puedes volver a lanzar");
-            puedeRepetirLanzamiento = true;
-            tirado = false;
-            return true;
-        }
-
-        // no dobles
-        int intentos = actual.getTiradasCarcel() + 1;
-        actual.setTiradasCarcel(intentos);
-
-        if (intentos < 3) {
-            System.out.println("No has sacado dobles. Sigues en la carcel");
-            System.out.println("Intentos realizados en carcel: " + intentos + " de 3");
-            System.out.println("Usa 'acabar turno' para pasar al siguiente jugador");
-            return false; // sigue preso sin mover
-        }
-
-        // tercer intento sin dobles -> debe pagar y avanzar
-        System.out.println("Tercer intento sin dobles. Debes pagar 500000 y avanzar la suma tirada");
-        if (actual.getFortuna() >= 500000) {
-            actual.pagar(500000);
-            actual.salirDeCarcel();
-            moverYEvaluar(actual, suma);
-            System.out.println("Usa 'acabar turno' para pasar al siguiente jugador");
-            return true;
-        } else {
-            System.out.println("No tienes suficiente dinero para pagar la fianza. Sigues en la carcel");
-            System.out.println("Usa 'acabar turno' para pasar al siguiente jugador");
-            return false;
-        }
-    }
-
-    private void hipotecar(String nombreCasilla) {
-        Jugador actual = jugadores.get(turno);
-        Casilla c = tablero.encontrar_casilla(nombreCasilla);
-
-        if (c == null) {
-            System.out.println("No se encontró la casilla " + nombreCasilla);
-            return;
-        }
-        actual.hipotecarPropiedad(c);
-    }
-
-    private void deshipotecar(String nombreCasilla) {
-        Jugador actual = jugadores.get(turno);
-        Casilla c = tablero.encontrar_casilla(nombreCasilla);
-
-        if (c == null) {
-            System.out.println("No se encontró la casilla " + nombreCasilla);
-            return;
-        }
-        actual.deshipotecarPropiedad(c);
-    }
-
-    private Jugador buscarJugadorPorNombre(String nombre) {
-        for (Jugador ju : jugadores) {
-            if (ju.getNombre().equalsIgnoreCase(nombre)) return ju;
-        }
-        return null;
-    }
-
-private void mostrarEstadisticas(String nombre) {
-    Jugador j = buscarJugadorPorNombre(nombre);
-    if (j == null) {
-        System.out.println("Jugador no encontrado: " + nombre);
-        return;
-    }
-    System.out.println("$> estadisticas " + nombre);
-    System.out.println("{");
-    System.out.println("dineroInvertido: " + (int) j.getDineroInvertido() + ",");
-    System.out.println("pagoTasasEImpuestos: " + (int) j.getPagoTasasEImpuestos() + ",");
-    System.out.println("pagoDeAlquileres: " + (int) j.getPagoDeAlquileres() + ",");
-    System.out.println("cobroDeAlquileres: " + (int) j.getCobroDeAlquileres() + ",");
-    System.out.println("pasarPorCasillaDeSalida: " + (int) j.getPasarPorCasillaDeSalida() + ",");
-    System.out.println("premiosInversionesOBote: " + (int) j.getPremiosInversionesOBote() + ",");
-    System.out.println("vecesEnLaCarcel:" + j.getVecesEnLaCarcel());
-    System.out.println("}");
-
-
-}
-
-    private void mostrarEstadisticasJuego() {
-        System.out.println("\n ESTADÍSTICAS DEL JUEGO \n");
-
-        // 1. Casilla más rentable
-        Casilla casillaMasRentable = null;
-        float maxAlquileres = 0;
-        for (Casilla c : tablero.getCasillas()) {
-            if (c.getAlquileresGenerados() > maxAlquileres) {
-                maxAlquileres = c.getAlquileresGenerados();
-                casillaMasRentable = c;
-            }
-        }
-
-        if (casillaMasRentable != null && maxAlquileres > 0) {
-            System.out.println("Casilla más rentable:");
-            System.out.println("  " + casillaMasRentable.getNombre() +
-                    " - Alquileres generados: " + String.format("%.0f€", maxAlquileres));
-        } else {
-            System.out.println("Casilla más rentable: Ninguna (aún no se han pagado alquileres)");
-        }
-
-        // 2. Grupo más rentable
-        HashMap<String, Float> alquileresPorGrupo = new HashMap<>();
-        for (Casilla c : tablero.getCasillas()) {
-            if (c.getGrupo() != null && c instanceof Solar) {
-                String color = c.getGrupo().getColor();
-                float actual = alquileresPorGrupo.getOrDefault(color, 0f);
-                alquileresPorGrupo.put(color, actual + c.getAlquileresGenerados());
-            }
-        }
-
-        String grupoMasRentable = null;
-        float maxGrupo = 0;
-        for (Map.Entry<String, Float> entry : alquileresPorGrupo.entrySet()) {
-            if (entry.getValue() > maxGrupo) {
-                maxGrupo = entry.getValue();
-                grupoMasRentable = entry.getKey();
-            }
-        }
-
-        if (grupoMasRentable != null && maxGrupo > 0) {
-            System.out.println("\nGrupo más rentable:");
-            System.out.println("  " + grupoMasRentable +
-                    " - Alquileres generados: " + String.format("%.0f€", maxGrupo));
-        } else {
-            System.out.println("\nGrupo más rentable: Ninguno");
-        }
-
-        // 3. Casilla más frecuentada
-        Casilla casillaMasFrecuentada = null;
-        int maxVisitas = 0;
-        for (Casilla c : tablero.getCasillas()) {
-            if (c.getVecesVisitada() > maxVisitas) {
-                maxVisitas = c.getVecesVisitada();
-                casillaMasFrecuentada = c;
-            }
-        }
-
-        if (casillaMasFrecuentada != null && maxVisitas > 0) {
-            System.out.println("\nCasilla más frecuentada:");
-            System.out.println("  " + casillaMasFrecuentada.getNombre() +
-                    " - Visitada " + maxVisitas + " veces");
-        } else {
-            System.out.println("\nCasilla más frecuentada: Ninguna");
-        }
-
-        // 4. Jugador con más vueltas
-        Jugador jugadorMasVueltas = null;
-        int maxVueltas = 0;
-        for (Jugador j : jugadores) {
-            if (j.getVueltas() > maxVueltas) {
-                maxVueltas = j.getVueltas();
-                jugadorMasVueltas = j;
-            }
-        }
-
-        if (jugadorMasVueltas != null && maxVueltas > 0) {
-            System.out.println("\nJugador con más vueltas:");
-            System.out.println("  " + jugadorMasVueltas.getNombre() +
-                    " - " + maxVueltas + " vueltas");
-        } else {
-            System.out.println("\nJugador con más vueltas: Ninguno");
-        }
-
-        // 5. Jugador con mayor fortuna total
-        Jugador jugadorMasRico = null;
-        float maxFortuna = 0;
-        for (Jugador j : jugadores) {
-            float fortunaTotal = j.getFortuna();
-
-            // Sumar valor de propiedades
-            for (Casilla c : j.getPropiedades()) {
-                fortunaTotal += c.getValor();
-            }
-
-            // Sumar valor de edificios
-            for (Casilla c : j.getPropiedades()) {
-                if (c instanceof Solar) {
-                    Solar s = (Solar) c;
-                    for (Edificio e : s.getEdificaciones()) {
-                        fortunaTotal += e.getPrecio();
-                    }
-                }
-            }
-
-            if (fortunaTotal > maxFortuna) {
-                maxFortuna = fortunaTotal;
-                jugadorMasRico = j;
-            }
-        }
-
-        if (jugadorMasRico != null) {
-            System.out.println("\nJugador con mayor fortuna:");
-            System.out.println("  " + jugadorMasRico.getNombre() +
-                    " - Fortuna total: " + String.format("%.0f€", maxFortuna));
-        } else {
-            System.out.println("\nJugador con mayor fortuna: Ninguno");
-        }
-
-        System.out.println(); // Línea en blanco al final
-    }
-
-
-
-
 }
