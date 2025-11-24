@@ -178,6 +178,7 @@ public class Jugador {
         }
         float cantidad = c.getPrecioHipoteca();
         fortuna += cantidad;
+
         c.setHipotecada(true);
         hipotecadas.add(c);
         propiedades.remove(c);

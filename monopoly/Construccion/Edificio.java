@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Clase base para edificacions. Xera IDs únicas por tipo.
  */
-public class Edificio {
+public abstract class  Edificio {
 
     private static final ConcurrentHashMap<String, AtomicInteger> CONTADORES = new ConcurrentHashMap<>();
 
@@ -16,7 +16,7 @@ public class Edificio {
     private final Solar solar;
     private final float precio;
 
-    public Edificio(String tipo, Solar solar, float precio) {
+    public  Edificio(String tipo, Solar solar, float precio) {
         this.tipo = tipo == null ? "desconocido" : tipo.toLowerCase();
         this.solar = solar;
         this.precio = precio;
@@ -48,9 +48,7 @@ public class Edificio {
     /**
      * Método que pode ser sobrescrito pola  subclase se hai regras específicas.
      */
-    public boolean esEdificable() {
-        return true;
-    }
+    public abstract boolean esEdificable();
 
 
     @Override
