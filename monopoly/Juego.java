@@ -495,10 +495,11 @@ public class Juego implements Comando {
         int posFin = (posIni + pasos) % 40;
 
         if (posIni + pasos >= 40) {
-            j.sumarFortuna((float) Valor.SUMA_VUELTA);
-            j.acumularPasarPorSalida((float) Valor.SUMA_VUELTA);
-            // CORRECCIÓN: Solo sumar si no cae en salida (0), pues Salida ya suma su propia estadística
+
+            // Solo sumar si no cae en salida (0), pues Salida ya suma su propia estadística
             if (posFin != 0) {
+                j.sumarFortuna((float) Valor.SUMA_VUELTA);
+                j.acumularPasarPorSalida((float) Valor.SUMA_VUELTA);
                 j.setVueltas();
             }
             consola.imprimir("Pasas por Salida. Cobras " + Valor.SUMA_VUELTA);
