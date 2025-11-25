@@ -1,0 +1,39 @@
+crear jugador antonio pelota
+lanzar dados 4+2
+comprar solar3
+acabar turno
+lanzar dados 2+1
+comprar solar5
+acabar turno
+lanzar dados 6+5
+acabar turno
+lanzar dados 6+5
+acabar turno
+lanzar dados 6+5
+acabar turno
+lanzar dados 5+1
+comprar solar4
+edificar casa
+edificar casa
+edificar casa
+edificar casa
+describir solar4
+listar jugadores
+edificar hotel
+edificar casa
+edificar casa
+listar edificios
+describir jugador antonio
+listar jugadores
+vender casas solar4 1
+vender hoteles solar4
+crear jugador juan coche
+acabar turno
+lanzar dados 4+4
+estadisticas antonio
+estadisticas juan
+lanzar dados 6+6
+lanzar dados 3+3
+estadisticas juan
+estadisticas
+lanzar dados 6+6

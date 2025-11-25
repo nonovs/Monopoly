@@ -7,7 +7,7 @@ import partida.Jugador;
 
 import java.util.List;
 
-
+//hola
 public class CajaComunidad extends Casilla {
 
     private static int indiceCarta = 0; // Índice global para las cartas de Caja de Comunidad (1..6 en bucle)
