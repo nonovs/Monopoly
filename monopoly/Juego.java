@@ -61,7 +61,8 @@ public class Juego implements Comando {
         }
         if (!tipoAvatar.equalsIgnoreCase("Coche") && !tipoAvatar.equalsIgnoreCase("Esfinge") &&
                 !tipoAvatar.equalsIgnoreCase("Sombrero") && !tipoAvatar.equalsIgnoreCase("Pelota")) {
-            consola.imprimir("Tipo de avatar no válido.");
+            consola.imprimir("Tipo de avatar no válido.Prueba con: ");
+            consola.imprimir("Coche, Esfinge, Sombrero, Pelota");
             return;
         }
 
