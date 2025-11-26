@@ -12,7 +12,7 @@ import static partida.GestorEdificaciones.eliminarEdificio;
 
 
 public class Juego implements Comando {
-//carallo
+//carallojlkjl
     public static ConsolaNormal consola = new ConsolaNormal();
 
     private final ArrayList<Jugador> jugadores;
