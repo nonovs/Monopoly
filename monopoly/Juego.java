@@ -15,11 +15,11 @@ public class Juego implements Comando {
 //carallo
     public static ConsolaNormal consola = new ConsolaNormal();
 
-    private ArrayList<Jugador> jugadores;
-    private ArrayList<Avatar> avatares;
-    private Tablero tablero;
-    private Dado dado;
-    private Jugador banca;
+    private final ArrayList<Jugador> jugadores;
+    private final ArrayList<Avatar> avatares;
+    private final Tablero tablero;
+    private final Dado dado;
+    private final Jugador banca;
 
     private int turno = 0;
     private int lanzamientos = 0;
