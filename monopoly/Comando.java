@@ -3,7 +3,7 @@ package monopoly;
 public interface Comando {
     /// default void metododefecto(){
     /// System.out.printnl("HOlacaracola)
-    /// } esto simplemente era para probar un metodo por defecto
+    /// } esto simplemente era para probar un metodo por defecto.
     void crearJugador(String nombre, String tipoAvatar);
     void mostrarJugadorEnTurno();
     void listarJugadores();
