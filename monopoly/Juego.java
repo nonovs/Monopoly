@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import monopoly.Excepciones.TratoException;
 import monopoly.casillas.*;      // Importa todas las casillas (Solar, Suerte, etc.)
 import monopoly.Construccion.*;  // Importa todos los edificios (Edificio, Casa, etc.)
 import partida.*;                // Importa Jugador, Avatar, Dado, etc.
@@ -20,7 +21,7 @@ public class Juego implements Comando {
     private final Tablero tablero;
     private final Dado dado;
     private final Jugador banca;
-
+    private ArrayList<Trato>tratosActivos=new ArrayList<>();
     private int turno = 0;
     private int lanzamientos = 0;
     private boolean tirado = false;
@@ -235,8 +236,31 @@ public class Juego implements Comando {
         puedeRepetirLanzamiento = false;
         solvente = true;
         consola.imprimir("Turno de: " + getJugadorActual().getNombre());
+        Jugador siguiente = jugadores.get(turno);
+        mostrarTratosPendientes(siguiente);
     }
+    /**
+     * Muestra los tratos propuestos al jugador especificado
+     */
+    private void mostrarTratosPendientes(Jugador jugador) {
+        ArrayList<Trato> tratosPendientes = new ArrayList<>();
 
+        for (Trato t : tratosActivos) {
+            if (t. getJugador2(). equals(jugador)) {
+                tratosPendientes.add(t);
+            }
+        }
+
+        if (! tratosPendientes.isEmpty()) {
+            consola.imprimir("\n--- TRATOS PENDIENTES ---");
+            for (Trato t : tratosPendientes) {
+                consola.imprimir("  " + t.getId() + ": " + t. getJugador1().getNombre() +
+                        " te propone: " + t.toStringParaDestinatario());
+            }
+            consola.imprimir("Usa 'aceptar trato <id>' para aceptar un trato.");
+            consola.imprimir("-------------------------\n");
+        }
+    }
     @Override
     public void listarJugadores() {
         if (jugadores.isEmpty()) { consola.imprimir("Sin jugadores."); return; }
@@ -585,4 +609,197 @@ public class Juego implements Comando {
         if (lanzamientos >= 3) { consola.imprimir("Límite lanzamientos."); return false; }
         return true;
     }
+
+
+    //Espacio de tratos
+    @Override
+    public void proponerTrato(String nombreDestinatario,String[] elementos){
+        if (jugadores.isEmpty()){
+            consola.imprimir("No hay jugadores.");
+            return;
+        }
+
+        Jugador jugador1=getJugadorActual();
+
+        Jugador jugador2=null;
+        for(Jugador j:jugadores){
+            if(j.getNombre().equalsIgnoreCase(nombreDestinatario)){
+                jugador2=j;
+                break;
+            }
+        }
+        if(jugador2==null) {consola.imprimir("Jugador no encontrado.");return;}
+        if (jugador2==jugador1){ consola.imprimir("No puedes hacer tratos con tigo mismo.");return;}
+        try{
+            Trato trato= separarTrato(jugador1,jugador2,elementos);
+            trato.validarTrato();
+            tratosActivos.add(trato);
+            consola.imprimir(trato.toString());
+
+        }catch (Exception e){
+            consola.imprimir(e.getMessage());
+
+        }
+    }
+
+    private Trato separarTrato(Jugador jugador1,Jugador jugador2,String[] elementos){
+        String parte1=elementos[0].trim();
+        String parte2=elementos[1].trim();
+
+        Casilla casilla1=tablero.encontrar_casilla(parte1);
+        float dineroJugador1=0;
+
+        if (parte1.contains(" y ")){
+            String[] partes=parte1.split(" y ");
+            casilla1=tablero.encontrar_casilla(partes[0].trim());
+            dineroJugador1=Float.parseFloat(partes[1].trim());
+
+        }else{
+            try{
+                dineroJugador1=Float.parseFloat(parte1);
+                casilla1=null;
+            }catch (NumberFormatException e){
+                casilla1=tablero.encontrar_casilla(parte1);
+            }
+        }
+
+
+        Casilla casilla2=tablero.encontrar_casilla(parte2);
+        float dineroJugador2=0;
+
+        if (parte2.contains(" y ")){
+            String[] partes=parte2.split(" y ");
+            casilla2=tablero.encontrar_casilla(partes[0].trim());
+            dineroJugador2=Float.parseFloat(partes[1].trim());
+
+        }else{
+            try{
+                dineroJugador2=Float.parseFloat(parte2);
+                casilla2=null;
+            }catch (NumberFormatException e){
+                casilla2=tablero.encontrar_casilla(parte2);
+            }
+        }
+
+        // Crear el trato según el caso
+        if (casilla1 != null && casilla2 != null && dineroJugador1 == 0 && dineroJugador2 == 0) {
+            return new Trato(jugador1, jugador2, casilla1, casilla2);
+        } else if (casilla1 != null && dineroJugador2 > 0 && casilla2 == null) {
+            return new Trato(jugador1, jugador2, casilla1, dineroJugador2);
+        } else if (dineroJugador1 > 0 && casilla2 != null && casilla1 == null) {
+            return new Trato(jugador1, jugador2, dineroJugador1, casilla2);
+        } else if (casilla1 != null && dineroJugador1 > 0 && casilla2 != null) {
+            return new Trato(jugador1, jugador2, casilla1, dineroJugador1, casilla2);
+        } else if (casilla1 != null && casilla2 != null && dineroJugador2 > 0) {
+            return new Trato(jugador1, jugador2, casilla1, casilla2, dineroJugador2);
+        }
+
+        throw new TratoException("Formato de trato inválido.");
+    }
+
+
+    @Override
+    public void aceptarTrato(String idTrato) {
+        Trato trato = null;
+        for (Trato t : tratosActivos) {
+            if (t.getId().equals(idTrato)) {
+                trato = t;
+                break;
+            }
+        }
+        if (trato == null) {
+            consola.imprimir("El trato no existe.");
+            return;
+        }
+        if (!trato.getJugador2().equals(getJugadorActual())) {
+            consola.imprimir("No puedes aceptar este trato.  No está dirigido a ti.");
+            return;
+        }
+
+        try {
+            trato.validarTrato();
+            trato.ejecutar();
+            tratosActivos.remove(trato);
+            consola.imprimir("Trato aceptado y ejecutado.");
+        } catch (TratoException e) {
+            consola.imprimir(e.getMessage());
+            tratosActivos.remove(trato);
+        }
+    }
+    @Override
+    public void listarTratos() {
+        if (jugadores.isEmpty()) {
+            consola.imprimir("No hay jugadores.");
+            return;
+        }
+
+        Jugador actual = getJugadorActual();
+        ArrayList<Trato> misTratosRecibidos = new ArrayList<>();
+        ArrayList<Trato> misTratosEnviados = new ArrayList<>();
+
+        // Separar tratos recibidos y enviados
+        for (Trato t : tratosActivos) {
+            if (t.getJugador2().equals(actual)) {
+                misTratosRecibidos. add(t);
+            } else if (t.getJugador1().equals(actual)) {
+                misTratosEnviados. add(t);
+            }
+        }
+
+        if (misTratosRecibidos.isEmpty() && misTratosEnviados.isEmpty()) {
+            consola.imprimir("No tienes tratos activos.");
+            return;
+        }
+
+        // Mostrar tratos recibidos
+        if (!misTratosRecibidos.isEmpty()) {
+            consola.imprimir("\n--- TRATOS PROPUESTOS A TI ---");
+            for (Trato t : misTratosRecibidos) {
+                consola.imprimir("  " + t.getId() + ": " + t.getJugador1().getNombre() +
+                        " te propone: " + t.toStringParaDestinatario());
+            }
+        }
+
+        // Mostrar tratos enviados
+        if (!misTratosEnviados.isEmpty()) {
+            consola.imprimir("\n--- TRATOS PROPUESTOS POR TI ---");
+            for (Trato t : misTratosEnviados) {
+                consola.imprimir("  " + t. getId() + ": " + t.toString());
+            }
+        }
+    }
+
+    @Override
+    public void eliminarTrato(String idTrato) {
+        if (jugadores.isEmpty()) {
+            consola.imprimir("No hay jugadores.");
+            return;
+        }
+
+        Jugador actual = getJugadorActual();
+        Trato trato = null;
+
+        // Buscar el trato
+        for (Trato t : tratosActivos) {
+            if (t. getId().equals(idTrato)) {
+                trato = t;
+                break;
+            }
+        }
+
+        if (trato == null) {
+            consola.imprimir("El trato no existe.");
+            return;
+        }
+
+        // Solo el proponente puede eliminar su trato
+        if (!trato. getJugador1().equals(actual)) {
+            consola.imprimir("No puedes eliminar este trato.  No lo propusiste tú.");
+            return;
+        }
+
+        tratosActivos.remove(trato);
+        consola.imprimir("Trato " + idTrato + " eliminado.");
+    }
+
 }

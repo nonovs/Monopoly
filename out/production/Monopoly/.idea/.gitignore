@@ -6,3 +6,12 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+# Ignorar archivos compilados de Java (el "pastel")
+*.class
+# Ignorar carpetas de compilación (donde se guardan los .class)
+out/
+bin/
+build/
+# Ignorar configuraciones de usuario de IntelliJ
+.idea/
+*.iml

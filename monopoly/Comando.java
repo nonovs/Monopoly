@@ -28,4 +28,8 @@ public interface Comando {
     void mostrarEstadisticas(String nombre);
     void mostrarEstadisticasJuego();
     void moverChetada(String casilla);
+    void proponerTrato(String nombreDestinatario,String[] elementos);
+    void aceptarTrato(String idTrato);
+    void listarTratos();
+    void eliminarTrato(String idTrato);
 }

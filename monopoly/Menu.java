@@ -60,6 +60,7 @@ public class Menu {
                     if (partes[1].equalsIgnoreCase("jugadores")) juego.listarJugadores();
                     else if (partes[1].equalsIgnoreCase("enventa")) juego.listarVenta();
                     else if (partes[1].equalsIgnoreCase("avatares")) juego.listarAvatares();
+                    else if (partes[1].equalsIgnoreCase("tratos")) juego.listarTratos();
                     else if (partes[1].equalsIgnoreCase("edificios")) {
                         if (partes.length >= 3) juego.listarEdificiosGrupo(partes[2]);
                         else juego.listarEdificios();
@@ -154,6 +155,40 @@ public class Menu {
             case "listargrupo":
                 String grupo = leer("Grupo: ");
                 juego.listarCasillasGrupo(grupo);
+                break;
+            case "trato":
+                if (partes.length >= 3) {
+                    String nombreDest = partes[1].replace(":", "");
+                    String resto = comando.substring(comando.indexOf("cambiar")). trim();
+
+                    // Extraer los elementos entre paréntesis
+                    int inicio = resto.indexOf("(");
+                    int fin = resto.indexOf(")");
+                    if (inicio != -1 && fin != -1) {
+                        String contenido = resto.substring(inicio + 1, fin);
+                        String[] elementos = contenido.split(",");
+                        juego.proponerTrato(nombreDest, elementos);
+                    } else {
+                        imprimir("Uso: trato <jugador>: cambiar (elem1, elem2)");
+                    }
+                } else {
+                    imprimir("Uso: trato <jugador>: cambiar (elem1, elem2)");
+                }
+                break;
+
+            case "aceptar":
+                if (partes.length >= 3 && partes[1].equalsIgnoreCase("trato")) {
+                    juego.aceptarTrato(partes[2]);
+                } else {
+                    imprimir("Uso: aceptar trato <id>");
+                }
+                break;
+            case "eliminar":
+                if (partes.length >= 3 && partes[1].equalsIgnoreCase("trato")) {
+                    juego.eliminarTrato(partes[2]);
+                } else {
+                    imprimir("Uso: eliminar trato <id>");
+                }
                 break;
 
             default:
