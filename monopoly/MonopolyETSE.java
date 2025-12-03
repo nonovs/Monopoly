@@ -1,10 +1,13 @@
 package monopoly;
+
+import excepciones.Excepcion;
+
 /// Para ejecutar desde terminal ///
 /// javac -d bin -sourcepath . monopoly/*.java monopoly/casillas/*.java monopoly/Construccion/*.java partida/*.java
 /// java -cp bin monopoly.MonopolyETSE fichero.txt
 public class MonopolyETSE {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Excepcion {
 
         Menu menu = new Menu();
         if (args.length >= 1) {

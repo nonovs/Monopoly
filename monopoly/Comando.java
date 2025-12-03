@@ -1,5 +1,7 @@
 package monopoly;
 
+import excepciones.Excepcion;
+
 public interface Comando {
     /// default void metododefecto(){
     /// System.out.printnl("HOlacaracola)
@@ -12,20 +14,20 @@ public interface Comando {
     void listarEdificios();
     void listarEdificiosGrupo(String grupo);
     void listarCasillasGrupo(String grupo);
-    void descJugador(String nombre);
+    void descJugador(String nombre) throws Excepcion;
     void descAvatar(String id);
-    void descCasilla(String nombre);
+    void descCasilla(String nombre)throws Excepcion;
     void lanzarDados();
     void lanzarDadosForzada(int a, int b);
-    void comprar(String nombre);
+    void comprar(String nombre) throws Excepcion;
     void salirCarcel();
     void acabarTurno();
     void mostrarTablero();
     void edificar(String tipo);
     void venderEdificio(String tipo, String solar, int cantidad);
-    void hipotecar(String nombre);
-    void deshipotecar(String nombre);
-    void mostrarEstadisticas(String nombre);
+    void hipotecar(String nombre) throws Excepcion;
+    void deshipotecar(String nombre) throws Excepcion;
+    void mostrarEstadisticas(String nombre) throws Excepcion;
     void mostrarEstadisticasJuego();
     void moverChetada(String casilla);
     void proponerTrato(String nombreDestinatario,String[] elementos);

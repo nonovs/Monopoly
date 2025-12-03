@@ -2,6 +2,13 @@ package partida;
 
 import java.util.ArrayList;
 
+import excepciones.Excepcion;
+import excepciones.accionNoValida.FondosInsuficientesException;
+import excepciones.accionNoValida.PropiedadNoHipotecadaException;
+import excepciones.accionNoValida.PropiedadYaHipotecadaException;
+import excepciones.objetoNoExiste.PropiedadNoExisteException;
+
+
 // Importamos Juego para poder acceder a la consola, pero lo usamos dentro del wrapper
 import monopoly.Juego;
 import monopoly.casillas.Casilla;
@@ -148,22 +155,26 @@ public class Jugador {
         return nombre;
     }
 
-    public void hipotecarPropiedad(Casilla c){
+    public void hipotecarPropiedad(Casilla c) throws Excepcion {
         if (!propiedades.contains(c)) {
-            imprimir(nombre + " no puede hipotecar " + c.getNombre() + ". No es una propiedad que le pertenece.");
-            return;
+            throw new PropiedadNoExisteException(
+                    nombre + " no puede hipotecar " + c.getNombre() + ". No es una propiedad que le pertenece."
+            );
         }
         if (c.isHipotecada()) {
-            imprimir(nombre + " no puede hipotecar " + c.getNombre() + ". Ya está hipotecada.");
-            return;
+            throw new PropiedadYaHipotecadaException(
+                    nombre + " no puede hipotecar " + c.getNombre() + ". Ya esta hipotecada."
+            );
         }
         if (c instanceof Solar) {
             Solar s = (Solar) c;
             if (!s.getEdificaciones().isEmpty()) {
-                imprimir(nombre + " no puede hipotecar " + s.getNombre() + ". Debe vender los edificios primero.");
+                imprimir(nombre + " no puede hipotecar " + s.getNombre() +
+                        ". Debe vender los edificios primero.");
                 return;
             }
         }
+
         float cantidad = c.getPrecioHipoteca();
         fortuna += cantidad;
 
@@ -171,39 +182,52 @@ public class Jugador {
         hipotecadas.add(c);
         propiedades.remove(c);
 
-        // USO DEL NUEVO MÉTODO CORTO
-        imprimir(String.format("%s recibe %.0f€ por la hipoteca de %s. No puede recibir alquileres ni edificar en el grupo %s.",
-                nombre, cantidad, c.getNombre(), c.getGrupo().getColor()));
+        imprimir(String.format(
+                "%s recibe %.0f€ por la hipoteca de %s. No puede recibir alquileres ni edificar en el grupo %s.",
+                nombre, cantidad, c.getNombre(),
+                c.getGrupo() != null ? c.getGrupo().getColor() : "-"
+        ));
     }
 
-    public void deshipotecarPropiedad(Casilla c){
+
+    public void deshipotecarPropiedad(Casilla c) throws Excepcion {
         if (!c.getDuenho().equals(this)) {
-            imprimir(nombre + " no puede deshipotecar " + c.getNombre() + ". No es una propiedad que le pertenece.");
-            return;
+            throw new PropiedadNoExisteException(
+                    nombre + " no puede deshipotecar " + c.getNombre() + ". No es una propiedad que le pertenece."
+            );
+        }
+        if (!hipotecadas.contains(c)) {
+            throw new PropiedadNoHipotecadaException(
+                    nombre + " no puede deshipotecar " + c.getNombre() + ". No esta hipotecada."
+            );
         }
         if (!(c instanceof Solar)) {
-            imprimir(nombre + " no puede deshipotecar " + c.getNombre() + ". Solo los solares son hipotecables.");
-            return;
+            
+            throw new PropiedadNoHipotecadaException(
+                    nombre + " no puede deshipotecar " + c.getNombre() + ". Solo los solares son hipotecables."
+            );
         }
+
         Solar s = (Solar) c;
-        if (!hipotecadas.contains(c)) {
-            imprimir(nombre + " no puede deshipotecar " + s.getNombre() + ". No está hipotecada.");
-            return;
-        }
         double cantidad = s.getPrecioHipoteca();
         if (fortuna < cantidad) {
-            imprimir(nombre + " no tiene suficiente dinero para deshipotecar " + s.getNombre() + ".");
-            return;
+            throw new FondosInsuficientesException(
+                    nombre + " no tiene suficiente dinero para deshipotecar " + s.getNombre() + "."
+            );
         }
+
         fortuna -= cantidad;
         s.setHipotecada(false);
         propiedades.add(c);
         hipotecadas.remove(c);
 
-        // USO DEL NUEVO MÉTODO CORTO
-        imprimir(String.format("%s paga %.0f€ por deshipotecar %s. Ahora puede recibir alquileres y edificar en el grupo %s.",
-                nombre, cantidad, c.getNombre(), c.getGrupo().getColor()));
+        imprimir(String.format(
+                "%s paga %.0f€ por deshipotecar %s. Ahora puede recibir alquileres y edificar en el grupo %s.",
+                nombre, cantidad, c.getNombre(),
+                c.getGrupo() != null ? c.getGrupo().getColor() : "-"
+        ));
     }
+
 
     // Getters y Setters restantes
     public void setAvatar(Avatar nuevoAvatar) { this.avatar = nuevoAvatar; }

@@ -4,6 +4,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import excepciones.Excepcion;
+import excepciones.accionNoValida.FondosInsuficientesException;
+import excepciones.accionNoValida.JugadorEnCarcelNoPuedeComprarException;
+import excepciones.accionNoValida.PropiedadNoHipotecadaException;
+import excepciones.accionNoValida.PropiedadYaHipotecadaException;
+import excepciones.accionNoValida.PropiedadYaTieneDuenhoException;
+import excepciones.objetoNoExiste.JugadorNoExisteException;
+import excepciones.objetoNoExiste.PropiedadNoExisteException;
+
 import monopoly.Excepciones.TratoException;
 import monopoly.casillas.*;      // Importa todas las casillas (Solar, Suerte, etc.)
 import monopoly.Construccion.*;  // Importa todos los edificios (Edificio, Casa, etc.)
@@ -152,11 +161,56 @@ public class Juego implements Comando {
     }
 
     @Override
-    public void comprar(String nombre) {
-        if (jugadores.isEmpty()) return;
+
+    public void comprar(String nombre) throws Excepcion {
+        if (jugadores.isEmpty()) {
+            throw new JugadorNoExisteException("No hay jugadores en la partida.");
+        }
+
+        Jugador actual = getJugadorActual();
         Casilla c = tablero.encontrar_casilla(nombre);
-        if (c != null) c.comprarCasilla(getJugadorActual(), banca);
-        else consola.imprimir("Casilla no existe.");
+
+        if (c == null) {
+            throw new PropiedadNoExisteException("La casilla " + nombre + " no existe.");
+        }
+
+        // Ejemplo de accion no valida
+        if (actual.isEnCarcel()) {
+            throw new JugadorEnCarcelNoPuedeComprarException(
+                    "No puedes comprar propiedades estando en la carcel."
+            );
+        }
+
+        // Propiedad ya vendida
+        if (c.getDuenho() != banca) {
+            throw new PropiedadYaTieneDuenhoException(
+                    "La propiedad " + c.getNombre() + " ya tiene duenho."
+            );
+        }
+
+        // Solo puedes comprar donde estas
+        if (actual.getPosicion() != c.getPosicion()) {
+            consola.imprimir("Solo puedes comprar la casilla en la que estas situado.");
+            return;
+        }
+
+        // Dinero insuficiente
+        if (actual.getFortuna() < c.getValor()) {
+            throw new FondosInsuficientesException(
+                    "No tienes dinero suficiente para comprar " + c.getNombre() + "."
+            );
+        }
+
+        // Efectuar compra
+        actual.pagar(c.getValor());
+        actual.acumularDineroInvertido(c.getValor());
+        c.setDuenho(actual);
+        actual.anhadirPropiedad(c);
+
+        consola.imprimir(String.format(
+                "El jugador %s compra la casilla %s por %.0f€. Su fortuna actual es %.0f€.",
+                actual.getNombre(), c.getNombre(), c.getValor(), actual.getFortuna()
+        ));
     }
 
     @Override
@@ -166,17 +220,31 @@ public class Juego implements Comando {
     }
 
     @Override
-    public void hipotecar(String nombre) {
+    public void hipotecar(String nombre) throws Excepcion {
+        if (jugadores.isEmpty()) {
+            throw new JugadorNoExisteException("No hay jugadores en la partida.");
+        }
+
         Casilla c = tablero.encontrar_casilla(nombre);
-        if (c != null) getJugadorActual().hipotecarPropiedad(c);
-        else consola.imprimir("Casilla no existe.");
+        if (c == null) {
+            throw new PropiedadNoExisteException("La casilla " + nombre + " no existe.");
+        }
+
+        getJugadorActual().hipotecarPropiedad(c);
     }
 
     @Override
-    public void deshipotecar(String nombre) {
+    public void deshipotecar(String nombre) throws Excepcion {
+        if (jugadores.isEmpty()) {
+            throw new JugadorNoExisteException("No hay jugadores en la partida.");
+        }
+
         Casilla c = tablero.encontrar_casilla(nombre);
-        if (c != null) getJugadorActual().deshipotecarPropiedad(c);
-        else consola.imprimir("Casilla no existe.");
+        if (c == null) {
+            throw new PropiedadNoExisteException("La casilla " + nombre + " no existe.");
+        }
+
+        getJugadorActual().deshipotecarPropiedad(c);
     }
 
     @Override
@@ -268,15 +336,16 @@ public class Juego implements Comando {
     }
 
     @Override
-    public void descJugador(String nombre) {
+    public void descJugador(String nombre) throws Excepcion {
         for (Jugador j : jugadores) {
             if (j.getNombre().equalsIgnoreCase(nombre)) {
                 descJugadorInterno(j);
                 return;
             }
         }
-        consola.imprimir("Jugador no encontrado.");
+        throw new JugadorNoExisteException("El jugador " + nombre + " no existe.");
     }
+
 
     @Override
     public void descAvatar(String id) {
@@ -285,10 +354,13 @@ public class Juego implements Comando {
     }
 
     @Override
-    public void descCasilla(String nombre) {
+    public void descCasilla(String nombre) throws Excepcion {
         Casilla c = tablero.encontrar_casilla(nombre);
-        if (c != null) consola.imprimir(c.infoCasilla());
-        else consola.imprimir("Casilla no encontrada.");
+        if (c != null) {
+            consola.imprimir(c.infoCasilla());
+        } else {
+            throw new PropiedadNoExisteException("La casilla " + nombre + " no existe.");
+        }
     }
 
     @Override
@@ -345,13 +417,13 @@ public class Juego implements Comando {
     }
 
     @Override
-    public void mostrarEstadisticas(String nombre) {
+    public void mostrarEstadisticas(String nombre) throws Excepcion {
         Jugador j = null;
         for (Jugador aux : jugadores) if (aux.getNombre().equalsIgnoreCase(nombre)) j = aux;
 
+
         if (j == null) {
-            consola.imprimir("Jugador no existe.");
-            return;
+            throw new JugadorNoExisteException("El jugador " + nombre + " no existe.");
         }
         consola.imprimir(String.format("Estadísticas de %s:", j.getNombre()));
         consola.imprimir(String.format(" Dinero Invertido: %.0f", j.getDineroInvertido()));

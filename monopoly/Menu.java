@@ -1,5 +1,13 @@
 package monopoly;
 import  monopoly.Juego;
+import excepciones.*;
+import excepciones.accionNoValida.JugadorEnCarcelNoPuedeComprarException;
+import excepciones.accionNoValida.PropiedadNoHipotecadaException;
+import excepciones.accionNoValida.PropiedadYaHipotecadaException;
+import excepciones.accionNoValida.PropiedadYaTieneDuenhoException;
+import excepciones.objetoNoExiste.JugadorNoExisteException;
+import excepciones.objetoNoExiste.PropiedadNoExisteException;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -16,26 +24,43 @@ public class Menu {
         this.juego = new Juego();
     }
 
-    public void iniciarPartida() {
-        imprimir("Bienvenido al Monopoly");
-        juego.mostrarTablero();
-        imprimir("Introduce comandos. Escribe 'salir' para terminar.\n");
-        procesarComandos();
+public void iniciarPartida() throws Excepcion {
+    imprimir("Bienvenido al Monopoly");
+    juego.mostrarTablero();
+    imprimir("Introduce comandos. Escribe 'salir' para terminar.\n");
+    try {
+        procesarComandos(); 
+    } catch (PropiedadNoExisteException e) {
+        imprimir("Error: La propiedad indicada no existe.");
+    } catch (JugadorNoExisteException e) {
+        imprimir("Error: El jugador indicado no existe.");
+    } catch (JugadorEnCarcelNoPuedeComprarException e) {
+        imprimir("Error: El jugador en cárcel no puede comprar propiedades.");
+    } catch (PropiedadYaTieneDuenhoException e) {
+        imprimir("Error: La propiedad ya tiene dueño.");
+    } catch (PropiedadYaHipotecadaException e) {
+        imprimir("Error: La propiedad ya está hipotecada.");
+    } catch (PropiedadNoHipotecadaException e) {
+        imprimir("Error: La propiedad no está hipotecada.");
     }
+}
 
-    private void procesarComandos() {
-        while (true) {
-            String comando = leer("> ");
 
-            if (comando.equalsIgnoreCase("salir")) {
-                imprimir("Fin de la partida.");
-                break;
-            }
-            analizarComando(comando);
+private void procesarComandos() throws Excepcion {
+    while (true) {
+        String comando = leer("> ");
+
+        if (comando.equalsIgnoreCase("salir")) {
+            imprimir("Fin de la partida.");
+            break;
         }
+        analizarComando(comando);
     }
+}
 
-    private void analizarComando(String comando) {
+
+
+    private void analizarComando (String comando) throws Excepcion {
         if (comando.isEmpty()) return;
         String[] partes = comando.split(" ");
         String cmd = partes[0].toLowerCase();
@@ -196,25 +221,53 @@ public class Menu {
         }
     }
 
-    public boolean procesarFichero(String fichero) {
-        try (BufferedReader buffer = new BufferedReader(new FileReader(fichero))) {
-            String linea;
-            while ((linea = buffer.readLine()) != null) {
-                linea = linea.trim();
-                if (linea.isEmpty()) continue;
+public boolean procesarFichero(String fichero) {
+    try (BufferedReader buffer = new BufferedReader(new FileReader(fichero))) {
+        String linea;
+        while ((linea = buffer.readLine()) != null) {
+            linea = linea.trim();
+            if (linea.isEmpty()) continue;
 
-                imprimir("> " + linea);
+            imprimir("> " + linea);
 
-                if (linea.equalsIgnoreCase("salir")) return true;
-                analizarComando(linea);
+            // Si el propio fichero pone "salir", terminamos y devolvemos true
+            if (linea.equalsIgnoreCase("salir")) {
+                return true;
             }
-        } catch (FileNotFoundException e) {
-            imprimir("Archivo no encontrado.");
-        } catch (IOException e) {
-            imprimir("Error de lectura.");
+
+            try {
+                // Aquí se pueden lanzar tus excepciones del juego
+                analizarComando(linea);
+
+            } catch (PropiedadNoExisteException e) {
+                imprimir("Error: La propiedad indicada no existe.");
+            } catch (JugadorNoExisteException e) {
+                imprimir("Error: El jugador indicado no existe.");
+            } catch (JugadorEnCarcelNoPuedeComprarException e) {
+                imprimir("Error: El jugador en carcel no puede comprar propiedades.");
+            } catch (PropiedadYaTieneDuenhoException e) {
+                imprimir("Error: La propiedad ya tiene duenho.");
+            } catch (PropiedadYaHipotecadaException e) {
+                imprimir("Error: La propiedad ya esta hipotecada.");
+            } catch (PropiedadNoHipotecadaException e) {
+                imprimir("Error: La propiedad no esta hipotecada.");
+            } catch (Excepcion e) {
+                // Cualquier otra excepcion propia del juego
+                imprimir("Error: " + e.getMessage());
+            } catch (Exception e) {
+                // Por si se cuela algo no previsto
+                imprimir("Error inesperado: " + e.toString());
+            }
         }
-        return false;
+    } catch (FileNotFoundException e) {
+        imprimir("Archivo no encontrado.");
+    } catch (IOException e) {
+        imprimir("Error de lectura.");
     }
+    // Si hemos llegado al final del fichero sin ver "salir"
+    return false;
+}
+
 
     // MÉTODOS AUXILIARES (WRAPPERS)
     private void imprimir(String mensaje) {
