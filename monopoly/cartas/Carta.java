@@ -15,14 +15,13 @@ public abstract class Carta {
     // Identificador de la carta (1..N dentro de su baraja)
     protected final int id;
 
-    // Texto descriptivo opcional (por si quieres mostrar mensajes asociados)
     protected final String descripcion;
 
     /**
      * Constructor de la carta.
      *
-     * @param id          Identificador de la carta dentro de su baraja.
-     * @param descripcion Texto descriptivo de la carta.
+     * @param id          
+     * @param descripcion 
      */
     public Carta(int id, String descripcion) {
         this.id = id;

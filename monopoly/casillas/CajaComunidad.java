@@ -1,8 +1,6 @@
 package monopoly.casillas;
 
 import monopoly.Tablero;
-// import monopoly.Valor;        // Ya no es necesario aqui
-// import partida.Avatar;        // Ya no es necesario aqui
 import monopoly.cartas.CartaCajaComunidad;
 import partida.Jugador;
 
@@ -11,8 +9,8 @@ import java.util.List;
 //hola
 public class CajaComunidad extends Casilla {
 
-    private static int indiceCarta = 0;       // Índice global para las cartas de Caja de Comunidad (1..6 en bucle)
-    private static final int NUM_CARTAS = 6;  // Número total de cartas de Caja de Comunidad
+    private static int indiceCarta = 0;       
+    private static final int NUM_CARTAS = 6;  
 
     // Constructor
     public CajaComunidad(String nombre, int posicion, Jugador duenho) {

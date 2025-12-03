@@ -16,7 +16,7 @@ import java.util.List;
 public class CartaSuerte extends Carta {
 
     public CartaSuerte(int id) {
-        // Puedes ajustar la descripcion si quieres algo mas elaborado por carta
+      
         super(id, "Carta de Suerte " + id);
     }
 
