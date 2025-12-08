@@ -1,11 +1,14 @@
 package partida;
 import monopoly.Excepciones.TratoException;
-import monopoly.casillas.Casilla;
+import monopoly.casillas.propiedades.Propiedad;
+
 public class Trato {
+
+    // Atributos:
     private Jugador jugador1;
     private Jugador jugador2;
-    private Casilla casillajugador1;
-    private Casilla casillajugador2;
+    private Propiedad casillajugador1;
+    private Propiedad casillajugador2;
     private float dineroJugador1;
     private float dineroJugador2;
     private String id;
@@ -15,7 +18,7 @@ public class Trato {
 
     //Comenzo creando o constructor para CAMBIO PROPIEDAD POR PROPIEDAD
     // Constructor para CAMBIO PROPIEDAD POR PROPIEDAD
-    public Trato(Jugador jugador1, Jugador jugador2, Casilla casillajugador1, Casilla casillajugador2) {
+    public Trato(Jugador jugador1, Jugador jugador2, Propiedad casillajugador1, Propiedad casillajugador2) {
         this.id = generarId();
         this.jugador1 = jugador1;
         this.jugador2 = jugador2;
@@ -26,7 +29,7 @@ public class Trato {
     }
 
     // Constructor para CAMBIO PROPIEDAD POR DINERO
-    public Trato(Jugador jugador1, Jugador jugador2, Casilla casillajugador1, float dineroJugador2) {
+    public Trato(Jugador jugador1, Jugador jugador2, Propiedad casillajugador1, float dineroJugador2) {
         this.id = generarId();
         this. jugador1 = jugador1;
         this.jugador2 = jugador2;
@@ -37,7 +40,7 @@ public class Trato {
     }
 
     // Constructor para CAMBIO DINERO POR PROPIEDAD
-    public Trato(Jugador jugador1, Jugador jugador2, float dineroJugador1, Casilla casillajugador2) {
+    public Trato(Jugador jugador1, Jugador jugador2, float dineroJugador1, Propiedad casillajugador2) {
         this.id = generarId();
         this. jugador1 = jugador1;
         this.jugador2 = jugador2;
@@ -48,7 +51,7 @@ public class Trato {
     }
 
     // Constructor para cambiar PROPIEDAD Y DINERO POR PROPIEDAD
-    public Trato(Jugador jugador1, Jugador jugador2, Casilla casillajugador1, float dineroJugador1, Casilla casillajugador2) {
+    public Trato(Jugador jugador1, Jugador jugador2, Propiedad casillajugador1, float dineroJugador1, Propiedad casillajugador2) {
         this.id = generarId();
         this.jugador1 = jugador1;
         this.jugador2 = jugador2;
@@ -59,7 +62,7 @@ public class Trato {
     }
 
     // Constructor para cambiar PROPIEDAD POR PROPIEDAD Y DINERO
-    public Trato(Jugador jugador1, Jugador jugador2, Casilla casillajugador1, Casilla casillajugador2, float dineroJugador2) {
+    public Trato(Jugador jugador1, Jugador jugador2, Propiedad casillajugador1, Propiedad casillajugador2, float dineroJugador2) {
         this.id = generarId();
         this. jugador1 = jugador1;
         this.jugador2 = jugador2;

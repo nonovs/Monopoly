@@ -1,13 +1,13 @@
 package partida;
 import monopoly.Juego;
 import monopoly.casillas.Casilla;
-import monopoly.casillas.Solar;
+import monopoly.casillas.propiedades.Solar;
 import monopoly.Construccion.Casa;
 import monopoly.Construccion.Hotel;
 import monopoly.Construccion.Piscina;
 import monopoly.Construccion.PistaDeporte;
 import monopoly.Construccion.Edificio;
-import monopoly.Grupo;
+import monopoly.casillas.Grupo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +39,13 @@ public class GestorEdificaciones {
         }
 
         Solar solar = (Solar) lugar;
+
+        // Delegamos la lógica en el nuevo métod que acepta el Solar explícitamente
+        procesarEdificacion(jugador, solar, tipo);
+    }
+
+    // NUEVO MÉTODOS: centraliza toda la lógica de construcción. Puede ser llamado desde el menú o desde la clase Solar
+    public static void procesarEdificacion (Jugador jugador, Solar solar, String tipo) {
         String nombreSolar = solar.getNombre();
         String jugadorNombre = jugador.getNombre();
         tipo = tipo == null ? "" : tipo.trim().toLowerCase();
@@ -48,7 +55,6 @@ public class GestorEdificaciones {
             Juego.consola.imprimir(String.format("%s no es el propietario de %s.%n", jugadorNombre, nombreSolar));
             return;
         }
-
         // Recuperar el grupo y comprobar la propiedad total del grupo cuando aplique
         Grupo grupo = solar.getGrupo();
 
@@ -81,7 +87,6 @@ public class GestorEdificaciones {
                         casa.getId(), nombreSolar, jugadorNombre, precio));
                 return;
             }
-
             case "hotel": {
                 //Compruebo que es duanho del grupo y que tiene 4 casas
                 if (grupo != null && !grupo.esDuenhoGrupo(jugador)) {
@@ -99,6 +104,7 @@ public class GestorEdificaciones {
                     Juego.consola.imprimir("No se puede edificar un hotel: se requieren 4 casas y ser dueño del grupo o ya existe un hotel.");
                     return;
                 }
+                // Lógica de reemplazo de casas por hotel
                 List<Edificio> casasAEliminar = new ArrayList<>();
                 for (Edificio e : solar.getEdificaciones()) {
                     if (e instanceof Casa) {
@@ -125,10 +131,8 @@ public class GestorEdificaciones {
                 Juego.consola.imprimir(String.format("Las 4 casas en %s han sido reemplazadas por el hotel.%n", nombreSolar));
                 return;
             }
-
             case "piscina": {
-                // Piscina  requerir hotel en la misma casilla; la propiedad del grupo ya no tengo que comprobarla la compruebo en hotel
-
+                // Piscina requerir hotel en la misma casilla; la propiedad del grupo ya no tengo que comprobarla la compruebo en hotel
                 float precio = solar.getPrecioPiscina();
                 if (jugador.getFortuna() < precio) {
                     Juego.consola.imprimir(String.format("La fortuna de %s no es suficiente para edificar una piscina en la casilla %s.%n", jugadorNombre, nombreSolar));
@@ -151,10 +155,8 @@ public class GestorEdificaciones {
                         piscina.getId(), nombreSolar, jugadorNombre, precio));
                 return;
             }
-
             case "pista":
             case "pista_deporte": {
-
                 float precio = solar.getPrecioPista();
                 if (jugador.getFortuna() < precio) {
                     Juego.consola.imprimir(String.format("La fortuna de %s no es suficiente para edificar una pista de deporte en la casilla %s.%n", jugadorNombre, nombreSolar));
@@ -177,33 +179,27 @@ public class GestorEdificaciones {
                         pista.getId(), nombreSolar, jugadorNombre, precio));
                 return;
             }
-
             default:
                 Juego.consola.imprimir("Tipo de edificación no reconocido. Usa: casa, hotel, piscina o pista_deporte.");
         }
     }
-
 
     public static boolean eliminarEdificio(Edificio edificio) {
         if (edificio == null) {
             Juego.consola.imprimir("No se puede eliminar un edificio nulo.");
             return false;
         }
-
         Solar solar = edificio.getSolar();
         if (solar == null) {
             Juego.consola.imprimir("El edificio no está asociado a ningún solar.");
             return false;
         }
-
         Jugador duenho = solar.getDuenho();
         if (duenho == null) {
             Juego.consola.imprimir("El solar no tiene dueño asignado.");
             return false;
         }
-
         String tipoEdificio = "";
-
         boolean resultado = false;
 
         // Identificar el tipo de edificio y ejecutar la demolición correspondiente
@@ -228,16 +224,12 @@ public class GestorEdificaciones {
             Juego.consola.imprimir("Tipo de edificio no reconocido.");
             return false;
         }
-
         if (!resultado) {
             Juego.consola.imprimir(String.format("No se pudo demoler el %s (%s) en %s.%n",
                     tipoEdificio, edificio.getId(), solar.getNombre()));
             return false;
         }
-
-
         solar.eliminarEdificacion(edificio);
-
         return true;
     }
 }

@@ -1,6 +1,6 @@
 package monopoly.Construccion;
 
-import monopoly.casillas.Solar;
+import monopoly.casillas.propiedades.Solar;
 
 /**
  * Hotel: require 4 casas e non ter hotel previo.

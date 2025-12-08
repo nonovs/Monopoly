@@ -1,4 +1,5 @@
 package monopoly;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,8 +8,6 @@ import java.util.Map;
 import excepciones.Excepcion;
 import excepciones.accionNoValida.FondosInsuficientesException;
 import excepciones.accionNoValida.JugadorEnCarcelNoPuedeComprarException;
-import excepciones.accionNoValida.PropiedadNoHipotecadaException;
-import excepciones.accionNoValida.PropiedadYaHipotecadaException;
 import excepciones.accionNoValida.PropiedadYaTieneDuenhoException;
 import excepciones.objetoNoExiste.JugadorNoExisteException;
 import excepciones.objetoNoExiste.PropiedadNoExisteException;
@@ -16,13 +15,17 @@ import excepciones.objetoNoExiste.PropiedadNoExisteException;
 import monopoly.Excepciones.TratoException;
 import monopoly.casillas.*;      // Importa todas las casillas (Solar, Suerte, etc.)
 import monopoly.Construccion.*;  // Importa todos los edificios (Edificio, Casa, etc.)
+import monopoly.casillas.propiedades.Propiedad;
+import monopoly.casillas.acciones.CajaComunidad;
+import monopoly.casillas.acciones.Suerte;
+import monopoly.casillas.propiedades.Solar;
 import partida.*;                // Importa Jugador, Avatar, Dado, etc.
 
 import static partida.GestorEdificaciones.eliminarEdificio;
 
 
 public class Juego implements Comando {
-//carallojlkjl
+
     public static ConsolaNormal consola = new ConsolaNormal();
 
     private final ArrayList<Jugador> jugadores;
@@ -174,6 +177,13 @@ public class Juego implements Comando {
             throw new PropiedadNoExisteException("La casilla " + nombre + " no existe.");
         }
 
+        // Verificar si es Propiedad
+        if (!(c instanceof Propiedad)) {
+            consola.imprimir("Esta casilla no se puede comprar.");
+            return;
+        }
+        Propiedad propiedad = (Propiedad) c;
+
         // Ejemplo de accion no valida
         if (actual.isEnCarcel()) {
             throw new JugadorEnCarcelNoPuedeComprarException(
@@ -182,7 +192,7 @@ public class Juego implements Comando {
         }
 
         // Propiedad ya vendida
-        if (c.getDuenho() != banca) {
+        if (propiedad.getDuenho() != banca) {
             throw new PropiedadYaTieneDuenhoException(
                     "La propiedad " + c.getNombre() + " ya tiene duenho."
             );
@@ -195,22 +205,13 @@ public class Juego implements Comando {
         }
 
         // Dinero insuficiente
-        if (actual.getFortuna() < c.getValor()) {
+        if (actual.getFortuna() < propiedad.valor()) {
             throw new FondosInsuficientesException(
                     "No tienes dinero suficiente para comprar " + c.getNombre() + "."
             );
         }
 
-        // Efectuar compra
-        actual.pagar(c.getValor());
-        actual.acumularDineroInvertido(c.getValor());
-        c.setDuenho(actual);
-        actual.anhadirPropiedad(c);
-
-        consola.imprimir(String.format(
-                "El jugador %s compra la casilla %s por %.0f€. Su fortuna actual es %.0f€.",
-                actual.getNombre(), c.getNombre(), c.getValor(), actual.getFortuna()
-        ));
+        propiedad.comprar(actual);  // Delegar en el método comprar de Propiedad
     }
 
     @Override
@@ -230,7 +231,13 @@ public class Juego implements Comando {
             throw new PropiedadNoExisteException("La casilla " + nombre + " no existe.");
         }
 
-        getJugadorActual().hipotecarPropiedad(c);
+        // Casting seguro porque hipotecar solo aplica a Propiedad
+        if (!(c instanceof Propiedad)) {
+            consola.imprimir("Esta casilla no es una propiedad y no se puede hipotecar.");
+            return;
+        }
+
+        getJugadorActual().hipotecarPropiedad((Propiedad) c);
     }
 
     @Override
@@ -244,7 +251,13 @@ public class Juego implements Comando {
             throw new PropiedadNoExisteException("La casilla " + nombre + " no existe.");
         }
 
-        getJugadorActual().deshipotecarPropiedad(c);
+        // Casting seguro
+        if (!(c instanceof Propiedad)) {
+            consola.imprimir("Esta casilla no es una propiedad y no se puede deshipotecar.");
+            return;
+        }
+
+        getJugadorActual().deshipotecarPropiedad((Propiedad) c);
     }
 
     @Override
@@ -375,8 +388,12 @@ public class Juego implements Comando {
     @Override
     public void listarCasillasGrupo(String grupo) {
         for (Casilla c : tablero.getCasillas()) {
-            if (c.getGrupo() != null && c.getGrupo().getColor().equalsIgnoreCase(grupo) && c.getDuenho() == banca) {
-                consola.imprimir(c.casEnVenta());
+            // Verificar si es Propiedad para acceder a getGrupo()
+            if (c instanceof Propiedad) {
+                Propiedad p = (Propiedad) c;
+                if (p.getGrupo() != null && p.getGrupo().getColor().equalsIgnoreCase(grupo) && p.getDuenho() == banca) {
+                    consola.imprimir(p.casEnVenta());
+                }
             }
         }
     }
@@ -442,9 +459,13 @@ public class Juego implements Comando {
         Casilla masRentable = null;
         float maxAlq = 0;
         for (Casilla c : tablero.getCasillas()) {
-            if (c.getAlquileresGenerados() > maxAlq) {
-                maxAlq = c.getAlquileresGenerados();
-                masRentable = c;
+            // Solo las Propiedades generan alquileres
+            if (c instanceof Propiedad) {
+                Propiedad p = (Propiedad) c;
+                if (p.getAlquileresGenerados() > maxAlq) {
+                    maxAlq = p.getAlquileresGenerados();
+                    masRentable = p;
+                }
             }
         }
         String rentMsg = (masRentable != null)
@@ -455,9 +476,13 @@ public class Juego implements Comando {
         // 2. Grupo más rentable
         Map<String, Float> grupoRent = new HashMap<>();
         for (Casilla c : tablero.getCasillas()) {
-            if (c instanceof Solar && c.getGrupo() != null) {
-                String col = c.getGrupo().getColor();
-                grupoRent.put(col, grupoRent.getOrDefault(col, 0f) + c.getAlquileresGenerados());
+            // Verificación Propiedad + Solar (o Propiedad con grupo)
+            if (c instanceof Solar) {
+                Solar s = (Solar) c; // Solar extiende Propiedad
+                if (s.getGrupo() != null) {
+                    String col = s.getGrupo().getColor();
+                    grupoRent.put(col, grupoRent.getOrDefault(col, 0f) + s.getAlquileresGenerados());
+                }
             }
         }
         String mejorGrupo = null;
@@ -477,8 +502,9 @@ public class Juego implements Comando {
         Casilla masFrec = null;
         int maxVis = 0;
         for (Casilla c : tablero.getCasillas()) {
-            if (c.getVecesVisitada() > maxVis) {
-                maxVis = c.getVecesVisitada();
+            // Usamos FrecuenciaVisita() que debe estar en Casilla
+            if (c.FrecuenciaVisita() > maxVis) {
+                maxVis = c.FrecuenciaVisita();
                 masFrec = c;
             }
         }
@@ -506,10 +532,11 @@ public class Juego implements Comando {
         float maxF = -1;
         for (Jugador j : jugadores) {
             float total = j.getFortuna();
-            for (Casilla c : j.getPropiedades()) {
-                total += c.getValor();
-                if (c instanceof Solar) {
-                    for (Edificio e : ((Solar) c).getEdificaciones()) {
+            // Cambio: Iterar sobre Propiedad
+            for (Propiedad p : j.getPropiedades()) {
+                total += p.valor();
+                if (p instanceof Solar) {
+                    for (Edificio e : ((Solar) p).getEdificaciones()) {
                         total += e.getPrecio();
                     }
                 }
@@ -709,66 +736,82 @@ public class Juego implements Comando {
             consola.imprimir(trato.toString());
 
         }catch (Exception e){
-            consola.imprimir(e.getMessage());
+            consola.imprimir("Error al proponer trato: " + e.getMessage());
 
         }
     }
 
-    private Trato separarTrato(Jugador jugador1,Jugador jugador2,String[] elementos){
-        String parte1=elementos[0].trim();
-        String parte2=elementos[1].trim();
+    private Trato separarTrato(Jugador jugador1, Jugador jugador2, String[] elementos) {
+        String parte1 = elementos[0].trim();
+        String parte2 = elementos[1].trim();
 
-        Casilla casilla1=tablero.encontrar_casilla(parte1);
-        float dineroJugador1=0;
+        // ---------------- PARTE 1 (Lo que da J1) ----------------
+        Casilla c1Found = null;
+        float dinero1 = 0;
 
-        if (parte1.contains(" y ")){
-            String[] partes=parte1.split(" y ");
-            casilla1=tablero.encontrar_casilla(partes[0].trim());
-            dineroJugador1=Float.parseFloat(partes[1].trim());
-
-        }else{
-            try{
-                dineroJugador1=Float.parseFloat(parte1);
-                casilla1=null;
-            }catch (NumberFormatException e){
-                casilla1=tablero.encontrar_casilla(parte1);
+        if (parte1.contains(" y ")) {
+            String[] partes = parte1.split(" y ");
+            c1Found = tablero.encontrar_casilla(partes[0].trim());
+            dinero1 = Float.parseFloat(partes[1].trim());
+        } else {
+            try {
+                dinero1 = Float.parseFloat(parte1);
+            } catch (NumberFormatException e) {
+                c1Found = tablero.encontrar_casilla(parte1);
             }
         }
 
-
-        Casilla casilla2=tablero.encontrar_casilla(parte2);
-        float dineroJugador2=0;
-
-        if (parte2.contains(" y ")){
-            String[] partes=parte2.split(" y ");
-            casilla2=tablero.encontrar_casilla(partes[0].trim());
-            dineroJugador2=Float.parseFloat(partes[1].trim());
-
-        }else{
-            try{
-                dineroJugador2=Float.parseFloat(parte2);
-                casilla2=null;
-            }catch (NumberFormatException e){
-                casilla2=tablero.encontrar_casilla(parte2);
+        // Verificación de tipo
+        Propiedad prop1 = null;
+        if (c1Found != null) {
+            if (c1Found instanceof Propiedad) {
+                prop1 = (Propiedad) c1Found;
+            } else {
+                throw new TratoException("La casilla " + c1Found.getNombre() + " no es una propiedad válida para intercambio.");
             }
         }
 
-        // Crear el trato según el caso
-        if (casilla1 != null && casilla2 != null && dineroJugador1 == 0 && dineroJugador2 == 0) {
-            return new Trato(jugador1, jugador2, casilla1, casilla2);
-        } else if (casilla1 != null && dineroJugador2 > 0 && casilla2 == null) {
-            return new Trato(jugador1, jugador2, casilla1, dineroJugador2);
-        } else if (dineroJugador1 > 0 && casilla2 != null && casilla1 == null) {
-            return new Trato(jugador1, jugador2, dineroJugador1, casilla2);
-        } else if (casilla1 != null && dineroJugador1 > 0 && casilla2 != null) {
-            return new Trato(jugador1, jugador2, casilla1, dineroJugador1, casilla2);
-        } else if (casilla1 != null && casilla2 != null && dineroJugador2 > 0) {
-            return new Trato(jugador1, jugador2, casilla1, casilla2, dineroJugador2);
+        // ---------------- PARTE 2 (Lo que da J2) ----------------
+        Casilla c2Found = null;
+        float dinero2 = 0;
+
+        if (parte2.contains(" y ")) {
+            String[] partes = parte2.split(" y ");
+            c2Found = tablero.encontrar_casilla(partes[0].trim());
+            dinero2 = Float.parseFloat(partes[1].trim());
+        } else {
+            try {
+                dinero2 = Float.parseFloat(parte2);
+            } catch (NumberFormatException e) {
+                c2Found = tablero.encontrar_casilla(parte2);
+            }
         }
 
-        throw new TratoException("Formato de trato inválido.");
+        // Verificación de tipo
+        Propiedad prop2 = null;
+        if (c2Found != null) {
+            if (c2Found instanceof Propiedad) {
+                prop2 = (Propiedad) c2Found;
+            } else {
+                throw new TratoException("La casilla " + c2Found.getNombre() + " no es una propiedad válida para intercambio.");
+            }
+        }
+
+        // Crear el trato según el caso (Usando Propiedad)
+        if (prop1 != null && prop2 != null && dinero1 == 0 && dinero2 == 0) {
+            return new Trato(jugador1, jugador2, prop1, prop2);
+        } else if (prop1 != null && dinero2 > 0 && prop2 == null) {
+            return new Trato(jugador1, jugador2, prop1, dinero2);
+        } else if (dinero1 > 0 && prop2 != null && prop1 == null) {
+            return new Trato(jugador1, jugador2, dinero1, prop2);
+        } else if (prop1 != null && dinero1 > 0 && prop2 != null) {
+            return new Trato(jugador1, jugador2, prop1, dinero1, prop2);
+        } else if (prop1 != null && prop2 != null && dinero2 > 0) {
+            return new Trato(jugador1, jugador2, prop1, prop2, dinero2);
+        }
+
+        throw new TratoException("Formato de trato inválido o combinación no soportada.");
     }
-
 
     @Override
     public void aceptarTrato(String idTrato) {

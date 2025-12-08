@@ -1,6 +1,6 @@
 package monopoly.Construccion;
 
-import monopoly.casillas.Solar;
+import monopoly.casillas.propiedades.Solar;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 

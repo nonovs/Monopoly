@@ -1,6 +1,6 @@
 package monopoly.Construccion;
 
-import monopoly.casillas.Solar;
+import monopoly.casillas.propiedades.Solar;
 
 /**
  * Piscina: require hotel e que non exista xa piscina.

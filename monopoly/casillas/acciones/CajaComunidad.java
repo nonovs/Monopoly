@@ -1,22 +1,18 @@
-package monopoly.casillas;
+package monopoly.casillas.acciones;
 
 import monopoly.Tablero;
 import monopoly.cartas.CartaCajaComunidad;
 import partida.Jugador;
-
 import java.util.List;
-
 import static monopoly.Juego.consola;
 
-//hola
-public class CajaComunidad extends Casilla {
+public class CajaComunidad extends Accion {
 
     private static int indiceCarta = 0;       
     private static final int NUM_CARTAS = 6;  
 
-    // Constructor
     public CajaComunidad(String nombre, int posicion, Jugador duenho) {
-        super(nombre, "CajaComunidad", posicion, duenho);
+        super(nombre, posicion, duenho);
     }
 
     private static int siguienteCarta() {
@@ -46,11 +42,6 @@ public class CajaComunidad extends Casilla {
     }
 
     @Override
-    public void comprarCasilla(Jugador solicitante, Jugador banca) {
-        // No se puede comprar una casilla de comunidad
-    }
-
-    @Override
     public String infoCasilla() {
         return String.format(
                 "{tipo: caja comunidad, nombre: %s, posicion: %d}",
@@ -58,8 +49,4 @@ public class CajaComunidad extends Casilla {
         );
     }
 
-    @Override
-    public String casEnVenta() {
-        return ""; // No está en venta
-    }
 }

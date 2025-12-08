@@ -3,7 +3,8 @@ package monopoly.cartas;
 import monopoly.Tablero;
 import monopoly.Valor;
 import monopoly.casillas.Casilla;
-import monopoly.casillas.Transporte;
+import monopoly.casillas.propiedades.Propiedad;
+import monopoly.casillas.propiedades.Transporte;
 import partida.Avatar;
 import partida.Jugador;
 
@@ -146,7 +147,17 @@ public class CartaSuerte extends Carta {
                         return true;
                     }
 
-                    float alquilerDoble = tr.getAlquiler() * 2;
+                    // Calcular alquiler real y duplicarlo
+                    // 1. Obtenemos base
+                    float base = tr.getAlquilerBase();
+                    // 2. Contamos cuántos tiene el dueño
+                    int numT = 0;
+                    for (Propiedad p : du.getPropiedades()) {
+                        if (p instanceof Transporte) numT++;
+                    }
+                    // 3. Calculamos el doble
+                    float alquilerDoble = (base * numT) * 2;
+
                     if (actual.getFortuna() >= alquilerDoble) {
                         actual.pagar(alquilerDoble);
                         du.recibir(alquilerDoble);

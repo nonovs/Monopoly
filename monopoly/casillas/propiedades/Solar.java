@@ -1,24 +1,23 @@
-package monopoly.casillas;
+package monopoly.casillas.propiedades;
 
 import monopoly.Construccion.*;
-import monopoly.Grupo;
+import monopoly.casillas.Grupo;
+import partida.GestorEdificaciones;
 import partida.Jugador;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import static monopoly.Juego.consola;
 
-public class Solar extends Casilla {
+public class Solar extends Propiedad {
 
-    // Base
+    // Atributos específicos de Solar (precios de edificación y alquileres)
     private float alquilerBase;
-
-    // Estado de edificaciones
     private int casas;          // 0..4
     private boolean hotel;      // true si hay hotel
     private boolean piscina;    // true si hay piscina
     private boolean pistaDeporte; // true si hay pista
+
+    // Atributos de precios y alquileres
     private float precioCasa;
     private float precioHotel;
     private float precioPiscina;
@@ -27,10 +26,10 @@ public class Solar extends Casilla {
     private float alquilerHotel;
     private float alquilerPiscina;
     private float alquilerPista;
-    private boolean hipotecado = false;
-    private ArrayList<Edificio> edificio = new ArrayList<>();
 
-    // Rexistro de edificacions construídas neste solar
+    private boolean hipotecado = false;
+
+    // Registro de edificios (Composición)
     private final List<Edificio> edificaciones;
 
     public Solar(
@@ -40,10 +39,17 @@ public class Solar extends Casilla {
             float alquilerCasa, float alquilerHotel, float alquilerPiscina, float alquilerPista,
             Jugador duenho, Grupo grupo
     ) {
-        super(nombre, "Solar", posicion, valor, duenho);// Llama al constructor de Casilla,
-        this.alquilerBase = alquilerBase;
-        this.setGrupo(grupo);
 
+        // Llamamos al constructor de Propiedad
+        // Propiedad se encarga de: nombre, posicion, valor, duenho, grupo
+        super(nombre, posicion, valor, duenho, grupo);
+
+        this.alquilerBase = alquilerBase;
+        /**
+         * La hipoteca base ya se calcula en Propiedad (valor/2), pero si el juego pasa a una específica,
+         * podríamos sobreescribirla o ignorarla. Aquí asumimos la lógica estandar, pero sino:
+         * this.hipotecarBase = hipoteca;
+         */
         this.precioCasa = precioCasa;
         this.precioHotel = precioHotel;
         this.precioPiscina = precioPiscina;
@@ -58,10 +64,78 @@ public class Solar extends Casilla {
         this.hotel = false;
         this.piscina = false;
         this.pistaDeporte = false;
-
         this.edificaciones = new ArrayList<>();
     }
 
+    // IMPLEMENTACIÓN DE MÉTODOS DE LA CLASE PADRE (PROPIEDAD)
+
+    @Override
+    public float valor() { return valor; }
+
+    @Override
+    public boolean alquiler (Jugador actual, int tirada) {
+        if (isHipotecada()) {
+            consola.imprimir(String.format("El solar %s está hipotecado. No pagas alquiiler.", nombre));
+            return true;
+        }
+
+        float monto = calcularAlquilerNumerico();
+        if (actual.getFortuna() >= monto) {
+            actual.pagar(monto);
+            if (duenho != null) duenho.recibir(monto);
+
+            //Estadísticas
+            actual.acumularPagoDeAlquileres(monto);
+            if (duenho != null) duenho.acumularCobroDeAlquileres(monto);
+            sumarAlquileresGenerado(monto);
+
+            consola.imprimir(String.format("%s paga %.0f€ de alquiler en %s.",
+                    actual.getNombre(), monto, nombre));
+            return true;
+        } else {
+            consola.imprimir(String.format("%s no tiene fondos para pagar el alquiler de %.0f€ en %s.",
+                    actual.getNombre(), monto, nombre));
+            return false;
+        }
+    }
+
+    // IMPLEMENTACIÓN DE MÉTODOS SOLICITADOS EN EL GUIÓN PARA SOLAR
+
+    public void edificar(String tipoEdificio) {
+        // Verificaciones básicas antes de edificar
+        if (duenho == null) {
+            consola.imprimir("No se puede edificar: el solar no tiene dueño.");
+            return;
+        }
+        // Llamamos al método estático que hemos creado en GestorEdificaciones
+        // Pasamos el dueño de este solar y 'this' como el solar objetivo.
+        GestorEdificaciones.procesarEdificacion(this.duenho, this, tipoEdificio);
+    }
+
+    public void hipotecar() {
+        if (hipotecada) {
+            consola.imprimir("Ya está hipotecada.");
+            return;
+        }
+        if (!edificaciones.isEmpty()) {
+            consola.imprimir("Debes vender los edificios antes de hipotecar.");
+            return;
+        }
+        // Ejecutamos hipoteca
+        float valorHipoteca = valor() / 2;
+        duenho.recibir(valorHipoteca);
+        setHipotecada(true);
+        if (duenho.getPropiedades().contains(this)) {
+            // Opcional: mover a lista de hipotecadas en Jugador si mantienes esa lógica
+            //duenho.moverAHipotecadas(this);
+        }
+        consola.imprimir(String.format("Has hipotecado %s por %.0f€.", nombre, valorHipoteca));
+    }
+
+    public boolean estaHipotecada() { return isHipotecada(); }
+
+
+    // IMPLEMENTACIÓN DE CASILLA
     /** Se ejecuta cuando un jugador cae en la casilla
      * -Si no tiene dueño o el dueño es la banca, no ocurre nada
      * -si perteneces al mismo jugador, tampoco.
@@ -69,64 +143,17 @@ public class Solar extends Casilla {
      */
     @Override
     public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {
-        if (getDuenho() == null || getDuenho() == actual || getDuenho() == banca)
-            return true;
-
-        //Si está hipotecada, no se cobra alquiler
-        if (hipotecado) {
-            consola.imprimir(String.format("La propiedad %s está hipotecada. No se cobra alquiler.", getNombre()));
+        // Si no tiene dueño o es mío, no pago
+        if (duenho == null || duenho == banca || duenho == actual) {
             return true;
         }
-
-        float alquiler = calcularAlquiler();
-        if (actual.getFortuna() >= alquiler) {
-            actual.pagar(alquiler);
-            getDuenho().recibir(alquiler);
-
-            //FUncions para ter en conta para as estadísticas
-            actual.acumularPagoDeAlquileres(alquiler);
-            getDuenho().acumularCobroDeAlquileres(alquiler);
-            this.sumarAlquilerGenerado(alquiler);
-            consola.imprimir(String.format("%s paga %.0f€ de alquiler a %s por %s.",
-                    actual.getNombre(), alquiler, getDuenho().getNombre(), getNombre()));
-
-            return true;
-        } else {
-            consola.imprimir(actual.getNombre() + " no puede pagar el alquiler de " + alquiler);
-            return false;
-        }
+        // Si tiene dueño, intentamos cobrar alquiler
+        return alquiler(actual, tirada);
     }
-    //  Permite al jugador comprar la casilla si está libre y se encuentra en ella
-    @Override
-    public void comprarCasilla(Jugador solicitante, Jugador banca) {
-        //Verifica que la propiedad no esté ya vendida
-        if (getDuenho() != banca) {
-            consola.imprimir("Este solar ya tiene dueño.");
-            return;
-        }
-        // Solo se puede comprar si el jugador está sobre la casilla
-        if (solicitante.getPosicion() != this.getPosicion()) {
-            consola.imprimir("Solo puedes comprar la casilla en la que estás situado.");
-            return;
-        }
-        // verifica que el jugador tenga suficiente dinero
-        if (solicitante.getFortuna() < getValor()) {
-            consola.imprimir(solicitante.getNombre() + " no tiene suficiente dinero para comprar " + getNombre());
-            return;
-        }
-        //Efectua la compra
-        solicitante.pagar(getValor());
-        solicitante.acumularDineroInvertido(getValor());
-        setDuenho(solicitante);
-        solicitante.anhadirPropiedad(this);
 
-        consola.imprimir(String.format(
-                "El jugador %s compra la casilla %s por %.0f€. Su fortuna actual es %.0f€.",
-                solicitante.getNombre(), getNombre(), getValor(), solicitante.getFortuna()
-        ));
-    }
-    //Calcula el alquieler actual de la casilla, teniendo en cuenta edificaciones y grupos
-    public float calcularAlquiler() {
+    // MÉTODOS AUXILIARES Y GETTERS
+
+    public float calcularAlquilerNumerico() {
         float total = 0;
 
         // Si hay edificios, se cobra solo el alquiler de los edificios
@@ -136,20 +163,15 @@ public class Solar extends Casilla {
             if (piscina)   total += alquilerPiscina;
             if (pistaDeporte) total += alquilerPista;
         } else {
-            // Si NO hay edificios, cobra el alquiler base
             total = alquilerBase;
-
-            // Si el dueño tiene todo el grupo, duplica el alquiler base
-            Grupo g = getGrupo();
-            if (g != null && g.esDuenhoGrupo(getDuenho())) {
+            if (grupo != null && grupo.esDuenhoGrupo(duenho)) {
                 total *= 2;
             }
         }
-
         return total;
     }
 
-    // Métodos para xestionar edificacions
+    // Lógica interna de control de contadores
     public boolean construirCasa() {
         Grupo g = getGrupo();
         if (g != null && casas < 4 && !hotel && g.esDuenhoGrupo(getDuenho())) {
@@ -167,7 +189,6 @@ public class Solar extends Casilla {
                     casasAEliminar.add(e);
                 }
             }
-
             // Eliminar solo 4 casas puido fallar o codigo e crear mais de 4
             int eliminadas = 0;
             for (Edificio casa : casasAEliminar) {
@@ -176,14 +197,12 @@ public class Solar extends Casilla {
                     eliminadas++;
                 }
             }
-
             casas = 0;      //casas a 0
             hotel = true;   // hotel1
             return true;
         }
         return false;
     }
-
 
     public boolean construirPiscina() {
         if (hotel && !piscina) {
@@ -201,25 +220,24 @@ public class Solar extends Casilla {
         return false;
     }
 
-
-
-
-    /**
-     * Engade a edificacion ao rexistro do solar.
-     */
+    // Engade a edificacion ao rexistro do solar.
     public void anhadirEdificacion(Edificio e) {
         if (e != null) {
             edificaciones.add(e);
         }
     }
 
-    /**
-     * Devolve unha copia da lista de edificacions deste solar.
-     */
+    // Elimina a edificacion do rexistro do solar.
+    public void eliminarEdificacion(Edificio edificio) {
+        if (edificio != null) {
+            edificaciones.remove(edificio);
+        }
+    }
+
+    // Devolve unha copia da lista de edificacions deste solar.
     public List<Edificio> getEdificaciones() {
         return new ArrayList<>(edificaciones);
     }
-
 
     @Override
     public String infoCasilla() {
@@ -244,42 +262,27 @@ public class Solar extends Casilla {
                         " alquiler pista: %.0f%n" +
                         "}",
                 color, duenhoStr,
-                getValor(), getPrecioHipoteca(), alquilerBase,
+                valor(), getPrecioHipoteca(), alquilerBase,
                 precioCasa, precioHotel, precioPiscina, precioPista,
                 alquilerCasa, alquilerHotel, alquilerPiscina, alquilerPista
         );
     }
-
-    @Override
-    public String casEnVenta() {
-        if (getDuenho() != null && !"Banca".equalsIgnoreCase(getDuenho().getNombre())) {
-            return "";
-        }
-        return String.format("{%n  tipo: solar,%n  grupo: %s,%n  valor: %.0f%n}", getGrupo(), getValor());
-    }
-
-
 
     //Aqui vou gestionar coossas de edificcacions
     public boolean romperCasa(Casa casa) {
         if (casa == null || !edificaciones.contains(casa)) {
             return false;
         }
-
-
         float devolucion = getPrecioCasa();
         if (getDuenho() != null) {
             getDuenho().recibir(devolucion);
-
             consola.imprimir(String.format("Se ha demolido la casa %s en %s. %s recibe %.0f€.",
                     casa.getId(), getNombre(), getDuenho().getNombre(), devolucion));
         }
-
         // Decrementar el contador de casas
         if (casas > 0) {
             casas--;
         }
-
         return true;
     }
 
@@ -287,18 +290,14 @@ public class Solar extends Casilla {
         if (hotel == null || !edificaciones.contains(hotel)) {
             return false;
         }
-
-
         float devolucion = getPrecioHotel() ;
         if (getDuenho() != null) {
             getDuenho().recibir(devolucion);
             consola.imprimir(String.format("Se ha demolido el hotel %s en %s. %s recibe %.0f€.",
                     hotel.getId(), getNombre(), getDuenho().getNombre(), devolucion));
         }
-
         // Marcar que ya no hay hotel
         this.hotel = false;
-
         // Volver a añadir 4 casas al demoler un hotel
         if (casas + 4 <= 4) {
             for (int i = 0; i < 4; i++) {
@@ -308,7 +307,6 @@ public class Solar extends Casilla {
             }
             consola.imprimir(String.format("Se han añadido 4 casas en %s tras demoler el hotel.", getNombre()));
         }
-
         return true;
     }
 
@@ -316,18 +314,14 @@ public class Solar extends Casilla {
         if (piscina == null || !edificaciones.contains(piscina)) {
             return false;
         }
-
-
         float devolucion = getPrecioPiscina();
         if (getDuenho() != null) {
             getDuenho().recibir(devolucion);
             consola.imprimir(String.format("Se ha demolido la piscina %s en %s. %s recibe %.0f€.",
                     piscina.getId(), getNombre(), getDuenho().getNombre(), devolucion));
         }
-
         // Marcar que ya no hay piscina
         this.piscina = false;
-
         return true;
     }
 
@@ -335,43 +329,24 @@ public class Solar extends Casilla {
         if (pista == null || !edificaciones.contains(pista)) {
             return false;
         }
-
-
         float devolucion =  getPrecioPista();
         if (getDuenho() != null) {
             getDuenho().recibir(devolucion);
             consola.imprimir(String.format("Se ha demolido la pista de deporte %s en %s. %s recibe %.0f€.",
                     pista.getId(), getNombre(), getDuenho().getNombre(), devolucion));
         }
-
         // Marcar que ya no hay pista
         this.pistaDeporte = false;
-
         return true;
     }
 
-    public void eliminarEdificacion(Edificio edificio) {
-        if (edificio != null) {
-            edificaciones.remove(edificio);
-        }
-    }
-
-
-
+    // Getters de precios para uso externo si fuera necesario
     public float getPrecioCasa() { return precioCasa; }
     public float getPrecioHotel() { return precioHotel; }
     public float getPrecioPiscina() { return precioPiscina; }
     public float getPrecioPista() { return precioPista; }
-
-
     public int getCasas() { return casas; }
     public boolean hasHotel() { return hotel; }
     public boolean hasPiscina() { return piscina; }
     public boolean hasPistaDeporte() { return pistaDeporte; }
-
-
-
-
-
-
 }

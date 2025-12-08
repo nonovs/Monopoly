@@ -1,7 +1,13 @@
 package monopoly;
 
-import monopoly.Juego;
 import monopoly.casillas.*;
+import monopoly.casillas.acciones.CajaComunidad;
+import monopoly.casillas.acciones.Parking;
+import monopoly.casillas.acciones.Suerte;
+import monopoly.casillas.propiedades.Propiedad;
+import monopoly.casillas.propiedades.Servicios;
+import monopoly.casillas.propiedades.Solar;
+import monopoly.casillas.propiedades.Transporte;
 import partida.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -161,6 +167,11 @@ public class Tablero {
         return Valor.BOLD_STRING + sb.toString() + Valor.RESET;
     }
 
+    /** EXPLICACION ARREGLO DE TABLERO (para que todo funcione como jerarquía de casillas)
+     * 1. Para añadir a la banca: Usamos 'instanceof Propiedad' y hacemos el cast (Propiedad).
+     * 2. Para crear grupos: Hacemos cast (Propiedad) al obtener del array.
+     * 3. Para setGrupo: Hacemos cast ((Propiedad)c).setGrupo(..)
+     */
     public void mostrarTablero() {
         Juego.consola.imprimir(this.toString());
     }
@@ -184,14 +195,20 @@ public class Tablero {
         ladoSur.add(new Solar(Valor.BLACK + "Solar1" + Valor.RESET, 1, 600000, 300000, 20000, 500000, 500000, 100000, 200000, 400000, 2500000, 500000, 500000, banca, null));
         ladoSur.add(new Especial("Salida", 0, banca, this));
 
-        for (int i=0; i<ladoSur.size(); i++) if(i!=0 && i!=10) banca.anhadirPropiedad(ladoSur.get(i));
+        for (Casilla c : ladoSur) {
+            // Solo añadimos a la banca si es una propiedad (solar, transporte, servicio)
+            // Esto excluye automaticamente: salida, carcel, suerte, caja comunidad, impuestos, parking, ir a la carcel
+            if (c instanceof Propiedad){
+                banca.anhadirPropiedad((Propiedad) c);
+            }
+        }
 
-        Grupo grupoCyan = new Grupo(ladoSur.get(1), ladoSur.get(2), ladoSur.get(4), "cian");
-        ladoSur.get(1).setGrupo(grupoCyan); ladoSur.get(2).setGrupo(grupoCyan); ladoSur.get(4).setGrupo(grupoCyan);
+        Grupo grupoCyan = new Grupo("cian",(Propiedad) ladoSur.get(1), (Propiedad) ladoSur.get(2), (Propiedad) ladoSur.get(4));
+        ((Propiedad) ladoSur.get(1)).setGrupo(grupoCyan); ((Propiedad) ladoSur.get(2)).setGrupo(grupoCyan); ((Propiedad) ladoSur.get(4)).setGrupo(grupoCyan);
         grupos.put("cian", grupoCyan);
 
-        Grupo grupoBlack = new Grupo(ladoSur.get(7), ladoSur.get(9), "negro");
-        ladoSur.get(7).setGrupo(grupoBlack); ladoSur.get(9).setGrupo(grupoBlack);
+        Grupo grupoBlack = new Grupo("negro", (Propiedad) ladoSur.get(7), (Propiedad) ladoSur.get(9));
+        ((Propiedad) ladoSur.get(7)).setGrupo(grupoBlack); ((Propiedad) ladoSur.get(9)).setGrupo(grupoBlack);
         grupos.put("negro", grupoBlack);
 
         posiciones.add(ladoSur);
@@ -209,21 +226,25 @@ public class Tablero {
         ladoOeste.add(new Servicios(Valor.WHITE + "Serv1" + Valor.RESET, 12, 500000, banca));
         ladoOeste.add(new Solar(Valor.PURPLE + "Solar6" + Valor.RESET, 11, 1400000, 700000, 100000, 1000000, 1000000, 200000, 400000, 1500000, 7500000, 1500000, 1500000, banca, null));
 
-        for (Casilla c : ladoOeste) banca.anhadirPropiedad(c);
+        for (Casilla c : ladoOeste){
+            if (c instanceof Propiedad) {
+                banca.anhadirPropiedad((Propiedad) c);
+            }
+        }
 
-        Grupo grupoOrange = new Grupo(ladoOeste.get(0), ladoOeste.get(1), ladoOeste.get(3), "naranja");
-        ladoOeste.get(0).setGrupo(grupoOrange); ladoOeste.get(1).setGrupo(grupoOrange); ladoOeste.get(3).setGrupo(grupoOrange);
+        Grupo grupoOrange = new Grupo("naranja", (Propiedad) ladoOeste.get(0), (Propiedad) ladoOeste.get(1), (Propiedad) ladoOeste.get(3));
+        ((Propiedad) ladoOeste.get(0)).setGrupo(grupoOrange); ((Propiedad) ladoOeste.get(1)).setGrupo(grupoOrange); ((Propiedad) ladoOeste.get(3)).setGrupo(grupoOrange);
         grupos.put("naranja", grupoOrange);
 
-        Grupo grupoPurple = new Grupo(ladoOeste.get(5), ladoOeste.get(6), ladoOeste.get(8), "morado");
-        ladoOeste.get(5).setGrupo(grupoPurple); ladoOeste.get(6).setGrupo(grupoPurple); ladoOeste.get(8).setGrupo(grupoPurple);
+        Grupo grupoPurple = new Grupo("morado", (Propiedad) ladoOeste.get(5), (Propiedad) ladoOeste.get(6), (Propiedad) ladoOeste.get(8));
+        ((Propiedad) ladoOeste.get(5)).setGrupo(grupoPurple); ((Propiedad) ladoOeste.get(6)).setGrupo(grupoPurple); ((Propiedad) ladoOeste.get(8)).setGrupo(grupoPurple);
         grupos.put("morado", grupoPurple);
         posiciones.add(ladoOeste);
     }
 
     private void insertarLadoNorte() {
         ArrayList<Casilla> ladoNorte = new ArrayList<>(11);
-        ladoNorte.add(new Especial(Valor.WHITE + "Parking" + Valor.RESET, 20, banca, this));
+        ladoNorte.add(new Parking(Valor.WHITE + "Parking" + Valor.RESET, 20, banca));
         ladoNorte.add(new Solar(Valor.RED + "Solar12" + Valor.RESET, 21, 2200000, 1100000, 180000, 1500000, 1500000, 300000, 600000, 2200000, 10500000, 2100000, 2100000, banca, null));
         ladoNorte.add(new Suerte(Valor.WHITE + "Suerte" + Valor.RESET, 22, banca));
         ladoNorte.add(new Solar(Valor.RED + "Solar13" + Valor.RESET, 23, 2200000, 1100000, 180000, 1500000, 1500000, 300000, 600000, 2200000, 10500000, 2100000, 2100000, banca, null));
@@ -235,14 +256,18 @@ public class Tablero {
         ladoNorte.add(new Solar(Valor.BROWN + "Solar17" + Valor.RESET, 29, 2800000, 1400000, 240000, 1500000, 1500000, 300000, 600000, 2600000, 12000000, 2400000, 2400000, banca, null));
         ladoNorte.add(new Especial(Valor.WHITE + "IrCarcel" + Valor.RESET, 30, banca, this));
 
-        for (int i=0; i<ladoNorte.size(); i++) if(i!=0 && i!=10) banca.anhadirPropiedad(ladoNorte.get(i));
+        for (Casilla c : ladoNorte) {
+            if (c instanceof Propiedad) {
+                banca.anhadirPropiedad((Propiedad) c);
+            }
+        }
 
-        Grupo grupoRed = new Grupo(ladoNorte.get(1), ladoNorte.get(3), ladoNorte.get(4), "rojo");
-        ladoNorte.get(1).setGrupo(grupoRed); ladoNorte.get(3).setGrupo(grupoRed); ladoNorte.get(4).setGrupo(grupoRed);
+        Grupo grupoRed = new Grupo("rojo", (Propiedad) ladoNorte.get(1), (Propiedad) ladoNorte.get(3), (Propiedad) ladoNorte.get(4));
+        ((Propiedad) ladoNorte.get(1)).setGrupo(grupoRed); ((Propiedad) ladoNorte.get(3)).setGrupo(grupoRed); ((Propiedad) ladoNorte.get(4)).setGrupo(grupoRed);
         grupos.put("rojo", grupoRed);
 
-        Grupo grupoBrown = new Grupo(ladoNorte.get(6), ladoNorte.get(7), ladoNorte.get(9), "marron");
-        ladoNorte.get(6).setGrupo(grupoBrown); ladoNorte.get(7).setGrupo(grupoBrown); ladoNorte.get(9).setGrupo(grupoBrown);
+        Grupo grupoBrown = new Grupo("marron", (Propiedad) ladoNorte.get(6), (Propiedad) ladoNorte.get(7), (Propiedad) ladoNorte.get(9));
+        ((Propiedad) ladoNorte.get(6)).setGrupo(grupoBrown); ((Propiedad) ladoNorte.get(7)).setGrupo(grupoBrown); ((Propiedad) ladoNorte.get(9)).setGrupo(grupoBrown);
         grupos.put("marron", grupoBrown);
         posiciones.add(ladoNorte);
     }
@@ -259,14 +284,18 @@ public class Tablero {
         ladoEste.add(new Impuestos(Valor.WHITE + "Imp2" + Valor.RESET, 38, 2000000, banca));
         ladoEste.add(new Solar(Valor.BLUE + "Solar22" + Valor.RESET, 39, 4000000, 2000000, 500000, 2000000, 2000000, 400000, 800000, 4250000, 20000000, 4000000, 4000000, banca, null));
 
-        for (Casilla c : ladoEste) banca.anhadirPropiedad(c);
+        for (Casilla c : ladoEste) {
+            if (c instanceof Propiedad) {
+                banca.anhadirPropiedad((Propiedad) c);
+            }
+        }
 
-        Grupo grupoGreen = new Grupo(ladoEste.get(0), ladoEste.get(1), ladoEste.get(3), "verde");
-        ladoEste.get(0).setGrupo(grupoGreen); ladoEste.get(1).setGrupo(grupoGreen); ladoEste.get(3).setGrupo(grupoGreen);
+        Grupo grupoGreen = new Grupo("verde", (Propiedad) ladoEste.get(0), (Propiedad) ladoEste.get(1), (Propiedad) ladoEste.get(3));
+        ((Propiedad) ladoEste.get(0)).setGrupo(grupoGreen); ((Propiedad) ladoEste.get(1)).setGrupo(grupoGreen); ((Propiedad) ladoEste.get(3)).setGrupo(grupoGreen);
         grupos.put("verde", grupoGreen);
 
-        Grupo grupoBlue = new Grupo(ladoEste.get(6), ladoEste.get(8), "azul");
-        ladoEste.get(6).setGrupo(grupoBlue); ladoEste.get(8).setGrupo(grupoBlue);
+        Grupo grupoBlue = new Grupo("azul", (Propiedad) ladoEste.get(6), (Propiedad) ladoEste.get(8));
+        ((Propiedad) ladoEste.get(6)).setGrupo(grupoBlue); ((Propiedad) ladoEste.get(8)).setGrupo(grupoBlue);
         grupos.put("azul", grupoBlue);
         posiciones.add(ladoEste);
     }

@@ -8,11 +8,11 @@ import excepciones.accionNoValida.PropiedadNoHipotecadaException;
 import excepciones.accionNoValida.PropiedadYaHipotecadaException;
 import excepciones.objetoNoExiste.PropiedadNoExisteException;
 
-
 // Importamos Juego para poder acceder a la consola, pero lo usamos dentro del wrapper
 import monopoly.Juego;
 import monopoly.casillas.Casilla;
-import monopoly.casillas.Solar;
+import monopoly.casillas.propiedades.Propiedad;
+import monopoly.casillas.propiedades.Solar;
 
 public class Jugador {
 
@@ -24,7 +24,10 @@ public class Jugador {
     private boolean enCarcel;
     private int tiradasCarcel;
     private int vueltas;
-    private ArrayList<Casilla> propiedades;
+
+    // Ahora guardamos Propiedades, no Casillas genéricas
+    private ArrayList<Propiedad> propiedades;
+
     private float dineroInvertido;
     private float pagoTasasEImpuestos;
     private float pagoDeAlquileres;
@@ -36,7 +39,9 @@ public class Jugador {
     //Atributos definidos por mi
     private int posicion;
     private int turnosEnCarcel;
-    private ArrayList<Casilla> hipotecadas;
+
+    // Ahora guardamos Propiedades
+    private ArrayList<Propiedad> hipotecadas;
 
     // Métodos de acumulación de estadísticas
     public void acumularDineroInvertido(float c) { sumarEstadistica("dineroInvertido", c); }
@@ -55,9 +60,9 @@ public class Jugador {
         this.tiradasCarcel=0;
         this.vueltas=0;
         this.enCarcel=false;
-        this.propiedades=new ArrayList<Casilla>();
+        this.propiedades=new ArrayList<>();
         this.posicion=0;
-        this.hipotecadas=new ArrayList<Casilla>();
+        this.hipotecadas=new ArrayList<>();
         this.turnosEnCarcel=0;
         this.avatar=null;
     }
@@ -77,14 +82,16 @@ public class Jugador {
         this.avatar=new Avatar(tipoAvatar,this,inicio,avCreados);
     }
 
-    //Otros métodos:
-    public void anhadirPropiedad(Casilla casilla) {
+    // OTROS METODOS
+
+    // Ahora recibe propiedad
+    public void anhadirPropiedad(Propiedad casilla) {
         if(!propiedades.contains(casilla)){
             propiedades.add(casilla);
         }
     }
-
-    public void eliminarPropiedad(Casilla casilla) {
+    // Ahora recibe propiedad
+    public void eliminarPropiedad(Propiedad casilla) {
         propiedades.remove(casilla);
         hipotecadas.remove(casilla);
     }
@@ -155,22 +162,18 @@ public class Jugador {
         return nombre;
     }
 
-    public void hipotecarPropiedad(Casilla c) throws Excepcion {
-        // 1) Comprobar que la propiedad pertenece a este jugador
-        if (!c.getDuenho().equals(this)) {
+    // Ahora recibe Propiedad
+    public void hipotecarPropiedad(Propiedad c) throws Excepcion {
+        if (!propiedades.contains(c)) {
             throw new PropiedadNoExisteException(
                     nombre + " no puede hipotecar " + c.getNombre() + ". No es una propiedad que le pertenece."
             );
         }
-
-        // 2) Si ya está hipotecada, lanzar la excepcion correcta
-        if (c.isHipotecada() || hipotecadas.contains(c)) {
+        if (c.isHipotecada()) {
             throw new PropiedadYaHipotecadaException(
                     nombre + " no puede hipotecar " + c.getNombre() + ". Ya esta hipotecada."
             );
         }
-
-        // 3) Si es un solar, no puede tener edificios
         if (c instanceof Solar) {
             Solar s = (Solar) c;
             if (!s.getEdificaciones().isEmpty()) {
@@ -179,8 +182,6 @@ public class Jugador {
                 return;
             }
         }
-
-        // 4) Calcular dinero, marcar como hipotecada y moverla de propiedades a hipotecadas
         float cantidad = c.getPrecioHipoteca();
         fortuna += cantidad;
 
@@ -195,9 +196,8 @@ public class Jugador {
         ));
     }
 
-
-
-    public void deshipotecarPropiedad(Casilla c) throws Excepcion {
+    // Ahora recibe Propiedad
+    public void deshipotecarPropiedad(Propiedad c) throws Excepcion {
         if (!c.getDuenho().equals(this)) {
             throw new PropiedadNoExisteException(
                     nombre + " no puede deshipotecar " + c.getNombre() + ". No es una propiedad que le pertenece."
@@ -209,7 +209,6 @@ public class Jugador {
             );
         }
         if (!(c instanceof Solar)) {
-            
             throw new PropiedadNoHipotecadaException(
                     nombre + " no puede deshipotecar " + c.getNombre() + ". Solo los solares son hipotecables."
             );
@@ -222,7 +221,6 @@ public class Jugador {
                     nombre + " no tiene suficiente dinero para deshipotecar " + s.getNombre() + "."
             );
         }
-
         fortuna -= cantidad;
         s.setHipotecada(false);
         propiedades.add(c);
@@ -234,7 +232,6 @@ public class Jugador {
                 c.getGrupo() != null ? c.getGrupo().getColor() : "-"
         ));
     }
-
 
     // Getters y Setters restantes
     public void setAvatar(Avatar nuevoAvatar) { this.avatar = nuevoAvatar; }
@@ -249,11 +246,11 @@ public class Jugador {
     public void setTiradasCarcel(int tiradasCarcel) { this.tiradasCarcel = tiradasCarcel; }
     public int getVueltas() { return vueltas; }
     public void setVueltas() { this.vueltas++; }
-    public ArrayList<Casilla> getPropiedades() { return propiedades; }
+    public ArrayList<Propiedad> getPropiedades() { return propiedades; }
     public int getPosicion() { return posicion; }
     public void setPosicion(int posicion) { this.posicion = posicion; }
     public int getTurnosEnCarcel() { return turnosEnCarcel; }
-    public ArrayList<Casilla> getHipotecadas() { return hipotecadas; }
+    public ArrayList<Propiedad> getHipotecadas() { return hipotecadas; }
 
     private void sumarEstadistica(String campo, float cantidad) {
         if (cantidad <= 0) return;
@@ -270,7 +267,6 @@ public class Jugador {
     // ================================================================
     //   MÉTODOS AUXILIARES PARA ACCESO A CONSOLA
     // ================================================================
-
     /**
      * Método auxiliar para imprimir mensajes usando la interfaz Consola del Juego.
      * Evita tener que escribir Juego.consola.imprimir() cada vez.

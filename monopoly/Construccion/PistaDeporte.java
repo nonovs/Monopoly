@@ -1,6 +1,6 @@
 package monopoly.Construccion;
 
-import monopoly.casillas.Solar;
+import monopoly.casillas.propiedades.Solar;
 
 /**
  * Pista de deporte: require hotel e piscina previas.
