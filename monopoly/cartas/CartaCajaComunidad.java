@@ -129,7 +129,7 @@ public class CartaCajaComunidad extends Carta {
         consola.imprimir(String.format("%s se mueve a %s (pos %d) debido a la carta de Caja de Comunidad.%n",
                 jugador.getNombre(),
                 destino != null ? destino.getNombre() : "desconocida",
-                posFin);
+                posFin));
 
         if (evaluarDestino && destino != null && !destino.esIrACarcel()) {
             boolean ok = destino.evaluarCasilla(jugador, banca, tirada);

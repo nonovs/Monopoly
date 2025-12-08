@@ -24,29 +24,16 @@ public class Menu {
         this.juego = new Juego();
     }
 
-public void iniciarPartida() throws Excepcion {
-    imprimir("Bienvenido al Monopoly");
-    juego.mostrarTablero();
-    imprimir("Introduce comandos. Escribe 'salir' para terminar.\n");
-    try {
-        procesarComandos(); 
-    } catch (PropiedadNoExisteException e) {
-        imprimir("Error: La propiedad indicada no existe.");
-    } catch (JugadorNoExisteException e) {
-        imprimir("Error: El jugador indicado no existe.");
-    } catch (JugadorEnCarcelNoPuedeComprarException e) {
-        imprimir("Error: El jugador en cárcel no puede comprar propiedades.");
-    } catch (PropiedadYaTieneDuenhoException e) {
-        imprimir("Error: La propiedad ya tiene dueño.");
-    } catch (PropiedadYaHipotecadaException e) {
-        imprimir("Error: La propiedad ya está hipotecada.");
-    } catch (PropiedadNoHipotecadaException e) {
-        imprimir("Error: La propiedad no está hipotecada.");
+    public void iniciarPartida() {
+        imprimir("Bienvenido al Monopoly");
+        juego.mostrarTablero();
+        imprimir("Introduce comandos. Escribe 'salir' para terminar.\n");
+        procesarComandos();
     }
-}
 
 
-private void procesarComandos() throws Excepcion {
+
+private void procesarComandos() {
     while (true) {
         String comando = leer("> ");
 
@@ -54,9 +41,33 @@ private void procesarComandos() throws Excepcion {
             imprimir("Fin de la partida.");
             break;
         }
-        analizarComando(comando);
+
+        try {
+        
+            analizarComando(comando);
+
+        } catch (PropiedadNoExisteException e) {
+            imprimir("Error: La propiedad indicada no existe.");
+        } catch (JugadorNoExisteException e) {
+            imprimir("Error: El jugador indicado no existe.");
+        } catch (JugadorEnCarcelNoPuedeComprarException e) {
+            imprimir("Error: El jugador en cárcel no puede comprar propiedades.");
+        } catch (PropiedadYaTieneDuenhoException e) {
+            imprimir("Error: La propiedad ya tiene dueño.");
+        } catch (PropiedadYaHipotecadaException e) {
+            imprimir("Error: La propiedad ya está hipotecada.");
+        } catch (PropiedadNoHipotecadaException e) {
+            imprimir("Error: La propiedad no está hipotecada.");
+        } catch (Excepcion e) {
+            // Cualquier otra excepción propia del juego
+            imprimir("Error: " + e.getMessage());
+        } catch (Exception e) {
+            // Por si se cuela algo no previsto
+            imprimir("Error inesperado: " + e.toString());
+        }
     }
 }
+
 
 
 
