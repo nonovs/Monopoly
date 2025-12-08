@@ -156,16 +156,21 @@ public class Jugador {
     }
 
     public void hipotecarPropiedad(Casilla c) throws Excepcion {
-        if (!propiedades.contains(c)) {
+        // 1) Comprobar que la propiedad pertenece a este jugador
+        if (!c.getDuenho().equals(this)) {
             throw new PropiedadNoExisteException(
                     nombre + " no puede hipotecar " + c.getNombre() + ". No es una propiedad que le pertenece."
             );
         }
-        if (c.isHipotecada()) {
+
+        // 2) Si ya está hipotecada, lanzar la excepcion correcta
+        if (c.isHipotecada() || hipotecadas.contains(c)) {
             throw new PropiedadYaHipotecadaException(
                     nombre + " no puede hipotecar " + c.getNombre() + ". Ya esta hipotecada."
             );
         }
+
+        // 3) Si es un solar, no puede tener edificios
         if (c instanceof Solar) {
             Solar s = (Solar) c;
             if (!s.getEdificaciones().isEmpty()) {
@@ -175,6 +180,7 @@ public class Jugador {
             }
         }
 
+        // 4) Calcular dinero, marcar como hipotecada y moverla de propiedades a hipotecadas
         float cantidad = c.getPrecioHipoteca();
         fortuna += cantidad;
 
@@ -188,6 +194,7 @@ public class Jugador {
                 c.getGrupo() != null ? c.getGrupo().getColor() : "-"
         ));
     }
+
 
 
     public void deshipotecarPropiedad(Casilla c) throws Excepcion {

@@ -51,7 +51,7 @@ private void procesarComandos() {
         } catch (JugadorNoExisteException e) {
             imprimir("Error: El jugador indicado no existe.");
         } catch (JugadorEnCarcelNoPuedeComprarException e) {
-            imprimir("Error: El jugador en cárcel no puede comprar propiedades.");
+            imprimir("Error: El jugador se encuentra en cárcel y no puede comprar propiedades.");
         } catch (PropiedadYaTieneDuenhoException e) {
             imprimir("Error: La propiedad ya tiene dueño.");
         } catch (PropiedadYaHipotecadaException e) {
