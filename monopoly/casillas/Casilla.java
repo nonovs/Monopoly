@@ -4,6 +4,8 @@ import partida.*;
 import monopoly.Grupo;
 import java.util.ArrayList;
 
+import static monopoly.Juego.consola;
+
 /** Representa una posición del tablero.
  * Cada casilla puede tener distinto tipo (solar, servicio...) y este determina cómo se comporta cuando se cae en ella.
  * Es la clase base de la jerarquía de casillas.
@@ -124,7 +126,7 @@ public class Casilla {
      * - Jugador que solicita la compra de la casilla.
      * - Banca del monopoly (es el dueño de las casillas no compradas aún).*/
     public void comprarCasilla(Jugador solicitante, Jugador banca) {
-        System.out.println("Esta casilla no se puede comprar o no tiene comportamiento definido.");
+        consola.imprimir("Esta casilla no se puede comprar o no tiene comportamiento definido.");
     }
 
     /*Método para añadir valor a una casilla. Utilidad:

@@ -73,6 +73,7 @@ private void procesarComandos() throws Excepcion {
                     juego.crearJugador(partes[2], partes[3]);
                 } else {
                     imprimir("Uso: crear jugador <nombre> <tipo_avatar>");
+                    imprimir("Avatares: Coche, Esfinge, Sombrero, Pelota");
                 }
                 break;
 

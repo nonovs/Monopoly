@@ -3,6 +3,8 @@ package monopoly.casillas;
 import monopoly.Menu.*;
 import partida.Jugador;
 
+import static monopoly.Juego.consola;
+
 /**
  * Casilla de impuesto.
  */
@@ -28,7 +30,7 @@ public class Impuestos extends Casilla {
 
             actual.pagar(impuesto);
             setBote(impuesto);
-            System.out.println("El jugador paga "+ (int)impuesto +" € que se depositan en el Parking.");//O cast solo o fixen pa que imprima bonito todo en int's
+            consola.imprimir(String.format("El jugador paga "+ (int)impuesto +" € que se depositan en el Parking."));//O cast solo o fixen pa que imprima bonito todo en int's
             banca.recibir(impuesto);
             return true;
         } else {
@@ -44,7 +46,7 @@ public class Impuestos extends Casilla {
     }
     @Override
     public void comprarCasilla(Jugador solicitante, Jugador banca) {
-        System.out.println("No puedes comprar una casilla de impuestos.");
+        consola.imprimir("No puedes comprar una casilla de impuestos.");
     }
 
     @Override

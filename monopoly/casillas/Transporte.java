@@ -2,6 +2,8 @@ package monopoly.casillas;
 
 import partida.Jugador;
 
+import static monopoly.Juego.consola;
+
 public class Transporte extends Casilla {
 
     private final float valor;
@@ -13,7 +15,6 @@ public class Transporte extends Casilla {
         this.valor = valor;
         this.alquiler = alquiler;
     }
-
 
     @Override
     public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {
@@ -34,13 +35,12 @@ public class Transporte extends Casilla {
             actual.acumularPagoDeAlquileres(alquilerTotal);
             getDuenho().acumularCobroDeAlquileres(alquilerTotal);
             this.sumarAlquilerGenerado(alquiler);
-            System.out.printf("%s paga %.0f a %s por el transporte %s.%n",
-                    actual.getNombre(), alquilerTotal, getDuenho().getNombre(), getNombre());
+            consola.imprimir(String.format("%s paga %.0f a %s por el transporte %s.",
+                    actual.getNombre(), alquilerTotal, getDuenho().getNombre(), getNombre()));
             return true;
         } else {
-            System.out.printf("%s no puede pagar el alquiler de %.0f por %s.%n",
-                    actual.getNombre(), alquilerTotal, getNombre());
-
+            consola.imprimir(String.format("%s no puede pagar el alquiler de %.0f por %s.",
+                    actual.getNombre(), alquilerTotal, getNombre()));
             return false;
         }
     }
@@ -48,17 +48,17 @@ public class Transporte extends Casilla {
     @Override
     public void comprarCasilla(Jugador solicitante, Jugador banca) {
         if (getDuenho() != banca) {
-            System.out.println("Este transporte ya tiene dueño.");
+            consola.imprimir("Este transporte ya tiene dueño.");
             return;
         }
 
         if (solicitante.getPosicion() != this.getPosicion()) {
-            System.out.println("Solo puedes comprar la casilla en la que estás situado.");
+            consola.imprimir("Solo puedes comprar la casilla en la que estás situado.");
             return;
         }
 
         if (solicitante.getFortuna() < getValor()) {
-            System.out.println(solicitante.getNombre() + " no tiene suficiente dinero para comprar " + getNombre());
+            consola.imprimir(solicitante.getNombre() + " no tiene suficiente dinero para comprar " + getNombre());
             return;
         }
 
@@ -67,13 +67,12 @@ public class Transporte extends Casilla {
         setDuenho(solicitante);
         solicitante.anhadirPropiedad(this);
 
-        System.out.printf(
-                "El jugador %s compra el transporte %s por %.0f€. Su fortuna actual es %.0f€.\n",
+        consola.imprimir(String.format(
+                "El jugador %s compra el transporte %s por %.0f€. Su fortuna actual es %.0f€.",
                 solicitante.getNombre(), getNombre(), getValor(), solicitante.getFortuna()
-        );
+        ));
     }
 
-    
     public float getAlquiler() {
         return alquiler;
     }

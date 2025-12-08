@@ -7,6 +7,8 @@ import partida.Jugador;
 
 import java.util.List;
 
+import static monopoly.Juego.consola;
+
 /**
  * Casilla especial: Salida, Carcel, Parking, IrCarcel, ...
  */
@@ -27,11 +29,11 @@ public class Especial extends Casilla {
         switch (pos) {
 
             case 0: // Salida
-                System.out.println(actual.getNombre() + " ha pasado por la salida.");
+                consola.imprimir(actual.getNombre() + " ha pasado por la salida.");
                 return true;
 
             case 10: // Cárcel (visita)
-                System.out.println(actual.getNombre() + " está en la casilla de la cárcel (visita).");
+                consola.imprimir(actual.getNombre() + " está en la casilla de la cárcel (visita).");
                 return true;
 
             case 20: // Parking con bote (entero)
@@ -42,11 +44,11 @@ public class Especial extends Casilla {
                     actual.acumularPremiosInversionesOBote(bote);
                     Impuestos.resetBote();
 
-                    System.out.printf("%s ha recibido %d del Parking gratuito.%n",
-                            actual.getNombre(), bote);
+                    consola.imprimir(String.format("%s ha recibido %d del Parking gratuito.",
+                            actual.getNombre(), bote));
 
                 } else {
-                    System.out.println(actual.getNombre() + " ha caído en Parking (sin bote).");
+                    consola.imprimir(actual.getNombre() + " ha caído en Parking (sin bote).");
                 }
 
                 return true;
@@ -56,21 +58,21 @@ public class Especial extends Casilla {
 
                 if (carcel != null) {
                     actual.enviarACarcel(carcel);
-                    System.out.println(actual.getNombre() + " ha sido enviado a la cárcel.");
+                    consola.imprimir(actual.getNombre() + " ha sido enviado a la cárcel.");
                 } else {
-                    System.out.println("No se pudo encontrar la casilla cárcel en el tablero.");
+                    consola.imprimir("No se pudo encontrar la casilla cárcel en el tablero.");
                 }
                 return true;
 
             default:
-                System.out.println(actual.getNombre() + " ha caído en una casilla especial: " + getNombre());
+                consola.imprimir(actual.getNombre() + " ha caído en una casilla especial: " + getNombre());
                 return true;
         }
     }
 
     @Override
     public void comprarCasilla(Jugador solicitante, Jugador banca) {
-        System.out.println("No puedes comprar una casilla de especial.");
+        consola.imprimir("No puedes comprar una casilla de especial.");
     }
 
     @Override

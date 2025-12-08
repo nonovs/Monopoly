@@ -6,6 +6,8 @@ import partida.Jugador;
 
 import java.util.List;
 
+import static monopoly.Juego.consola;
+
 //hola
 public class CajaComunidad extends Casilla {
 
@@ -31,7 +33,7 @@ public class CajaComunidad extends Casilla {
 
         //Esta funcion lo que hace es robar una carta de Caja de Comunidad y realizar la accion correspondiente
         int carta = siguienteCarta();
-        System.out.printf("%s roba carta de Caja de Comunidad nº %d.%n", actual.getNombre(), carta);
+        consola.imprimir(String.format("%s roba carta de Caja de Comunidad nº %d.%n", actual.getNombre(), carta));
 
         CartaCajaComunidad cartaComunidad = new CartaCajaComunidad(carta);
         return cartaComunidad.accion(tablero, actual, banca, jugadores, tirada);
@@ -39,7 +41,7 @@ public class CajaComunidad extends Casilla {
 
     @Override
     public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {
-        System.out.println(actual.getNombre() + " ha caído en una casilla de Caja de Comunidad.");
+        consola.imprimir(String.format(actual.getNombre() + " ha caído en una casilla de Caja de Comunidad."));
         return true;
     }
 

@@ -7,6 +7,8 @@ import partida.Jugador;
 import java.util.ArrayList;
 import java.util.List;
 
+import static monopoly.Juego.consola;
+
 public class Solar extends Casilla {
 
     // Base
@@ -72,7 +74,7 @@ public class Solar extends Casilla {
 
         //Si está hipotecada, no se cobra alquiler
         if (hipotecado) {
-            System.out.printf("La propiedad %s está hipotecada. No se cobra alquiler.%n", getNombre());
+            consola.imprimir(String.format("La propiedad %s está hipotecada. No se cobra alquiler.", getNombre()));
             return true;
         }
 
@@ -85,12 +87,12 @@ public class Solar extends Casilla {
             actual.acumularPagoDeAlquileres(alquiler);
             getDuenho().acumularCobroDeAlquileres(alquiler);
             this.sumarAlquilerGenerado(alquiler);
-            System.out.printf("%s paga %.0f€ de alquiler a %s por %s.%n",
-                    actual.getNombre(), alquiler, getDuenho().getNombre(), getNombre());
+            consola.imprimir(String.format("%s paga %.0f€ de alquiler a %s por %s.",
+                    actual.getNombre(), alquiler, getDuenho().getNombre(), getNombre()));
 
             return true;
         } else {
-            System.out.println(actual.getNombre() + " no puede pagar el alquiler de " + alquiler);
+            consola.imprimir(actual.getNombre() + " no puede pagar el alquiler de " + alquiler);
             return false;
         }
     }
@@ -99,17 +101,17 @@ public class Solar extends Casilla {
     public void comprarCasilla(Jugador solicitante, Jugador banca) {
         //Verifica que la propiedad no esté ya vendida
         if (getDuenho() != banca) {
-            System.out.println("Este solar ya tiene dueño.");
+            consola.imprimir("Este solar ya tiene dueño.");
             return;
         }
         // Solo se puede comprar si el jugador está sobre la casilla
         if (solicitante.getPosicion() != this.getPosicion()) {
-            System.out.println("Solo puedes comprar la casilla en la que estás situado.");
+            consola.imprimir("Solo puedes comprar la casilla en la que estás situado.");
             return;
         }
         // verifica que el jugador tenga suficiente dinero
         if (solicitante.getFortuna() < getValor()) {
-            System.out.println(solicitante.getNombre() + " no tiene suficiente dinero para comprar " + getNombre());
+            consola.imprimir(solicitante.getNombre() + " no tiene suficiente dinero para comprar " + getNombre());
             return;
         }
         //Efectua la compra
@@ -118,10 +120,10 @@ public class Solar extends Casilla {
         setDuenho(solicitante);
         solicitante.anhadirPropiedad(this);
 
-        System.out.printf(
-                "El jugador %s compra la casilla %s por %.0f€. Su fortuna actual es %.0f€.\n",
+        consola.imprimir(String.format(
+                "El jugador %s compra la casilla %s por %.0f€. Su fortuna actual es %.0f€.",
                 solicitante.getNombre(), getNombre(), getValor(), solicitante.getFortuna()
-        );
+        ));
     }
     //Calcula el alquieler actual de la casilla, teniendo en cuenta edificaciones y grupos
     public float calcularAlquiler() {
@@ -269,8 +271,8 @@ public class Solar extends Casilla {
         if (getDuenho() != null) {
             getDuenho().recibir(devolucion);
 
-            System.out.printf("Se ha demolido la casa %s en %s. %s recibe %.0f€.%n",
-                    casa.getId(), getNombre(), getDuenho().getNombre(), devolucion);
+            consola.imprimir(String.format("Se ha demolido la casa %s en %s. %s recibe %.0f€.",
+                    casa.getId(), getNombre(), getDuenho().getNombre(), devolucion));
         }
 
         // Decrementar el contador de casas
@@ -290,8 +292,8 @@ public class Solar extends Casilla {
         float devolucion = getPrecioHotel() ;
         if (getDuenho() != null) {
             getDuenho().recibir(devolucion);
-            System.out.printf("Se ha demolido el hotel %s en %s. %s recibe %.0f€.%n",
-                    hotel.getId(), getNombre(), getDuenho().getNombre(), devolucion);
+            consola.imprimir(String.format("Se ha demolido el hotel %s en %s. %s recibe %.0f€.",
+                    hotel.getId(), getNombre(), getDuenho().getNombre(), devolucion));
         }
 
         // Marcar que ya no hay hotel
@@ -304,7 +306,7 @@ public class Solar extends Casilla {
                 edificaciones.add(casa);
                 casas++;
             }
-            System.out.printf("Se han añadido 4 casas en %s tras demoler el hotel.%n", getNombre());
+            consola.imprimir(String.format("Se han añadido 4 casas en %s tras demoler el hotel.", getNombre()));
         }
 
         return true;
@@ -319,8 +321,8 @@ public class Solar extends Casilla {
         float devolucion = getPrecioPiscina();
         if (getDuenho() != null) {
             getDuenho().recibir(devolucion);
-            System.out.printf("Se ha demolido la piscina %s en %s. %s recibe %.0f€.%n",
-                    piscina.getId(), getNombre(), getDuenho().getNombre(), devolucion);
+            consola.imprimir(String.format("Se ha demolido la piscina %s en %s. %s recibe %.0f€.",
+                    piscina.getId(), getNombre(), getDuenho().getNombre(), devolucion));
         }
 
         // Marcar que ya no hay piscina
@@ -338,8 +340,8 @@ public class Solar extends Casilla {
         float devolucion =  getPrecioPista();
         if (getDuenho() != null) {
             getDuenho().recibir(devolucion);
-            System.out.printf("Se ha demolido la pista de deporte %s en %s. %s recibe %.0f€.%n",
-                    pista.getId(), getNombre(), getDuenho().getNombre(), devolucion);
+            consola.imprimir(String.format("Se ha demolido la pista de deporte %s en %s. %s recibe %.0f€.",
+                    pista.getId(), getNombre(), getDuenho().getNombre(), devolucion));
         }
 
         // Marcar que ya no hay pista

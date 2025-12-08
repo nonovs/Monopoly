@@ -36,21 +36,6 @@ public abstract class Carta {
         return descripcion;
     }
 
-    /**
-     * Ejecuta la acción asociada a la carta.
-     *
-     * @param tablero   Tablero de juego.
-     * @param actual    Jugador al que se aplica la carta.
-     * @param banca     Jugador que representa a la banca.
-     * @param jugadores Lista de jugadores de la partida (para cartas que afectan a varios).
-     * @param tirada    Tirada de dados que ha llevado al jugador a la casilla.
-     *
-     * @return true si el jugador sigue siendo solvente tras aplicar la carta,
-     *         false si no puede hacer frente a los pagos (deuda/bancarrota).
-     */
-    public abstract boolean accion(Tablero tablero,
-                                   Jugador actual,
-                                   Jugador banca,
-                                   List<Jugador> jugadores,
-                                   int tirada);
+
+    public abstract boolean accion(Tablero tablero, Jugador actual, Jugador banca, List<Jugador> jugadores, int tirada);
 }

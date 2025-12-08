@@ -1,39 +1,43 @@
-crear jugador antonio pelota
-lanzar dados 4+2
-comprar solar3
+crear jugador Ana coche
+crear jugador Luis sombrero
+
+# --- Fase de compra (Setup) ---
+mover Solar1
+comprar Solar1
+mover Solar2
+comprar Solar2
 acabar turno
-lanzar dados 2+1
-comprar solar5
+
+mover Solar10
+comprar Solar10
+mover Solar11
+comprar Solar11
 acabar turno
-lanzar dados 6+5
+
+# --- Turno de Ana: Proponer ---
+trato Luis: cambiar (Solar1, Solar10)
+trato Luis: cambiar (Solar2, 500000)
+trato Luis: cambiar (Solar2 y 100000, Solar11)
+
+# Pruebas de error (opcionales)
+trato Luis: cambiar (Solar20, Solar10)
+trato Luis: cambiar (Solar1, Solar20)
+
+listar tratos
+
+# IMPORTANTE: Ana debe gastar su movimiento para poder acabar turno
+mover Solar3
 acabar turno
-lanzar dados 6+5
-acabar turno
-lanzar dados 6+5
-acabar turno
-lanzar dados 5+1
-comprar solar4
-edificar casa
-edificar casa
-edificar casa
-edificar casa
-describir solar4
+
+# --- Turno de Luis: Aceptar ---
+# Ahora SÍ es el turno de Luis
+listar tratos
+
+# Luis acepta el trato 1 (Solar1 x Solar10)
+aceptar trato trato1
+
+# Luis acepta el trato 2 (Solar2 x 500.000)
+aceptar trato trato2
+
+# Verificamos que las propiedades han cambiado de manos
 listar jugadores
-edificar hotel
-edificar casa
-edificar casa
-listar edificios
-describir jugador antonio
-listar jugadores
-vender casas solar4 1
-vender hoteles solar4
-crear jugador juan coche
-acabar turno
-lanzar dados 4+4
-estadisticas antonio
-estadisticas juan
-lanzar dados 6+6
-lanzar dados 3+3
-estadisticas juan
-estadisticas
-lanzar dados 6+6

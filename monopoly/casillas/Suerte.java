@@ -8,6 +8,8 @@ import partida.Jugador;
 
 import java.util.List;
 
+import static monopoly.Juego.consola;
+
 
 public class Suerte extends Casilla {
 
@@ -33,7 +35,7 @@ public class Suerte extends Casilla {
                                 List<Jugador> jugadores, int tirada) {
 
         int carta = siguienteCarta();
-        System.out.printf("%s roba carta de Suerte nº %d.%n", actual.getNombre(), carta);
+        consola.imprimir(String.format("%s roba carta de Suerte nº %d.%n", actual.getNombre(), carta));
 
         // Delegamos la logica en la carta correspondiente
         CartaSuerte cartaSuerte = new CartaSuerte(carta);
@@ -42,14 +44,14 @@ public class Suerte extends Casilla {
 
     @Override
     public boolean evaluarCasilla(Jugador actual, Jugador banca, int tirada) {
-        System.out.printf("%s ha caído en una casilla de Suerte.%n", actual.getNombre());
+        consola.imprimir(String.format("%s ha caído en una casilla de Suerte.%n", actual.getNombre()));
         return true;
     }
 
     @Override
     public void comprarCasilla(Jugador solicitante, Jugador banca) {
         // No se puede comprar una casilla de suerte
-        System.out.printf("La casilla %s no se puede comprar.%n", getNombre());
+       consola.imprimir(String.format("La casilla %s no se puede comprar.%n", getNombre()));
     }
 
     @Override
