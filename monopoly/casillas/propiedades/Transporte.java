@@ -60,4 +60,12 @@ public class Transporte extends Propiedad {
 
     // NUEVO MÉTODO NECESARIO PARA CARTA SUERTE
     public float getAlquilerBase() { return alquilerBase;}
+
+    @Override
+    public String casEnVenta() {
+        if (getDuenho() != null && !"Banca".equalsIgnoreCase(getDuenho().getNombre())){
+            return "";
+        }
+        return String.format("{\n  tipo: transporte,\n  valor: %.0f\n}", valor);
+    }
 }

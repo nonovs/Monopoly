@@ -414,26 +414,104 @@ public class Juego implements Comando {
                 Solar s = (Solar) c;
                 for (Edificio e : s.getEdificaciones()) {
                     hay = true;
-                    consola.imprimir(String.format("{id: %s, solar: %s, coste: %.0f}", e.getId(), s.getNombre(), e.getPrecio()));
+                    // Obtenemos el grupo de forma segura
+                    String nombreGrupo = (s.getGrupo() != null) ? s.getGrupo().getColor() : "sin grupo";
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("{\n");
+                    sb.append("  id: ").append(e.getId()).append(",\n");
+                    sb.append("  propietario: ").append(s.getDuenho().getNombre()).append(",\n");
+                    sb.append("  casilla: ").append(s.getNombre()).append(",\n");
+                    sb.append("  grupo: ").append(nombreGrupo).append(",\n");
+                    sb.append(String.format("  coste: %.0f\n", e.getPrecio()));
+                    sb.append("}");
+                    consola.imprimir(sb.toString());
                 }
             }
         }
-        if(!hay) consola.imprimir("No hay edificios.");
+        if (!hay) consola.imprimir("No hay edificios construidos en el tablero.");
     }
 
     @Override
     public void listarEdificiosGrupo(String colorGrupo) {
-        boolean hay = false;
+        ArrayList<Solar> solaresGrupo = new ArrayList<>();
+        // 1. Buscar los solares del grupo
         for (Casilla c : tablero.getCasillas()) {
             if (c instanceof Solar) {
                 Solar s = (Solar) c;
-                if(s.getGrupo() != null && s.getGrupo().getColor().equalsIgnoreCase(colorGrupo) && !s.getEdificaciones().isEmpty()){
-                    hay = true;
-                    consola.imprimir(s.getNombre() + ": " + s.getEdificaciones().size() + " edificios.");
+                if (s.getGrupo() != null && s.getGrupo().getColor().equalsIgnoreCase(colorGrupo)) {
+                    solaresGrupo.add(s);
                 }
             }
         }
-        if(!hay) consola.imprimir("No hay edificios en el grupo " + colorGrupo);
+        if (solaresGrupo.isEmpty()) {
+            consola.imprimir("No se ha encontrado el grupo " + colorGrupo + " o no tiene solares.");
+            return;
+        }
+        // 2. Imprimir información de cada propiedad
+        for (Solar s : solaresGrupo) {
+            List<String> hoteles = new ArrayList<>();
+            List<String> casas = new ArrayList<>();
+            List<String> piscinas = new ArrayList<>();
+            List<String> pistas = new ArrayList<>();
+
+            for (Edificio e : s.getEdificaciones()) {
+                if (e instanceof monopoly.Construccion.Hotel) hoteles.add(e.getId());
+                else if (e instanceof monopoly.Construccion.Casa) casas.add(e.getId());
+                else if (e instanceof monopoly.Construccion.Piscina) piscinas.add(e.getId());
+                else if (e instanceof monopoly.Construccion.PistaDeporte) pistas.add(e.getId());
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("{\n");
+            sb.append("  propiedad: ").append(s.getNombre()).append(",\n");
+
+            sb.append("  hoteles: ").append(hoteles.isEmpty() ? "-" : listToString(hoteles)).append(",\n");
+            sb.append("  casas: ").append(casas.isEmpty() ? "-" : listToString(casas)).append(",\n");
+            sb.append("  piscinas: ").append(piscinas.isEmpty() ? "-" : listToString(piscinas)).append(",\n");
+            sb.append("  pistasDeDeporte: ").append(pistas.isEmpty() ? "-" : listToString(pistas)).append(",\n");
+
+            // Calculamos el alquiler actual
+            sb.append(String.format("  alquiler: %.0f\n", s.calcularAlquilerNumerico()));
+            sb.append("}");
+            consola.imprimir(sb.toString());
+        }
+        // 3. Generar mensaje de resumen de construcción
+        // Comprobamos la capacidad general basándonos en si algún solar permite construir X
+        boolean puedeCasa = false;
+        boolean puedeHotel = false;
+        boolean puedePiscina = false;
+        boolean puedePista = false;
+
+        for (Solar s : solaresGrupo) {
+            if (s.getCasas() < 4 && !s.hasHotel()) puedeCasa = true;
+            if (s.getCasas() == 4 && !s.hasHotel()) puedeHotel = true;
+            if (s.hasHotel() && !s.hasPiscina()) puedePiscina = true;
+            if (s.hasHotel() && s.hasPiscina() && !s.hasPistaDeporte()) puedePista = true;
+        }
+        List<String> siSePuede = new ArrayList<>();
+        if (puedeCasa) siSePuede.add("casas");
+        if (puedeHotel) siSePuede.add("hoteles");
+        if (puedePiscina) siSePuede.add("piscinas");
+        if (puedePista) siSePuede.add("pistas de deporte");
+
+        List<String> noSePuede = new ArrayList<>();
+        if (!puedeCasa) noSePuede.add("casas");
+        if (!puedeHotel) noSePuede.add("hoteles");
+        if (!puedePiscina) noSePuede.add("piscinas");
+        if (!puedePista) noSePuede.add("pistas de deporte");
+
+        consola.imprimir("\nRESUMEN DE CONSTRUCCIÓN:");
+        if (!siSePuede.isEmpty()) {
+            consola.imprimir("Aún se pueden edificar: " + String.join(", ", siSePuede) + ".");
+        }
+        if (!noSePuede.isEmpty()) {
+            consola.imprimir("Ya no se pueden construir: " + String.join(", ", noSePuede) + ".");
+        }
+    }
+    // Pequeño helper para formatear listas [elem1, elem2]
+    private String listToString(List<String> lista) {
+        return "[" + String.join(", ", lista) + "]";
     }
 
     @Override
@@ -702,12 +780,58 @@ public class Juego implements Comando {
     }
 
     private void descJugadorInterno(Jugador j) {
-        String av = (j.getAvatar() != null) ? j.getAvatar().getId() : "-";
-        List<String> props = new ArrayList<>();
-        for (Casilla c : j.getPropiedades()) props.add(c.getNombre());
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        sb.append("  nombre: ").append(j.getNombre()).append(",\n");
+        sb.append("  avatar: ").append(j.getAvatar() != null ? j.getAvatar().getId() : "-").append(",\n");
+        sb.append(String.format("  fortuna: %.0f,\n", j.getFortuna()));
 
-        consola.imprimir(String.format("{nombre: %s, avatar: %s, fortuna: %.0f, propiedades: %s}",
-                j.getNombre(), av, j.getFortuna(), props));
+        // Formatear Propiedades
+        sb.append("  propiedades: ");
+        if (j.getPropiedades().isEmpty()) {
+            sb.append("-\n");
+        } else {
+            sb.append("[");
+            for (int i = 0; i < j.getPropiedades().size(); i++) {
+                sb.append(j.getPropiedades().get(i).getNombre());
+                if (i < j.getPropiedades().size() - 1) sb.append(", ");
+            }
+            sb.append("]\n");
+        }
+        // Formatear Hipotecas
+        sb.append("  hipotecas: ");
+        if (j.getHipotecadas().isEmpty()) {
+            sb.append("-\n");
+        } else {
+            sb.append("[");
+            for (int i = 0; i < j.getHipotecadas().size(); i++) {
+                sb.append(j.getHipotecadas().get(i).getNombre());
+                if (i < j.getHipotecadas().size() - 1) sb.append(", ");
+            }
+            sb.append("]\n");
+        }
+        // Formatear Edificios (Recopilarlos de todos los solares)
+        List<String> edificiosIds = new ArrayList<>();
+        for (Propiedad p : j.getPropiedades()) {
+            if (p instanceof Solar) {
+                for (Edificio e : ((Solar) p).getEdificaciones()) {
+                    edificiosIds.add(e.getId());
+                }
+            }
+        }
+        sb.append("  edificios: ");
+        if (edificiosIds.isEmpty()) {
+            sb.append("-\n");
+        } else {
+            sb.append("[");
+            for (int i = 0; i < edificiosIds.size(); i++) {
+                sb.append(edificiosIds.get(i));
+                if (i < edificiosIds.size() - 1) sb.append(", ");
+            }
+            sb.append("]\n");
+        }
+        sb.append("}");
+        consola.imprimir(sb.toString());
     }
 
     private boolean validarTurno() {

@@ -55,4 +55,12 @@ public class Servicios extends Propiedad {
 
         return alquiler(actual, tirada);
     }
+
+    @Override
+    public String casEnVenta() {
+        if (getDuenho() != null && !"Banca".equalsIgnoreCase(getDuenho().getNombre())){
+            return "";
+        }
+        return String.format("{\n  tipo: servicio,\n  valor: %.0f\n}", valor);
+    }
 }

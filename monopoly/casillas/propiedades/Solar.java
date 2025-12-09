@@ -340,6 +340,15 @@ public class Solar extends Propiedad {
         return true;
     }
 
+    @Override
+    public String casEnVenta() {
+        if (getDuenho() != null && !"Banca".equalsIgnoreCase(getDuenho().getNombre())){
+            return "";
+        }
+        String colorGrupo = (getGrupo() != null) ? getGrupo().getColor() : "-";
+        return String.format("{\n  tipo: solar,\n  grupo: %s,\n  valor: %.0f\n}", colorGrupo, valor);
+    }
+
     // Getters de precios para uso externo si fuera necesario
     public float getPrecioCasa() { return precioCasa; }
     public float getPrecioHotel() { return precioHotel; }
