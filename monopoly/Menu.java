@@ -214,8 +214,9 @@ private void procesarComandos() {
                 break;
 
             case "aceptar":
-                if (partes.length >= 3 && partes[1].equalsIgnoreCase("trato")) {
-                    juego.aceptarTrato(partes[2]);
+                if (partes.length == 2) {
+                    juego.aceptarTrato(partes[1]);
+
                 } else {
                     imprimir("Uso: aceptar trato <id>");
                 }

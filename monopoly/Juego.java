@@ -287,7 +287,8 @@ public class Juego implements Comando {
 
         List<Edificio> aVender = new ArrayList<>();
         for(Edificio e : s.getEdificaciones()) {
-            String t = e.getTipo().toLowerCase();
+            // MODIFICACIÓN: Asegurar que cogemos el tipo correcto de forma segura
+            String t = e.getClass().getSimpleName().toLowerCase();
             if(t.contains(tipoNorm)) aVender.add(e);
         }
 
@@ -296,14 +297,20 @@ public class Juego implements Comando {
             return;
         }
 
-        float total = 0;
+        // MODIFICACIÓN: Contamos los vendidos para el mensaje final
+        int vendidosReales = 0;
         for(int i=0; i<cantidad; i++) {
             Edificio e = aVender.get(i);
-            boolean resultado=eliminarEdificio(e);
-
+            // gestorEdificaciones -> Solar -> paga dinero -> elimina de lista
+            if (eliminarEdificio(e)) {
+                vendidosReales++;
+            }
         }
-       // actual.sumarFortuna(total);
-        //consola.imprimir(String.format("Vendidos %d %s. Recibes %.0f.", cantidad, tipoNorm, total));
+
+        // MODIFICACIÓN: Imprimimos confirmación (el dinero ya lo notificó Solar)
+        if (vendidosReales > 0) {
+            consola.imprimir(String.format("Has vendido %d %s(s) en %s.", vendidosReales, tipoNorm, solarNombre));
+        }
     }
 
     @Override
@@ -713,32 +720,47 @@ public class Juego implements Comando {
 
     //Espacio de tratos
     @Override
-    public void proponerTrato(String nombreDestinatario,String[] elementos){
-        if (jugadores.isEmpty()){
+    public void proponerTrato(String nombreDestinatario, String[] elementos) {
+        if (jugadores.isEmpty()) {
             consola.imprimir("No hay jugadores.");
             return;
         }
 
-        Jugador jugador1=getJugadorActual();
+        Jugador jugador1 = getJugadorActual();
 
-        Jugador jugador2=null;
-        for(Jugador j:jugadores){
-            if(j.getNombre().equalsIgnoreCase(nombreDestinatario)){
-                jugador2=j;
+        // 1. LIMPIEZA: Quitamos los dos puntos (:) y espacios extra
+        String nombreLimpio = nombreDestinatario.replace(":", "").trim();
+
+        Jugador jugador2 = null;
+        for (Jugador j : jugadores) {
+            // Comparamos usando el nombre limpio
+            if (j.getNombre().equalsIgnoreCase(nombreLimpio)) {
+                jugador2 = j;
                 break;
             }
         }
-        if(jugador2==null) {consola.imprimir("Jugador no encontrado.");return;}
-        if (jugador2==jugador1){ consola.imprimir("No puedes hacer tratos con tigo mismo.");return;}
-        try{
-            Trato trato= separarTrato(jugador1,jugador2,elementos);
+
+        // 2. VALIDACIONES
+        if (jugador2 == null) {
+            consola.imprimir("El jugador '" + nombreLimpio + "' no existe.");
+            return;
+        }
+
+        if (jugador2 == jugador1) {
+            consola.imprimir("No puedes hacer tratos contigo mismo."); // Corregido 'tigo'
+            return;
+        }
+
+        try {
+            Trato trato = separarTrato(jugador1, jugador2, elementos);
             trato.validarTrato();
             tratosActivos.add(trato);
+            // Confirmación visual
+            consola.imprimir("Trato registrado con ID: " + trato.getId());
             consola.imprimir(trato.toString());
 
-        }catch (Exception e){
+        } catch (Exception e) {
             consola.imprimir("Error al proponer trato: " + e.getMessage());
-
         }
     }
 
