@@ -842,51 +842,98 @@ public class Juego implements Comando {
     }
 
 
-    //Espacio de tratos
-    @Override
-    public void proponerTrato(String nombreDestinatario, String[] elementos) {
-        if (jugadores.isEmpty()) {
-            consola.imprimir("No hay jugadores.");
-            return;
-        }
+  //espacio de tratos
+  @Override
+  public void proponerTrato(String nombreDestinatario, String[] elementos) {
+      if (jugadores.isEmpty()) {
+          consola.imprimir("No hay jugadores.");
+          return;
+      }
 
-        Jugador jugador1 = getJugadorActual();
+      Jugador jugador1 = getJugadorActual(); // El que está en turno (el que PROPONE)
 
-        // 1. LIMPIEZA: Quitamos los dos puntos (:) y espacios extra
-        String nombreLimpio = nombreDestinatario.replace(":", "").trim();
+      // 1. LIMPIEZA: Quitamos los dos puntos (:) y espacios extra
+      String nombreLimpio = nombreDestinatario.replace(":", "").trim();
 
-        Jugador jugador2 = null;
-        for (Jugador j : jugadores) {
-            // Comparamos usando el nombre limpio
-            if (j.getNombre().equalsIgnoreCase(nombreLimpio)) {
-                jugador2 = j;
-                break;
+      // 2. BUSCAR al jugador destinatario (el OTRO jugador)
+      Jugador jugador2 = null;
+      for (Jugador j : jugadores) {
+          if (j.getNombre().equalsIgnoreCase(nombreLimpio)) {
+              jugador2 = j;
+              break;
+          }
+      }
+
+      // 3. VALIDACIONES
+      if (jugador2 == null) {
+          consola.imprimir("El jugador '" + nombreLimpio + "' no existe.");
+          return;
+      }
+
+      // ESTA ES LA VALIDACIÓN CORRECTA:
+      if (jugador2 == jugador1) {
+          consola.imprimir("No puedes hacer tratos contigo mismo.");
+          return;
+      }
+
+      try {
+          // Crear el trato:  jugador1 ofrece elementos[0], jugador2 ofrece elementos[1]
+          Trato trato = separarTrato(jugador1, jugador2, elementos);
+          trato.validarTrato();
+          tratosActivos.add(trato);
+
+          // Confirmación visual al estilo de la especificación
+          String mensaje = construirMensajeTrato(nombreLimpio, elementos);
+          consola.imprimir(mensaje);
+          consola.imprimir("Trato registrado con ID: " + trato.getId());
+
+      } catch (Exception e) {
+          consola.imprimir("Error al proponer trato: " + e. getMessage());
+      }
+  }
+
+    /**
+     * Construye el mensaje de confirmación del trato según la especificación
+     */
+    private String construirMensajeTrato(String nombreDestinatario, String[] elementos) {
+        String parte1 = elementos[0]. trim();
+        String parte2 = elementos[1].trim();
+
+        return nombreDestinatario + ", ¿te doy " + parte1 + " y tú me das " + parte2 + "?";
+    }
+    /**
+     * Busca el dueño de una propiedad mencionada en un texto
+     */
+    private Jugador buscarDuenhoEnTexto(String texto, Jugador jugadorActual) {
+        // Si contiene "y", separar
+        String[] partes = texto.contains(" y ") ? texto.split(" y ") : new String[]{texto};
+
+        for (String parte : partes) {
+            parte = parte.trim();
+
+            // Intentar parsear como número (dinero)
+            try {
+                Float. parseFloat(parte);
+                continue; // Es dinero, no propiedad
+            } catch (NumberFormatException e) {
+                // No es número, podría ser propiedad
+                Casilla casilla = tablero.encontrar_casilla(parte);
+
+                if (casilla instanceof Propiedad) {
+                    Propiedad prop = (Propiedad) casilla;
+                    Jugador duenho = prop. getDuenho();
+
+                    // Debe tener dueño y no ser la banca ni el jugador actual
+                    if (duenho != null && duenho != banca && duenho != jugadorActual) {
+                        return duenho;
+                    }
+                }
             }
         }
 
-        // 2. VALIDACIONES
-        if (jugador2 == null) {
-            consola.imprimir("El jugador '" + nombreLimpio + "' no existe.");
-            return;
-        }
-
-        if (jugador2 == jugador1) {
-            consola.imprimir("No puedes hacer tratos contigo mismo."); // Corregido 'tigo'
-            return;
-        }
-
-        try {
-            Trato trato = separarTrato(jugador1, jugador2, elementos);
-            trato.validarTrato();
-            tratosActivos.add(trato);
-            // Confirmación visual
-            consola.imprimir("Trato registrado con ID: " + trato.getId());
-            consola.imprimir(trato.toString());
-
-        } catch (Exception e) {
-            consola.imprimir("Error al proponer trato: " + e.getMessage());
-        }
+        return null;
     }
+
 
     private Trato separarTrato(Jugador jugador1, Jugador jugador2, String[] elementos) {
         String parte1 = elementos[0].trim();

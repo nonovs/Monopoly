@@ -222,8 +222,8 @@ private void procesarComandos() {
                 }
                 break;
             case "eliminar":
-                if (partes.length >= 3 && partes[1].equalsIgnoreCase("trato")) {
-                    juego.eliminarTrato(partes[2]);
+                if (partes.length >= 3 && partes[1].equalsIgnoreCase("trato")|| partes.length==2) {
+                    juego.eliminarTrato(partes[1]);
                 } else {
                     imprimir("Uso: eliminar trato <id>");
                 }
