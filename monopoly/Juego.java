@@ -299,10 +299,11 @@ public class Juego implements Comando {
         float total = 0;
         for(int i=0; i<cantidad; i++) {
             Edificio e = aVender.get(i);
-            if(eliminarEdificio(e)) total += e.getPrecio() / 2;
+            boolean resultado=eliminarEdificio(e);
+
         }
-        actual.sumarFortuna(total);
-        consola.imprimir(String.format("Vendidos %d %s. Recibes %.0f.", cantidad, tipoNorm, total));
+       // actual.sumarFortuna(total);
+        //consola.imprimir(String.format("Vendidos %d %s. Recibes %.0f.", cantidad, tipoNorm, total));
     }
 
     @Override

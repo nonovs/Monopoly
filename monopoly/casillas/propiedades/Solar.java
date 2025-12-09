@@ -299,14 +299,14 @@ public class Solar extends Propiedad {
         // Marcar que ya no hay hotel
         this.hotel = false;
         // Volver a añadir 4 casas al demoler un hotel
-        if (casas + 4 <= 4) {
+        /*if (casas + 4 <= 4) {
             for (int i = 0; i < 4; i++) {
                 Casa casa = new Casa(this, getPrecioCasa());
                 edificaciones.add(casa);
                 casas++;
             }
             consola.imprimir(String.format("Se han añadido 4 casas en %s tras demoler el hotel.", getNombre()));
-        }
+        }*/
         return true;
     }
 
